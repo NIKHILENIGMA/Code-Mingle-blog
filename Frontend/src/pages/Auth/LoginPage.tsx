@@ -1,6 +1,5 @@
 import { Button } from "@/components";
-import { EmailInput } from "@/features/auth/components/EmailInput";
-import PasswordInput from "@/features/auth/components/PasswordInput";
+import { LoginInput } from "@/features/auth/components/LoginInput";
 import { useLoginForm } from "@/features/auth/hooks/useLoginForm";
 
 function LoginPage(): JSX.Element {
@@ -15,9 +14,23 @@ function LoginPage(): JSX.Element {
         className="flex flex-col w-2/3 h-1/2"
       >
         {/* Email field */}
-        <EmailInput register={register} error={errors?.email} />
+        <LoginInput
+          type="email"
+          label="Email"
+          placeholder="Enter your email"
+          name="email"
+          register={register}
+          error={errors?.email}
+        />
         {/* Password field */}
-        <PasswordInput register={register} error={errors?.password} />
+        <LoginInput
+          type="password"
+          label="Password"
+          placeholder="Enter your password"
+          name="password"
+          register={register}
+          error={errors?.password}
+        />
         <div>
           <Button disabled={isSubmitting} type="submit">
             {isSubmitting ? "Loading....." : "Login"}
