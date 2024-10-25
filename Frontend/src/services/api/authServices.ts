@@ -7,6 +7,20 @@ type RegisterData = {
   password: string;
 };
 
+export const signup = async (userData: RegisterData) => {
+  try {
+    const response = await apiInstance.post("/api/register", userData);
+
+    if (response.status !== 200) {
+      throw new Error("Failed to register");
+    }
+
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 export const login = async (email: string, password: string) => {
   try {
     const response = await apiInstance.post("/api/login", {
@@ -16,20 +30,6 @@ export const login = async (email: string, password: string) => {
 
     if (response.status !== 200) {
       throw new Error("Failed to login");
-    }
-
-    return response.data;
-  } catch (error) {
-    console.error(error);
-  }
-};
-
-export const register = async (data: RegisterData) => {
-  try {
-    const response = await apiInstance.post("/api/register", data);
-
-    if (response.status !== 200) {
-      throw new Error("Failed to register");
     }
 
     return response.data;
@@ -65,3 +65,17 @@ export const refreshToken = async (): Promise<unknown> => {
     console.error(error);
   }
 };
+
+export const resetPassword = async (email: string) => {
+  try {
+    const response = await apiInstance.post("/api/reset-password", { email });
+
+    if (response.status !== 200) {
+      throw new Error("Failed to reset password");
+    }
+
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+}
