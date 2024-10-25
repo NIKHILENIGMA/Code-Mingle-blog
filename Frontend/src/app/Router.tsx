@@ -2,18 +2,43 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import HomePage from "../pages/HomePage";
 import React from "react";
 import AboutPage from "../pages/AboutPage";
-import NotFoundPage from "../pages/NotFoundPage";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <HomePage />,
-    errorElement: <NotFoundPage />,
   },
   {
     path: "/about",
     element: <AboutPage />,
-    errorElement: <NotFoundPage />
+  },
+  {
+    path: "/login",
+    lazy: async () => {
+      const LoginPage = (await import("@/pages/Auth/LoginPage")).default;
+      return {
+        element: <LoginPage />,
+      };
+    },
+  },
+  {
+    path: "/forgot-password",
+    lazy: async () => {
+      const ResetPasswordPage = (await import("@/pages/Auth/ResetPasswordPage"))
+        .default;
+      return {
+        element: <ResetPasswordPage />,
+      };
+    }
+  },
+  {
+    path: "/signup",
+    lazy: async () => {
+      const SignupPage = (await import("@/pages/Auth/SignupPage")).default;
+      return {
+        element: <SignupPage />,
+      };
+    },
   },
   {
     path: "*",
@@ -22,14 +47,12 @@ const router = createBrowserRouter([
       return {
         element: <NotFoundPage />,
       };
-    }
-  }
+    },
+  },
 ]);
 
-
-
 const AppRouter: React.FC = () => {
-    return <RouterProvider router={router}/>
-}
+  return <RouterProvider router={router} />;
+};
 
 export default AppRouter;
