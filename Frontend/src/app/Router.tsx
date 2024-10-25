@@ -13,6 +13,28 @@ const router = createBrowserRouter([
     element: <AboutPage />,
   },
   {
+    path: "/profile",
+    lazy: async () => {
+      const ProfilePage = (await import("@/pages/ProfileManagement/ProfilePage"))
+        .default;
+      return {
+        element: <ProfilePage />,
+      };
+    },
+    children: [
+      // {
+      //   path: "/setting",
+      //   lazy: async () => {
+      //     const SettingPage = (await import("@/pages/ProfileManagement/SettingPage"))
+      //       .default;
+      //     return {
+      //       element: <SettingPage />,
+      //     };
+      //   }
+      // }
+    ]
+  },
+  {
     path: "/login",
     lazy: async () => {
       const LoginPage = (await import("@/pages/Auth/LoginPage")).default;
