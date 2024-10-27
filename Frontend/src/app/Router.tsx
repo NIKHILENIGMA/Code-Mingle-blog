@@ -2,37 +2,45 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import HomePage from "../pages/HomePage";
 import React from "react";
 import AboutPage from "../pages/AboutPage";
+import Main from "@/Layout/Main";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <HomePage />,
-  },
-  {
-    path: "/about",
-    element: <AboutPage />,
-  },
-  {
-    path: "/profile",
-    lazy: async () => {
-      const ProfilePage = (await import("@/pages/ProfileManagement/ProfilePage"))
-        .default;
-      return {
-        element: <ProfilePage />,
-      };
-    },
+    element: <Main />,
     children: [
-      // {
-      //   path: "/setting",
-      //   lazy: async () => {
-      //     const SettingPage = (await import("@/pages/ProfileManagement/SettingPage"))
-      //       .default;
-      //     return {
-      //       element: <SettingPage />,
-      //     };
-      //   }
-      // }
-    ]
+      {
+        path: "/",
+        element: <HomePage />,
+      },
+      {
+        path: "/about",
+        element: <AboutPage />,
+      },
+      {
+        path: "/profile",
+        lazy: async () => {
+          const ProfilePage = (
+            await import("@/pages/ProfileManagement/ProfilePage")
+          ).default;
+          return {
+            element: <ProfilePage />,
+          };
+        },
+        children: [
+          // {
+          //   path: "/setting",
+          //   lazy: async () => {
+          //     const SettingPage = (await import("@/pages/ProfileManagement/SettingPage"))
+          //       .default;
+          //     return {
+          //       element: <SettingPage />,
+          //     };
+          //   }
+          // }
+        ],
+      },
+    ],
   },
   {
     path: "/login",
@@ -51,7 +59,7 @@ const router = createBrowserRouter([
       return {
         element: <ResetPasswordPage />,
       };
-    }
+    },
   },
   {
     path: "/signup",
@@ -62,6 +70,7 @@ const router = createBrowserRouter([
       };
     },
   },
+
   {
     path: "*",
     lazy: async () => {
