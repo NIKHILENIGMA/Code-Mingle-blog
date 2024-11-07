@@ -1,0 +1,18 @@
+version: '3.8'  # Specify the Docker Compose file format version
+
+services:
+  db:
+    container_name: code_mingle  # Set the container name
+    image: postgres:latest  # Use the latest PostgreSQL image
+    restart: always  # Restart the container if it stops
+    ports:
+      - "5433:5432"  # Map port 5432 of the container to port 5433 on the host
+    environment:
+      POSTGRES_USER: nikhilenigma  # Set the PostgreSQL user
+      POSTGRES_PASSWORD: root  # Set the PostgreSQL password
+      POSTGRES_DB: code_mingle  # Create a database
+    volumes:
+      - ./code_mingle_data:/var/lib/postgresql/data  # Mount the host directory to persist data
+
+volumes:
+  code_mingle_data:  # Define the volume for PostgreSQL data
