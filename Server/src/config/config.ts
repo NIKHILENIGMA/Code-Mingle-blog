@@ -9,4 +9,10 @@ export default {
     DATABASE_URL: process.env.DATABASE_URL
 }
 
-
+export const tokenInfo = {
+    token_issuer: process.env.JWT_ISSUER,
+    token_audience: process.env.JWT_AUDIENCE,
+    access_validity: process.env.ACCESS_TOKEN_VALIDITY_IN_SEC,
+    refresh_validity: process.env.REFRESH_TOKEN_VALIDITY_IN_SEC,
+    role: process.env.JWT_ROLE
+}
