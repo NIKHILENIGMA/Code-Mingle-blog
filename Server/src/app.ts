@@ -5,6 +5,8 @@ import httpResponseMessage from './constant/httpResponseMessage'
 import globalErrorHandler from './middleware/globalErrorHandler'
 import ApiError from './utils/ApiError'
 import helmet from 'helmet'
+import routes from './routes'
+
 const app: Application = express()
 
 // cors options
@@ -24,6 +26,8 @@ app.use(cors(corsOptions)) // for enabling cors
 
 // Routes
 app.use('/api/v1', apiRoutes)
+app.use(routes)
+
 
 // 404 Handler
 app.use((_: Request, res: Response, next: NextFunction): void => {
