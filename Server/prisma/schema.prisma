@@ -1,0 +1,56 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  firstName String?   @map("first_name")
+  lastName  String?   @map("last_name")
+  username  String?   @unique @map("username")
+  password  String
+  dob       DateTime? @map("date_of_birth")
+  bio       String?   @map("bio_data")
+  avatarImg String?   @map("avatar_img")
+  coverImg  String?   @map("cover_img")
+  role      String    @default("USER")
+  posts     Post[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("users")
+}
+
+model Post {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("posts")
+}
+
+model KeyStore {
+  id         Int      @id @default(autoincrement())
+  userId     String   @unique @map("user_id")
+  accessKey  String   @unique @map("access_key")
+  refreshKey String   @unique @map("refresh_key")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("key_store")
+}
