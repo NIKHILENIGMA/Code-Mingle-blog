@@ -27,19 +27,17 @@ const router = createBrowserRouter([
             element: <ProfilePage />,
           };
         },
-        children: [
-          // {
-          //   path: "/setting",
-          //   lazy: async () => {
-          //     const SettingPage = (await import("@/pages/ProfileManagement/SettingPage"))
-          //       .default;
-          //     return {
-          //       element: <SettingPage />,
-          //     };
-          //   }
-          // }
-        ],
+        children: [],
       },
+      {
+        path: "/write",
+        lazy: async () => {
+          const WritePage = (await import("@/pages/Blog/WriteBlogPage")).default;
+          return {
+            element: <WritePage />,
+          };
+        },
+      }
     ],
   },
   {
