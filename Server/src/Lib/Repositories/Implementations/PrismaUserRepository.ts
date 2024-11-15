@@ -1,7 +1,8 @@
 import { IUserRepository } from '../Interfaces/IUserRepository'
 import { User } from '../../Models/User'
-import prisma from '../../Databases/PrismaConfig'
-import ApiError from '../../../utils/ApiError'
+import { PrismaClient } from '@prisma/client'
+const prisma = new PrismaClient()
+import { ApiError } from '../../../utils/ApiError'
 
 export class PrismaUserRepository implements IUserRepository {
     /**
@@ -13,7 +14,14 @@ export class PrismaUserRepository implements IUserRepository {
      */
 
     async create(user: User): Promise<User> {
-        return await prisma.user.create({ data: user })
+        try {
+            const newUser = await prisma.user.create({
+                data: user
+            })
+            return newUser
+        } catch (error) {
+            throw new ApiError(500, `Error creating user ${(error as Error).message}`)
+        }
     }
 
     /**
@@ -50,8 +58,6 @@ export class PrismaUserRepository implements IUserRepository {
         return await prisma.user.update({ where: { id }, data: user })
     }
 
-
-
     /**
      * @description This TypeScript function deletes a user from the database using Prisma.
      * @param {string} id - The `id` parameter is a string that represents the unique identifier of the user that you want to delete from the database.
@@ -70,7 +76,7 @@ export class PrismaUserRepository implements IUserRepository {
      */
     async findByEmail(email: string): Promise<User | null> {
         if (!email) throw new ApiError(404, 'Email not found when searching for user')
-            
+
         return prisma.user.findUnique({ where: { email } })
     }
 }
