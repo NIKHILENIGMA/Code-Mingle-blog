@@ -1,9 +1,8 @@
-import { NextFunction, Request, Response } from 'express'
+import { Request, Response } from 'express'
 import httpResponseMessage from '../constant/httpResponseMessage'
-// import logger from '../utils/logger'
-// import { THttpError } from '../types/types'
 
-const globalErrorHandler = (err: Error, req: Request, res: Response, next: NextFunction) => {
+const globalErrorHandler = (err: Error, req: Request, res: Response) => {
+
     res.status(500).json({
         success: false,
         statusCode: httpResponseMessage.error.internalServerError.code,
@@ -13,10 +12,8 @@ const globalErrorHandler = (err: Error, req: Request, res: Response, next: NextF
             url: req.url
         },
         message: httpResponseMessage.error.internalServerError.message,
-        stack: err.stack
-    
+        stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
     })
-    next()
 }
 
 export default globalErrorHandler
