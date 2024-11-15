@@ -1,8 +1,14 @@
+import { PrismaUserRepository, PrismaKeyStoreRepository } from './Implementations'
 import { IUserRepository } from './Interfaces/IUserRepository'
-import { PrismaUserRepository } from '../Repositories/Implementations/PrismaUserRepository'
+import { IKeyStoreRepository } from './Interfaces/IKeyStore'
+
 
 export class RepositoryFactory {
-    static createUserRepository(): IUserRepository {
+    static UserRepository(): IUserRepository {
         return new PrismaUserRepository()
+    }
+
+    static KeyStoreRepository(): IKeyStoreRepository {
+        return new PrismaKeyStoreRepository()
     }
 }
