@@ -1,24 +1,24 @@
 import { readFile } from 'node:fs'
-import ApiError from '../utils/ApiError'
+import { ApiError } from '../utils/ApiError'
 import jwt from 'jsonwebtoken'
 import { promisify } from 'node:util'
+import path from 'node:path'
 
-export class JWTPayload {
-    aud: string
-    sub: string
-    iss: string
+export type JWTPayload = {
+    issuer: string
+    audience: string
+    subject: string
+    param: string
     iat: number
     exp: number
-    prm: number | string
+}
 
-    constructor(issuer: string, audience: string, subject: string, param: string, validity: number) {
-        this.iss = issuer
-        this.aud = audience
-        this.sub = subject
-        this.iat = Math.floor(Date.now() / 1000)
-        this.exp = this.iat + validity
-        this.prm = param
-    }
+export type Payload = {
+    issuer: string
+    audience: string
+    subject: string
+    param: string
+    validity: number
 }
 
 /**
@@ -30,21 +30,27 @@ export class JWTPayload {
  * private.pem file and returns its content as a string. If `keyName` is 'public', it reads the
  * public.pem file and returns its content as a string. If the
  */
-async function readFileKey(keyName: string): Promise<string> {
+const readFileAsync = promisify(readFile)
+
+export async function readFileKey(keyName: string): Promise<string> {
     try {
+        let filePath: string
         if (keyName === 'private') {
-            return await promisify(readFile)('../../keys/private.pem', 'utf8')
+            filePath = path.join(__dirname, '../../keys/private_key.pem')
         } else if (keyName === 'public') {
-            return await promisify(readFile)('../../keys/public.pem', 'utf8')
+            filePath = path.join(__dirname, '../../keys/public_key.pem')
         } else {
             throw new ApiError(400, 'Invalid keyName provided')
         }
+        return await readFileAsync(filePath, 'utf-8')
     } catch (error) {
-        throw new ApiError(404, `Error reading key file: ${(error as Error).message}`)
+        throw new ApiError(404, `Error reading key file: ${(error as Error)?.message}`)
     }
 }
 
-
+// Server\keys\private_key.pem
+//C:\Users\Mesh\Desktop\Software Development\Web Development\Project\Full stack projects\CodeMingle\Server\keys\public_key.pem
+// C:\\Users\\Mesh\\Desktop\\Software Development\\Web Development\\Project\\Full stack projects\\keys\\private_key.pem'
 
 /**
  * The `encode` function asynchronously encodes a JWT payload using a private key read from a file and
@@ -55,7 +61,7 @@ async function readFileKey(keyName: string): Promise<string> {
  * @returns The `encode` function returns a Promise that resolves to a string, which is the encoded JWT
  * token generated using the `jwt.sign` method with the RS256 algorithm.
  */
-export const encode = async (payload: JWTPayload): Promise<string> => {
+export const encode = async (payload: Payload): Promise<string> => {
     try {
         const secret = await readFileKey('private')
 
@@ -65,7 +71,6 @@ export const encode = async (payload: JWTPayload): Promise<string> => {
 
         const token = jwt.sign(payload, secret, { algorithm: 'RS256' })
         return token
-        
     } catch (error) {
         throw new ApiError(500, `Error encoding JWT: ${(error as Error).message}`)
     }
