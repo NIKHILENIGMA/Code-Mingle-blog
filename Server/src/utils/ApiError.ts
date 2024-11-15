@@ -1,4 +1,4 @@
-class ApiError extends Error {
+export class ApiError extends Error {
     public success: boolean
     public data: string | null
     constructor(
@@ -23,4 +23,4 @@ class ApiError extends Error {
     }
 }
 
-export default ApiError
+
