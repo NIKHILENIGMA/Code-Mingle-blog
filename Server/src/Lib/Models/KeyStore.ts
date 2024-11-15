@@ -1,10 +1,24 @@
-
 export interface KeyStore {
-    id: string
+    id: number
     userId: string
-    username: string
-    accessTokenKey: string
-    refreshTokenKey: string
+    accessKey: string
+    refreshKey: string
     createdAt: Date
     updatedAt: Date
+}
+
+export interface UserTokenKeys {
+    userId: string
+    accessKey: string
+    refreshKey: string
+}
+
+export interface Tokens {
+    accessToken: string
+    refreshToken: string
+}
+
+export interface TokenKeys {
+    accessKey: string
+    refreshKey: string
 }
