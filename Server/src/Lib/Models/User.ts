@@ -21,6 +21,7 @@ export interface UserDTO {
         refreshToken: string
     }
     userData: {
+        id: string
         email: string
         firstName?: string | null
         lastName?: string | null
