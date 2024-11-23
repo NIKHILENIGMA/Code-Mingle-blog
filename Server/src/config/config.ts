@@ -14,5 +14,6 @@ export const tokenInfo = {
     token_audience: process.env.JWT_AUDIENCE,
     access_validity: process.env.ACCESS_TOKEN_VALIDITY_IN_SEC,
     refresh_validity: process.env.REFRESH_TOKEN_VALIDITY_IN_SEC,
-    role: process.env.JWT_ROLE
+    role: process.env.JWT_ROLE,
+    reset_validity: process.env.RESET_TOKEN_VALIDITY_IN_SEC,
 }
