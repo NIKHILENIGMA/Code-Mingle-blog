@@ -10,6 +10,7 @@ export type THttpError = {
     message: string
     data: unknown
     trace?: object | null
+    stack?: string | null
 }
 
 // Reponse Types
