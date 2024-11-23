@@ -2,36 +2,25 @@ import bcrypt from 'bcrypt'
 import { RepositoryFactory } from '../Lib/Repositories'
 import { IUserRepository } from '../Lib/Repositories/Interfaces/IUserRepository'
 import { ApiError } from '../utils/ApiError'
-import TokenServices from './token.service'
-import { User, UserDTO } from '../Lib/Models/User'
-
-export interface Credentials {
-    email: string
-    password: string
-}
+import { ILoginUser, ISignupUser, IUser, User } from '../Lib/Models/User'
 
 export default class AuthService {
     private UserRepository: IUserRepository
-    private tokenService: TokenServices
-    
 
     constructor() {
         this.UserRepository = RepositoryFactory.UserRepository()
-        this.tokenService = new TokenServices()
     }
 
     /**
-     * This TypeScript function creates a new user, hashes their password, generates access and refresh
-     * tokens, and returns the tokens along with the user data excluding the password.
-     * @param {User} user - The `signupUser` function you provided is responsible for creating a new
-     * user in your system. It performs the following steps:
-     * @returns The function `createUser` returns an object with two properties:
-     * 1. `tokens`: Contains the access token and refresh token generated for the new user.
-     * 2. `userData`: Contains the user data without the password field.
+     * Creates a new user.
+     *
+     * @param {ISignupUser} user - The user data for signup.
+     * @returns {Promise<User>} - A promise that resolves to the created user.
+     * @throws {ApiError} - Throws an error if the email already exists, if there is an error hashing the password, or if there is an error creating the user.
      */
-
-    public async signupUser(user: User): Promise<UserDTO> {
-        const emailExists = await this.UserRepository.findByEmail(user.email)
+    public async createUser(user: ISignupUser): Promise<IUser> {
+        // Check if email exists
+        const emailExists = await this.UserRepository.findUserByEmail(user.email)
 
         if (emailExists) {
             throw new ApiError(400, 'Email already exists')
@@ -53,59 +42,106 @@ export default class AuthService {
             throw new ApiError(404, 'Error while creating user')
         }
 
-        // Generate tokens for user
-        const tokens = await this.tokenService.generateToken(newUser.id)
-        
-
-        if (!tokens) {
-            throw new ApiError(500, 'Error generating tokens')
-        }
-
-        // Return tokens and new user except password
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { password, ...newUserWithoutPassword } = newUser
+        const { password, ...userDetails } = newUser
 
-        return { tokens, userData: newUserWithoutPassword }
+        return userDetails
     }
-    async loginUser(credentials: Credentials) {
-        const user = await this.UserRepository.findByEmail(credentials.email)
+
+    public async loginUser(credientials: ILoginUser): Promise<IUser> {
+        try {
+
+            const user = await this.verifyUser(credientials.email)
+
+            if (!user) {
+                throw new ApiError(404, 'User not found')
+            }
+            // Compare passwords
+            const passwordMatch = await this.comparePassword(credientials.password, user.password)
+
+            if (!passwordMatch) {
+                throw new ApiError(401, 'Please check your credentials')
+            }
+
+            return user
+        } catch (error) {
+            throw new ApiError(500, (error as Error).message)
+        }
+    }
+
+    public async forgotPassword(email: string) {
+        const user = await this.verifyUser(email)
 
         if (!user) {
             throw new ApiError(404, 'User not found')
         }
 
-        const passwordMatch = await this.comparePassword(credentials.password, user.password)
-
-        if (!passwordMatch) {
-            throw new ApiError(401, 'Please check your credentials')
-        }
-
-        const tokens = await this.tokenService.generateToken(user.id)
-
-        if (!tokens) {
-            throw new ApiError(500, 'Error generating tokens')
-        }
-
-        return { tokens, userData: user }
+        return user
     }
 
     /**
-     * The function `HashedPassword` asynchronously hashes a given password using a salt generated with
-     * a specified number of rounds.
-     * @param {string} password - The `password` parameter is a string that represents the user's
-     * password that needs to be hashed for security purposes.
-     * @returns The `HashedPassword` function returns a Promise that resolves to a hashed password
-     * string after hashing the input password using a salt generated with a specified number of
-     * rounds.
+     * Checks if a user exists by email or ID.
+     *
+     * @param {string} [email] - The email of the user to check.
+     * @param {string} [id] - The ID of the user to check.
+     * @returns {Promise<IUser>} A promise that resolves to the user if found.
+     * @throws {ApiError} Throws an error if the user does not exist with the provided email or ID.
      */
 
+    public async verifyUser(email?: string, id?: string): Promise<User> {
+        let userExist: User | null = null
+
+        if (email) {
+            userExist = await this.UserRepository.findUserByEmail(email)
+        } else if (id) {
+            userExist = await this.UserRepository.findUserById(id)
+        }
+
+        if (!userExist) {
+            throw new ApiError(404, 'User does not exist with the provided  ID or email')
+        }
+        
+        return userExist
+    }
+
+    public async changePassword(userId: string, newPassword: string): Promise<void> {
+        try {
+
+            const hashedPassword = await this.HashedPassword(newPassword)
+
+            const changePassword = await this.UserRepository.update(userId, { password: hashedPassword })
+
+            if (!changePassword) {
+                throw new ApiError(404, 'Error changing password')
+            }
+
+
+        } catch (error) {
+            throw new ApiError(500, `Error changing password: ${(error as Error).message}`)
+        }
+    }
+
+    public async resetPassword(password: string, token: string) {
+        await Promise.resolve({ password, token })
+    }
+
+    /**
+     * Hashes a plain text password using bcrypt.
+     *
+     * @param password - The plain text password to be hashed.
+     * @returns A promise that resolves to the hashed password string.
+     * @throws {ApiError} If an error occurs during the hashing process.
+     */
     private async HashedPassword(password: string): Promise<string> {
         // Hash password
-        const saltRounds = process.env.HASH_PASSWORD_SALT ? parseInt(process.env.HASH_PASSWORD_SALT) : 10
-
-        const salt = await bcrypt.genSalt(saltRounds)
-        const hashedPassword = await bcrypt.hash(password, salt)
-        return hashedPassword
+        try {
+            const saltRounds = process.env.HASH_PASSWORD_SALT ? parseInt(process.env.HASH_PASSWORD_SALT) : 10
+            const salt = await bcrypt.genSalt(saltRounds)
+            const hashedPassword = await bcrypt.hash(password, salt)
+            return hashedPassword
+        } catch (error) {
+            throw new ApiError(500, (error as Error).message)
+        }
     }
 
     /**
