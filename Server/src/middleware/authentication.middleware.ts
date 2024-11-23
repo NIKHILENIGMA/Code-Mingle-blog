@@ -1,12 +1,12 @@
-import { Request, Response, NextFunction } from 'express'
-import { User } from '../Lib/Models/User'
-import { ApiError } from '../utils/ApiError'
-import { decode } from '../helpers/JWT'
-import { RepositoryFactory } from '../Lib/Repositories'
+import { Response, NextFunction } from 'express';
+import { decode } from '../helpers/JWT';
+import { RepositoryFactory } from '../Lib/Repositories';
+import { ProtectedRequest } from '../types/app-request';
+import { ApiError } from '../utils/ApiError'; 
+import { AsyncHandler } from '../utils/AsyncHandler';
 
-interface AuthRequest extends Request {
-    user?: User
-}
+const userRepository = RepositoryFactory.UserRepository();
+const keyStoreRepository = RepositoryFactory.KeyStoreRepository();
 
 /**
  * Middleware to check if the user is authenticated.
@@ -23,30 +23,47 @@ interface AuthRequest extends Request {
  * @throws {ApiError} If the access token is missing, invalid, or the user does not exist.
  */
 
-export const isAuthenticated = async (req: Request, _: Response, next: NextFunction) => {
+export const isAuthenticated = AsyncHandler(async (req: ProtectedRequest, _: Response, next: NextFunction) => {
     try {
-        const accessToken = req.headers.authorization?.split(' ')[1]
+        const accessToken = (req.cookies as Record<string, string>)?.access_token;
 
         if (!accessToken) {
-            throw new ApiError(401, 'Unauthorized')
+            throw new ApiError(401, 'Unauthorized, access token not found in cookies');
         }
 
-        const decodeToken = await decode(accessToken)
+        // Decode the token
+        const decodedToken = await decode(accessToken);
 
-        if (!decodeToken) {
-            throw new ApiError(401, 'Unauthorized')
+        if (!decodedToken) {
+            throw new ApiError(401, 'Unauthorized');
         }
 
-        const user = await RepositoryFactory.UserRepository().getById(decodeToken?.subject)
+        // Find user by id
+        const user = await userRepository.findUserById(decodedToken?.subject);
 
         if (!user) {
-            throw new ApiError(401, 'Unauthorized, user not found')
+            throw new ApiError(401, 'Unauthorized, user not found by access token');
         }
 
-        ;(req as AuthRequest).user = user
+        // Attach user to request object
+        req.user = user;
 
-        next()
+        // Find key store by user id
+        const keyStore = await keyStoreRepository.findKeyStoreByUserId(user.id);
+
+        if (!keyStore) {
+            throw new ApiError(401, 'Unauthorized, key store not found');
+        }
+
+        if (keyStore.accessKey !== decodedToken?.param){
+            throw new ApiError(401, 'Unauthorized, access key mismatch');
+        }
+
+        // Attach key store to request object
+        req.keyStore = keyStore;
+
+        next();
     } catch (error) {
-        throw new ApiError(401, `Error message: authentication failure ${(error as Error)?.message}`)
+        throw new ApiError(401, `Error message: authentication failure ${(error as Error)?.message}`);
     }
-}
+});
