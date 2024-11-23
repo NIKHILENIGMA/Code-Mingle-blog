@@ -15,25 +15,29 @@ export interface User {
     updatedAt: Date
 }
 
-export interface UserDTO {
-    tokens: {
-        accessToken: string
-        refreshToken: string
-    }
-    userData: {
-        id: string
-        email: string
-        firstName?: string | null
-        lastName?: string | null
-        username?: string | null
-        dob?: Date | null
-        bio?: string | null
-        avatarImg?: string | null
-        coverImg?: string | null
-        role: string
-    }
+export interface IUser {
+    id: string
+    email: string
+    firstName?: string | null
+    lastName?: string | null
+    username?: string | null
+    dob?: Date | null
+    bio?: string | null
+    avatarImg?: string | null
+    coverImg?: string | null
+    role: string
+    createdAt: Date
+    updatedAt: Date
 }
 
-export interface ICreateUser {
-    newUser: User
+export interface ISignupUser {
+    firstName?: string
+    lastName?: string
+    email: string
+    password: string
+}
+
+export interface ILoginUser {
+    email: string
+    password: string
 }

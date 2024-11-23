@@ -22,3 +22,8 @@ export interface TokenKeys {
     accessKey: string
     refreshKey: string
 }
+
+export interface verifyResetToken {
+    userId: string
+    resetKey: string
+}
