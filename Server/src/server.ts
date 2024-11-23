@@ -1,7 +1,7 @@
 import app from './app'
 import config from './config/config'
 import logger, { winstonStream } from './utils/logger'
-import prisma from './Lib/ORMs/PrismaConnection'
+import prisma from './Lib/database/PrismaConnection'
 import morgan from 'morgan'
 
 const morganFormat = ':method :url :status :response-time ms'
