@@ -1,9 +1,9 @@
 import { Request, Response } from 'express'
+import { THttpError } from '../types/types'
 import httpResponseMessage from '../constant/httpResponseMessage'
 
-const globalErrorHandler = (err: Error, req: Request, res: Response) => {
-
-    res.status(500).json({
+const globalErrorHandler = (err: THttpError, req: Request, res: Response) => {
+    res.status(err.statusCode || 500).json({
         success: false,
         statusCode: httpResponseMessage.error.internalServerError.code,
         request: {

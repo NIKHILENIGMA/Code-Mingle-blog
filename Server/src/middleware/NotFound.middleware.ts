@@ -1,5 +1,4 @@
 import { Request, Response } from 'express'
-import { ApiError } from '../utils/ApiError'
 
 /**
  * The `notFound` function sends a 404 status with a message indicating that the requested resource was
@@ -10,5 +9,10 @@ import { ApiError } from '../utils/ApiError'
  */
 
 export const notFound = (_: Request, res: Response): void => {
-    res.status(404).json(new ApiError(404, 'The requested resource was not found'))
+    res.status(404).json({
+        error: {
+            code: 404,
+            message: 'The requested resource was not found'
+        }
+    });
 }
