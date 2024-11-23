@@ -1,8 +1,7 @@
-import { KeyStore, UserTokenKeys } from '../../Models/KeyStore'
+import { KeyStore } from '../../Models/KeyStore'
+import { IBaseRepository } from './IBaseRepository'
 
-export interface IKeyStoreRepository  {
-    create(data: UserTokenKeys): Promise<KeyStore>
-    findByUserId(userId: string): Promise<KeyStore | null>
-    findByAccessTokenKey(accessTokenKey: string): Promise<KeyStore | null>
-    findByRefreshTokenKey(refreshTokenKey: string): Promise<KeyStore | null>
+export interface IKeyStoreRepository extends IBaseRepository<KeyStore> {
+    findByAccessKey(accessTokenKey: string): Promise<KeyStore | null>
+    findKeyStoreByUserId(userId: string): Promise<KeyStore | null>
 }
