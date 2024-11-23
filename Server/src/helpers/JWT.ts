@@ -3,6 +3,7 @@ import { ApiError } from '../utils/ApiError'
 import jwt from 'jsonwebtoken'
 import { promisify } from 'node:util'
 import path from 'node:path'
+import { ProtectedRequest } from '../types/app-request'
 
 export type JWTPayload = {
     issuer: string
@@ -95,3 +96,13 @@ export const decode = async (token: string): Promise<JWTPayload> => {
         throw new ApiError(401, `Error decoding JWT: ${(error as Error).message}`)
     }
 }
+
+
+export const checkAccessToken = (req: ProtectedRequest): string | null => {
+    const authHeader = req.headers['authorization'];
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+        return authHeader.split(' ')[1];
+    }
+    return null;
+}
+
