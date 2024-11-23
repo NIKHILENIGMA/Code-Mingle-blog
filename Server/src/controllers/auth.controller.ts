@@ -2,44 +2,47 @@ import { Request, Response } from 'express'
 import { AsyncHandler } from '../utils/AsyncHandler'
 import { ApiResponse } from '../utils/ApiResponse'
 import { ApiError } from '../utils/ApiError'
-import { User } from '../Lib/Models/User'
-import { createUserSchema } from '../schemas/user.schema'
-import { z } from 'zod'
+import { ILoginUser, ISignupUser } from '../Lib/Models/User'
 import { cookieOptions } from '../constant/cookieOptions'
-import AuthService, { Credentials } from '../services/auth.service'
-import UserServices from '../services/user.service'
+import AuthService from '../services/auth.service'
+import { ProtectedRequest } from '../types/app-request'
+import { KeyStore } from '../Lib/Models/KeyStore'
+import TokenServices from '../services/token.service'
+import MailService from '../services/mail.service'
+// import logger from '../utils/logger'
 
 const authServices = new AuthService()
-const userServices = new UserServices()
+const tokenService = new TokenServices()
+const mailService = new MailService()
 
 /**
  * Create a new User
  * @description Accepts user details (username, email, password) to create a new account.
- * @param req - The request object containing user data.
- * @returns res - The response object containing the newly created user.
+ * @param {Request} req - The request object containing user data.
+ * @param {Response} res - The response object containing the newly created user.
+ * @returns {Promise<void>} - A promise that resolves when the user is created.
+ * @throws {ApiError} - Throws an error if user creation fails.
  */
-export const signup = AsyncHandler(async (req: Request, res: Response) => {
+
+export const signup = AsyncHandler(async (req: Request, res: Response): Promise<void> => {
     try {
-        const user = createUserSchema.parse(req.body) as User
+        const user = req.body as ISignupUser
 
-        const { tokens, userData } = await authServices.signupUser(user)
+        const newUser = await authServices.createUser(user)
 
-        if (!tokens || !userData) {
-            throw new ApiError(500, 'Error creating user')
+        const tokens = await tokenService.generateTokens(newUser.id)
+
+        // Check if user was created successfully
+        if (!tokens || !newUser) {
+            throw new ApiError(500, 'Error occur while creating user account')
         }
-
-        const currentUser = await userServices.getUserDetails(userData.id)
 
         res.status(200)
             .cookie('access_token', tokens.accessToken, cookieOptions)
             .cookie('refresh_token', tokens.refreshToken, cookieOptions)
-            .json(new ApiResponse(201, { currentUser, tokens }, 'User created successfully'))
+            .json(new ApiResponse(201, { newUser, tokens }, 'User created successfully'))
     } catch (error) {
-        if (error instanceof z.ZodError) {
-            res.status(400).json(new ApiError(400, error.errors.map((err) => err.message).join(', ')))
-        } else {
-            throw new ApiError(500, (error as Error).message)
-        }
+        throw new ApiError(500, `Error creating user: ${(error as Error).message}`)
     }
 })
 
@@ -52,11 +55,20 @@ export const signup = AsyncHandler(async (req: Request, res: Response) => {
 
 export const login = AsyncHandler(async (req: Request, res: Response) => {
     try {
-        const userCredientials = req.body as Credentials
+        const user = req.body as ILoginUser
 
-        const login = await authServices.loginUser(userCredientials)
+        const userData = await authServices.loginUser(user)
 
-        res.status(200).json(new ApiResponse(200, login, 'User logged in successfully'))
+        const tokens = await tokenService.generateTokens(userData.id)
+
+        if (!tokens || !userData) {
+            throw new ApiError(500, 'Error logging in user')
+        }
+
+        res.status(200)
+            .cookie('access_token', tokens.accessToken, cookieOptions)
+            .cookie('refresh_token', tokens.refreshToken, cookieOptions)
+            .json(new ApiResponse(200, { tokens, userData }, 'User logged in successfully'))
     } catch (error) {
         throw new ApiError(500, (error as Error).message)
     }
@@ -69,11 +81,19 @@ export const login = AsyncHandler(async (req: Request, res: Response) => {
  * @returns res - The response object containing the log out status.
  */
 
-export const logout = AsyncHandler(async (_: Request, res: Response) => {
-    await Promise.resolve()
-    res.clearCookie('access_token', cookieOptions)
-    res.clearCookie('refresh_token', cookieOptions)
-    res.status(200).json(new ApiResponse(200, null, 'User logged out successfully'))
+export const logout = AsyncHandler(async (req: ProtectedRequest, res: Response): Promise<void> => {
+    try {
+        const keyStoreId: number = (req.keyStore as KeyStore).id
+
+        await tokenService.removeTokenById(keyStoreId)
+
+        res.status(200)
+            .clearCookie('access_token', cookieOptions)
+            .clearCookie('refresh_token', cookieOptions)
+            .json(new ApiResponse(200, null, 'User logged out successfully'))
+    } catch (error) {
+        throw new ApiError(500, (error as Error).message)
+    }
 })
 
 /**
@@ -83,19 +103,46 @@ export const logout = AsyncHandler(async (_: Request, res: Response) => {
  * @returns res - The response object containing the password recovery status.
  */
 
-export const forgotPassword = AsyncHandler(async (_: Request, res: Response) => {
-    await Promise.resolve()
-    res.status(200).json(new ApiResponse(200, null, 'Password recovery email sent'))
+export const forgotPassword = AsyncHandler(async (req: Request, res: Response): Promise<void> => {
+    // User Requests Password Reset:
+    const { email } = req.body as { email: string }
+
+    const user = await authServices.verifyUser(email)
+
+    // Generate a password reset token
+    const resetToken = await tokenService.generateResetToken(user.id)
+
+    // Send password reset email
+    await mailService.sendPasswordResetEmail(email, resetToken)
+
+    res.status(200).json(new ApiResponse(200, null, 'Password reset email sent successfully'))
 })
 
 /**
- * Reset password
- * @description - Accepts a new password along with a recovery token to reset the user's password.
- * @param req - The request object containing the new password and recovery token.
- * @returns res - The response object containing the password reset status.
+ * Handles the password reset process.
+ *
+ * This function is an asynchronous request handler that resets a user's password.
+ * It expects a request body containing a reset token and a new password.
+ *
+ * @param req - The request object, containing the reset token and new password in the body.
+ * @param res - The response object used to send the status and response message.
+ *
+ * @returns A JSON response indicating the success of the password reset operation.
+ *
+ * @throws Will throw an error if the reset token is invalid or if the password change operation fails.
  */
 
-export const resetPassword = AsyncHandler(async (_: Request, res: Response) => {
-    await Promise.resolve()
-    res.status(200).json(new ApiResponse(200, null, 'Password reset successful'))
+export const resetPassword = AsyncHandler(async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { token, newPassword } = req.body as { token: string; newPassword: string }
+
+        // Verify the reset token
+        const userId = await tokenService.verifyResetToken(token)
+
+        await authServices.changePassword(userId, newPassword)
+
+        res.status(200).json(new ApiResponse(200, null, 'Password reset successful'))
+    } catch (error) {
+        throw new ApiError(500, `Error resetting password: ${(error as Error).message}`)
+    }
 })
