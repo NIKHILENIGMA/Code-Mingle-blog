@@ -22,3 +22,7 @@ export const resetPasswordSchema = z.object({
     newPassword: z.string().min(6, 'Password must be at least 6 characters long'),
     token: z.string()
 })
+
+export const refreshTokenSchema = z.object({
+    refresh_token: z.string()
+})
