@@ -146,3 +146,26 @@ export const resetPassword = AsyncHandler(async (req: Request, res: Response): P
         throw new ApiError(500, `Error resetting password: ${(error as Error).message}`)
     }
 })
+
+export const refreshToken = AsyncHandler(async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { refresh_token: refreshToken } = (req.body as { refresh_token: string }) || (req.cookies as Record<string, string>).refresh_token
+
+        const userId = await tokenService.verifyRefreshToken(refreshToken)
+
+        const tokens = await tokenService.generateTokens(userId)
+
+        if (!tokens) {
+            throw new ApiError(500, 'Error refreshing token')
+        }
+
+        res.status(200)
+            .cookie('access_token', tokens.accessToken, cookieOptions)
+            .cookie('refresh_token', tokens.refreshToken, cookieOptions)
+            .json(new ApiResponse(200, { tokens }, 'Token refreshed successfully'))
+    } catch (error) {
+        throw new ApiError(500, `Error refreshing token: ${(error as Error).message}`)
+        // req.body.refresh_token as { refresh_token: string }
+        //
+    }
+})
