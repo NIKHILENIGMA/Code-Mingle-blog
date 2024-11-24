@@ -1,6 +1,6 @@
 import crypto from 'crypto'
 import { tokenInfo } from '../config/config'
-import { encode } from '../helpers/JWT'
+import { decode, encode } from '../helpers/JWT'
 import { RepositoryFactory } from '../Lib/Repositories'
 import { ApiError } from '../utils/ApiError'
 import { TokenKeys, Tokens } from '../Lib/Models/KeyStore'
@@ -52,6 +52,16 @@ export default class TokenServices {
         }
     }
 
+    /**
+     * Generates a reset token for the given user ID.
+     *
+     * This function creates a random token, hashes it, and stores the hashed token along with the user ID and an expiry time in the reset password repository.
+     * The original token is returned for further use (e.g., sending to the user via email).
+     *
+     * @param {string} userId - The ID of the user for whom the reset token is being generated.
+     * @returns {Promise<string>} - A promise that resolves to the original reset token.
+     * @throws {ApiError} - Throws an error if there is an issue generating the reset token.
+     */
     public async generateResetToken(userId: string): Promise<string> {
         try {
             // create random and hash token
@@ -73,6 +83,48 @@ export default class TokenServices {
         }
     }
 
+    public async verifyRefreshToken(token: string): Promise<string> {
+        try {
+            // Decode token
+            const userRefreshToken = await decode(token)
+
+            if (!userRefreshToken) {
+                throw new ApiError(403, 'Invalid refresh token')
+            }
+
+            // Find key store by userId
+            const keyStore = await this.keyStoreRepository.findByUserId(userRefreshToken.subject)
+            
+            if (!keyStore) {
+                throw new ApiError(403, 'Invalid refresh token')
+            }
+
+            // Check if refresh token is valid
+            if (userRefreshToken.param !== keyStore.refreshKey) {
+                throw new ApiError(403, 'Invalid refresh token')
+            }
+
+            // Delete key store
+            await this.keyStoreRepository.delete(keyStore.id)
+            
+            return keyStore.userId
+
+        } catch (error) {
+            throw new ApiError(500, `Error verifying refresh token: ${(error as Error).message}`)
+        }   
+    }
+
+    /**
+     * Verifies the provided reset token.
+     *
+     * This method hashes the provided token and searches for it in the database.
+     * If the token is found, it checks if the token has expired.
+     * If the token is valid and not expired, it returns the associated user ID.
+     *
+     * @param {string} token - The reset token to verify.
+     * @returns {Promise<string>} - A promise that resolves to the user ID associated with the reset token.
+     * @throws {ApiError} - Throws an error if the token does not exist, has expired, or if there is an error during verification.
+     */
     public async verifyResetToken(token: string): Promise<string> {
         try {
             const hashToken = crypto.createHash('sha256').update(token).digest('hex')
@@ -169,6 +221,12 @@ export default class TokenServices {
         }
     }
 
+    /**
+     * Checks if the given expiry time has already passed.
+     *
+     * @param {string} expiry - The expiry time as a string.
+     * @returns {boolean} - Returns `true` if the expiry time has passed, otherwise `false`.
+     */
     private timeExpired(expiry: string): boolean {
         const expiryTime = new Date(expiry).getTime()
         const currentTime = new Date().getTime()
