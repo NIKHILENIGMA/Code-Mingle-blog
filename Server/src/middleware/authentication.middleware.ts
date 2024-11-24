@@ -49,7 +49,7 @@ export const isAuthenticated = AsyncHandler(async (req: ProtectedRequest, _: Res
         req.user = user;
 
         // Find key store by user id
-        const keyStore = await keyStoreRepository.findKeyStoreByUserId(user.id);
+        const keyStore = await keyStoreRepository.findByUserId(user.id);
 
         if (!keyStore) {
             throw new ApiError(401, 'Unauthorized, key store not found');
