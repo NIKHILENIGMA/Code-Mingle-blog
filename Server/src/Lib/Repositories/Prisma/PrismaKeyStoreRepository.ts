@@ -43,23 +43,34 @@ export class PrismaKeyStoreRepository implements IKeyStoreRepository {
         }
     }
 
-    public async update(id: string, data: Partial<KeyStore>): Promise<KeyStore | null> {
-        if (!id || !data) {
-            return null
+    public async update(id: number, data: Partial<KeyStore>): Promise<KeyStore | null> {
+        try {
+            const keyStore = await prisma.keyStore.update({
+                where: { id },
+                data
+            })
+
+            return keyStore
+        } catch (error) {
+            throw new ApiError(500, 'Error while updating key store Error : ' + (error as Error)?.message)
         }
-        await Promise.resolve()
-        return null
     }
 
     public async delete(id: string): Promise<void> {
-        if (!id) {
-            return
+        try {
+            await prisma.keyStore.delete({
+                where: {
+                    id: parseInt(id)
+                }
+            })
+        } catch (error) {
+            throw new ApiError(500, 'Error while deleting key store Error : ' + (error as Error)?.message)
+            
         }
-        await Promise.resolve()
     }
 
 
-    public async findKeyStoreByUserId(userId: string): Promise<KeyStore | null> {
+    public async findByUserId(userId: string): Promise<KeyStore | null> {
         try {
             const store = await prisma.keyStore.findFirst({
                 where: {
@@ -87,6 +98,21 @@ export class PrismaKeyStoreRepository implements IKeyStoreRepository {
             
         }
     }
+
+    public async findByRefreshKey(refreshTokenKey: string): Promise<KeyStore | null> {
+        try {
+            const store = await prisma.keyStore.findFirst({
+                where: {
+                    refreshKey: refreshTokenKey
+                }
+            })
+
+            return store
+        } catch (error) {
+            throw new ApiError(500, 'Error while finding key store by refresh token key Error : ' + (error as Error)?.message)
+        }
+    }
+
     public async removeTokens(id: number): Promise<void> {
         try {
             await prisma.keyStore.delete({ where: { id } })
