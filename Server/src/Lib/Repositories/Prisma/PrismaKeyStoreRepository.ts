@@ -1,10 +1,6 @@
-// import { IKeyStoreRepository } from '../Interfaces/IKeyStore'
-import { KeyStore } from '../../Models/KeyStore'
 import prisma from '../../database/PrismaConnection'
-import { ApiError } from '../../../utils/ApiError'
+import { KeyStore } from '../../Models/KeyStore'
 import { IKeyStoreRepository } from '../Interfaces/IKeyStore'
-
-
 
 export class PrismaKeyStoreRepository implements IKeyStoreRepository {
     /**
@@ -14,110 +10,72 @@ export class PrismaKeyStoreRepository implements IKeyStoreRepository {
      * @returns {Promise<KeyStore>} A promise that resolves to the created key store.
      * @throws {ApiError} Throws an error if there is an issue while creating the key store.
      */
-    public async create(data: Partial<KeyStore>): Promise<KeyStore> {
-        try {
-            const keyStore = await prisma.keyStore.findFirst({ where: { userId: data.userId } })
+    public async create(keyStore: Partial<KeyStore>): Promise<KeyStore> {
 
-            if (!keyStore) {
-                const store = await prisma.keyStore.create({
-                    data: {
-                        userId: data.userId as string,
-                        accessKey: data.accessKey as string,
-                        refreshKey: data.refreshKey as string   
-                    }
-                })
-
-                return store
-            } else {
-                const store = await prisma.keyStore.update({
-                    where: {
-                        id: keyStore.id
-                    },
-                    data
-                })
-
-                return store
-            }
-        } catch (error) {
-            throw new ApiError(500, 'Error while creatinga key store Error : ' + (error as Error)?.message)
+        const payload = {
+            userId: keyStore.userId as string,
+            accessKey: keyStore.accessKey as string,
+            refreshKey: keyStore.refreshKey as string
         }
+
+        const createdStore = await prisma.keyStore.create({
+            data: payload
+        })
+
+        return createdStore
     }
 
     public async update(id: number, data: Partial<KeyStore>): Promise<KeyStore | null> {
-        try {
-            const keyStore = await prisma.keyStore.update({
-                where: { id },
-                data
-            })
+        const keyStore = await prisma.keyStore.update({
+            where: { id },
+            data
+        })
 
-            return keyStore
-        } catch (error) {
-            throw new ApiError(500, 'Error while updating key store Error : ' + (error as Error)?.message)
-        }
+        return keyStore
     }
 
     public async delete(id: string): Promise<void> {
-        try {
-            await prisma.keyStore.delete({
-                where: {
-                    id: parseInt(id)
-                }
-            })
-        } catch (error) {
-            throw new ApiError(500, 'Error while deleting key store Error : ' + (error as Error)?.message)
-            
-        }
+        await prisma.keyStore.delete({
+            where: {
+                id: parseInt(id)
+            }
+        })
     }
 
+    public async findKeyStoreByUserId(userId: string): Promise<KeyStore | null> {
+        const store = await prisma.keyStore.findFirst({
+            where: {
+                userId
+            }
+        })
 
-    public async findByUserId(userId: string): Promise<KeyStore | null> {
-        try {
-            const store = await prisma.keyStore.findFirst({
-                where: {
-                    userId
-                }
-            })
-
-            return store
-        } catch (error) {
-            throw new ApiError(500, 'Error while finding key store by userId Error : ' + (error as Error)?.message)
-        }
+        return store
     }
 
-    public async findByAccessKey(accessTokenKey: string): Promise<KeyStore | null> {
-        try {
-            const store = await prisma.keyStore.findFirst({
-                where: {
-                    accessKey: accessTokenKey
-                }
-            })
+    public async findKeyStoreByAccessKey(accessTokenKey: string): Promise<KeyStore | null> {
+        const store = await prisma.keyStore.findFirst({
+            where: {
+                accessKey: accessTokenKey
+            }
+        })
 
-            return store
-        } catch (error) {
-            throw new ApiError(500, 'Error while finding key store by access token key Error : ' + (error as Error)?.message)
-            
-        }
+        return store
     }
 
-    public async findByRefreshKey(refreshTokenKey: string): Promise<KeyStore | null> {
-        try {
-            const store = await prisma.keyStore.findFirst({
-                where: {
-                    refreshKey: refreshTokenKey
-                }
-            })
+    public async findKeyStoreByIdAndRefreshKey(userId: string, refreshTokenKey: string): Promise<KeyStore | null> {
+        const store = await prisma.keyStore.findUnique({
+            where: {
+                userId: userId,
+                refreshKey: refreshTokenKey
+            }
+        })
 
-            return store
-        } catch (error) {
-            throw new ApiError(500, 'Error while finding key store by refresh token key Error : ' + (error as Error)?.message)
-        }
+        return store
     }
 
-    public async removeTokens(id: number): Promise<void> {
-        try {
-            await prisma.keyStore.delete({ where: { id } })
-        } catch (error) {
-            throw new ApiError(500, 'Error while removing keys by id Error : ' + (error as Error)?.message)
-        }
+    public async deleteKeyStoreByRefreshKey(refreshTokenKey: string): Promise<void> {
+        await prisma.keyStore.delete({ where: { 
+            refreshKey: refreshTokenKey
+         } })
     }
 }
