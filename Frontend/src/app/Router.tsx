@@ -3,6 +3,7 @@ import HomePage from "../pages/HomePage";
 import React from "react";
 import AboutPage from "../pages/AboutPage";
 import Main from "@/Layout/Main";
+import AuthProvider from "@/components/AuthProvider";
 
 const router = createBrowserRouter([
   {
@@ -24,7 +25,11 @@ const router = createBrowserRouter([
             await import("@/pages/ProfileManagement/ProfilePage")
           ).default;
           return {
-            element: <ProfilePage />,
+            element: (
+              <AuthProvider>
+                <ProfilePage />
+              </AuthProvider>
+            ),
           };
         },
         children: [],
@@ -32,12 +37,13 @@ const router = createBrowserRouter([
       {
         path: "/write",
         lazy: async () => {
-          const WritePage = (await import("@/pages/Blog/WriteBlogPage")).default;
+          const WritePage = (await import("@/pages/Blog/WriteBlogPage"))
+            .default;
           return {
             element: <WritePage />,
           };
         },
-      }
+      },
     ],
   },
   {
