@@ -2,7 +2,9 @@ import bcrypt from 'bcrypt'
 import { RepositoryFactory } from '../Lib/Repositories'
 import { IUserRepository } from '../Lib/Repositories/Interfaces/IUserRepository'
 import { ApiError } from '../utils/ApiError'
-import { ILoginUser, ISignupUser, IUser, User } from '../Lib/Models/User'
+import { ILoginUser, ISignupUserBody, IUser, User } from '../Lib/Models/User'
+import { NextFunction, Request } from 'express'
+import responseMessage from '../constant/responseMessage'
 
 export default class AuthService {
     private UserRepository: IUserRepository
@@ -14,66 +16,66 @@ export default class AuthService {
     /**
      * Creates a new user.
      *
-     * @param {ISignupUser} user - The user data for signup.
+     * @param {ISignupUserBody} user - The user data for signup.
      * @returns {Promise<User>} - A promise that resolves to the created user.
      * @throws {ApiError} - Throws an error if the email already exists, if there is an error hashing the password, or if there is an error creating the user.
      */
-    public async createUser(user: ISignupUser): Promise<IUser> {
-        // Check if email exists
-        const emailExists = await this.UserRepository.findUserByEmail(user.email)
+    public async userRegisterService(req: Request, next: NextFunction, user: ISignupUserBody): Promise<IUser | void> {
+        try {
+            // Check if email exists
+            await this.checkEmailExists(user.email, req, next)
 
-        if (emailExists) {
-            throw new ApiError(400, 'Email already exists')
+            // Hash password
+            const hashPassword = await this.hashedPassword(req, next, user.password)
+
+            if (!hashPassword) {
+                return ApiError(new Error(responseMessage.METHOD_FAILED('hashing password')), req, next, 500)
+            }
+
+            user.password = hashPassword
+
+            // Create user
+            const newUser = await this.UserRepository.create(user)
+
+            if (!newUser) {
+                return ApiError(new Error(responseMessage.METHOD_FAILED('new user')), req, next, 500)
+            }
+
+            return this.removePassword(newUser)
+            
+        } catch (error) {
+            return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('register service')), req, next, 500)
         }
-
-        // Hash password
-        const hashPassword = await this.HashedPassword(user.password)
-
-        if (!hashPassword) {
-            throw new ApiError(500, 'Error occured while hashing password')
-        }
-
-        user.password = hashPassword
-
-        // Create user
-        const newUser = await this.UserRepository.create(user)
-
-        if (!newUser) {
-            throw new ApiError(404, 'Error while creating user')
-        }
-
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { password, ...userDetails } = newUser
-
-        return userDetails
     }
 
-    public async loginUser(credientials: ILoginUser): Promise<IUser> {
+    public async userLoginService(req: Request, next: NextFunction, credientials: ILoginUser): Promise<IUser | void> {
         try {
-
-            const user = await this.verifyUser(credientials.email)
+            const user = await this.verifyUserByEmail(credientials.email)
 
             if (!user) {
-                throw new ApiError(404, 'User not found')
+                return ApiError(new Error(responseMessage.NOT_FOUND('user with email')), req, next, 404)
             }
             // Compare passwords
             const passwordMatch = await this.comparePassword(credientials.password, user.password)
 
             if (!passwordMatch) {
-                throw new ApiError(401, 'Please check your credentials')
+                return ApiError(new Error(responseMessage.INVALID_PASSWORD), req, next, 401)
             }
 
-            return user
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { password, ...userDetails } = user
+
+            return userDetails
         } catch (error) {
-            throw new ApiError(500, (error as Error).message)
+            return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('login service')), req, next, 401)
         }
     }
 
-    public async forgotPassword(email: string) {
-        const user = await this.verifyUser(email)
+    public async userForgotPasswordService(req: Request, next: NextFunction, email: string): Promise<IUser | void> {
+        const user = await this.verifyUserByEmail(email)
 
-        if (!user) {
-            throw new ApiError(404, 'User not found')
+        if (user === null) {
+            return ApiError(new Error(responseMessage.NOT_FOUND('user with email')), req, next, 404)
         }
 
         return user
@@ -88,41 +90,46 @@ export default class AuthService {
      * @throws {ApiError} Throws an error if the user does not exist with the provided email or ID.
      */
 
-    public async verifyUser(email?: string, id?: string): Promise<User> {
-        let userExist: User | null = null
-
-        if (email) {
-            userExist = await this.UserRepository.findUserByEmail(email)
-        } else if (id) {
-            userExist = await this.UserRepository.findUserById(id)
-        }
-
-        if (!userExist) {
-            throw new ApiError(404, 'User does not exist with the provided  ID or email')
-        }
+    private async checkEmailExists(email: string, req: Request, next: NextFunction): Promise<void> {
+        const userExist = await this.UserRepository.findUserByEmail(email)
         
-        return userExist
+        if (userExist) {
+            ApiError(new Error(responseMessage.ALREADY_EXIST(email)), req, next, 409)
+        }
+
     }
 
-    public async changePassword(userId: string, newPassword: string): Promise<void> {
-        try {
+    private async verifyUserByEmail(email: string): Promise<User | null> {
+        return await this.UserRepository.findUserByEmail(email)
+    }
 
-            const hashedPassword = await this.HashedPassword(newPassword)
+    // private async verifyUserById(id: string): Promise<User | null> {
+    //     return await this.UserRepository.findUserById(id)
+    // }
+
+    public async changePasswordService(req: Request, next: NextFunction, userId: string, newPassword: string): Promise<void> {
+        try {
+            const hashedPassword = await this.hashedPassword(req, next, newPassword)
+
+            if (!hashedPassword) {
+                return ApiError(new Error(responseMessage.METHOD_FAILED('hashing password')), req, next, 500)
+            }
 
             const changePassword = await this.UserRepository.update(userId, { password: hashedPassword })
 
             if (!changePassword) {
-                throw new ApiError(404, 'Error changing password')
+                return ApiError(new Error(responseMessage.METHOD_FAILED('changing password')), req, next, 500)
             }
-
-
         } catch (error) {
-            throw new ApiError(500, `Error changing password: ${(error as Error).message}`)
+            return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('login service')), req, next, 401)
         }
     }
 
-    public async resetPassword(password: string, token: string) {
-        await Promise.resolve({ password, token })
+    private removePassword(user: User): IUser {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { password, ...userDetails } = user
+
+        return userDetails
     }
 
     /**
@@ -132,17 +139,21 @@ export default class AuthService {
      * @returns A promise that resolves to the hashed password string.
      * @throws {ApiError} If an error occurs during the hashing process.
      */
-    private async HashedPassword(password: string): Promise<string> {
+    private async hashedPassword(req: Request, next: NextFunction,password: string): Promise<string | void> {
         // Hash password
         try {
             const saltRounds = process.env.HASH_PASSWORD_SALT ? parseInt(process.env.HASH_PASSWORD_SALT) : 10
+
             const salt = await bcrypt.genSalt(saltRounds)
-            const hashedPassword = await bcrypt.hash(password, salt)
-            return hashedPassword
+
+            return await bcrypt.hash(password, salt)
+
+             
         } catch (error) {
-            throw new ApiError(500, (error as Error).message)
+            return ApiError(error instanceof Error ? error : new Error(responseMessage.INTERNAL_SERVICE('hashing')), req, next, 500)
         }
     }
+
 
     /**
      * Compares a plain text password with a hashed password.
