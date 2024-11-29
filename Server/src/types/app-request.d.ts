@@ -8,11 +8,8 @@ import { KeyStore } from '../models/key-store.model'
 
 // app-request.d.ts
 declare interface ProtectedRequest extends Request {
-
-    user?: User;
-    keyStore?: KeyStore;
-    accessToken?: string;
-
+    user?: User
+    keyStore?: KeyStore
+    accessToken?: string
+    refreshToken?: string
 }
-
-
