@@ -1,29 +1,26 @@
+import { AUTHENTICATIONURL } from "@/constants/constants";
 import { apiInstance } from "./apiInstance";
+import { RegisterUser } from "@/Types/auth";
 
-type RegisterData = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-};
-
-export const signup = async (userData: RegisterData) => {
+export const signup = async (user: RegisterUser) => {
   try {
-    const response = await apiInstance.post("/api/register", userData);
+    const response = await apiInstance.post(
+      `${AUTHENTICATIONURL}/signup`,
+      user
+    );
 
     if (response.status !== 200) {
-      throw new Error("Failed to register");
+      throw new Error("Failed to register user account");
     }
-
     return response.data;
   } catch (error) {
-    console.error(error);
+    throw new Error((error as Error).message);
   }
 };
 
-export const login = async (email: string, password: string) => {
+export const loginService = async (email: string, password: string) => {
   try {
-    const response = await apiInstance.post("/api/login", {
+    const response = await apiInstance.post(`${AUTHENTICATIONURL}/login`, {
       email,
       password,
     });
@@ -40,7 +37,7 @@ export const login = async (email: string, password: string) => {
 
 export const logout = async (): Promise<unknown> => {
   try {
-    const response = await apiInstance.post("/api/logout");
+    const response = await apiInstance.post(`${AUTHENTICATIONURL}/logout`);
 
     if (response.status !== 200) {
       throw new Error("Failed to logout");
@@ -52,9 +49,11 @@ export const logout = async (): Promise<unknown> => {
   }
 };
 
-export const refreshToken = async (): Promise<unknown> => {
+export const refreshTokenService = async () => {
   try {
-    const response = await apiInstance.post("/api/refresh-token");
+    const response = await apiInstance.post(
+      `${AUTHENTICATIONURL}/refresh-token`
+    );
 
     if (response.status !== 200) {
       throw new Error("Failed to refresh token");
@@ -66,9 +65,29 @@ export const refreshToken = async (): Promise<unknown> => {
   }
 };
 
+export const forgotPassword = async (email: string) => {
+  try {
+    const response = await apiInstance.post(
+      `${AUTHENTICATIONURL}/forgot-password`,
+      { email }
+    );
+
+    if (response.status !== 200) {
+      throw new Error("Failed to send password reset email");
+    }
+
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 export const resetPassword = async (email: string) => {
   try {
-    const response = await apiInstance.post("/api/reset-password", { email });
+    const response = await apiInstance.post(
+      `${AUTHENTICATIONURL}/reset-password`,
+      { email }
+    );
 
     if (response.status !== 200) {
       throw new Error("Failed to reset password");
@@ -78,4 +97,4 @@ export const resetPassword = async (email: string) => {
   } catch (error) {
     console.error(error);
   }
-}
+};

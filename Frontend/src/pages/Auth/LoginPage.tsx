@@ -22,6 +22,7 @@ function LoginPage(): JSX.Element {
           />
           {errors?.email && <p>{errors.email?.message}</p>}
         </div>
+        
         {/* Password field */}
         <div>
           <Label>Password: </Label>
@@ -34,18 +35,24 @@ function LoginPage(): JSX.Element {
           />
           {errors?.password && <p>{errors.password?.message}</p>}
         </div>
-        <div className="">
+        
+        {/* Forgot password link */}
+        <div>
           <p className="text-sm font-light">
             Forgot your password?{" "}
             <Link to="/forgot-password" className="font-normal text-violet-600">Reset it here</Link>
           </p>
         </div>
+
+        {/* Submit button */}
         <div>
           <Button disabled={isSubmitting} type="submit">
             {isSubmitting ? "Loading....." : "Login"}
           </Button>
         </div>
       </form>
+
+      {/* Signup link */}
       <div className="">
         <p className="text-sm font-light">
           Don't have an account?{" "}
