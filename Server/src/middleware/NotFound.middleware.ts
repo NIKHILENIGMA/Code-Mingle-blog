@@ -8,11 +8,15 @@ import { Request, Response } from 'express'
  * @param {Response} res - The `res` parameter in the code snippet refers to the response object that is used to send a response back to the client making the request. In this case, it is being used to set the status code to 404 (Not Found) and send a JSON response with an error message indicating that
  */
 
-export const notFound = (_: Request, res: Response): void => {
+export const notFound = (req: Request, res: Response): void => {
     res.status(404).json({
         error: {
             code: 404,
-            message: 'The requested resource was not found'
+            message: 'The requested resource was not found',
+            request: {
+                method: req.method,
+                url: req.originalUrl
+            }
         }
     });
 }

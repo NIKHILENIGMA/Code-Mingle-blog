@@ -1,19 +1,15 @@
 import { Request, Response, NextFunction } from 'express'
 import { z } from 'zod'
+import { ApiError } from '../utils/ApiError'
 
 export const validateSchema = (schema: z.Schema) => {
-    return (req: Request, res: Response, next: NextFunction) => {
+    return (req: Request, _: Response, next: NextFunction) => {
         try {
             schema.parse(req.body)
             next()
         } catch (error) {
             if (error instanceof z.ZodError) {
-                res.status(400).json({
-                    message: error.errors.map((err) => ({
-                        field: err.path.join('.'),
-                        message: err.message
-                    }))
-                })
+                return ApiError(new Error(error.errors[0].message), req, next, 400)
             }
             next(error)
         }
