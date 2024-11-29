@@ -1,4 +1,5 @@
 import crypto from 'crypto'
+import { Request, NextFunction } from 'express'
 import { tokenInfo } from '../config/config'
 import { decode, encode } from '../helpers/JWT'
 import { RepositoryFactory } from '../Lib/Repositories'
@@ -6,6 +7,7 @@ import { ApiError } from '../utils/ApiError'
 import { TokenKeys, Tokens } from '../Lib/Models/KeyStore'
 import { IKeyStoreRepository } from '../Lib/Repositories/Interfaces/IKeyStore'
 import { IResetPasswordRepository } from '../Lib/Repositories/Interfaces/IResetPasswordRepository'
+import responseMessage from '../constant/responseMessage'
 
 export default class TokenServices {
     private keyStoreRepository: IKeyStoreRepository
@@ -24,31 +26,31 @@ export default class TokenServices {
      * @throws {ApiError} Throws an error if the key store creation or token generation fails.
      */
 
-    public async generateTokens(userId: string): Promise<Tokens> {
+    public async generateAccessAndRefreshTokenService(req: Request, next: NextFunction, userId: string): Promise<Tokens | void> {
         try {
             // Generate secret keys
             const { accessKey, refreshKey } = this.generateKeySecret()
 
             // Create key store
-            await this.createStore(userId, accessKey, refreshKey)
+            await this.createStore(req, next, userId, accessKey, refreshKey)
 
             // Generate access token
-            const accessToken = await this.generatePayloadToken(userId, 'access', accessKey, tokenInfo?.access_validity || '0')
+            const accessToken = await this.generatePayloadTokenService(req, next, userId, accessKey, tokenInfo?.access_validity || '0')
+
+            if (!accessToken) {
+                return ApiError(new Error(responseMessage.METHOD_FAILED('access generate token')), req, next, 500)
+            }
 
             // Generate refresh token
-            const refreshToken = await this.generatePayloadToken(userId, 'refresh', refreshKey, tokenInfo?.refresh_validity || '0')
+            const refreshToken = await this.generatePayloadTokenService(req, next, userId, refreshKey, tokenInfo?.refresh_validity || '0')
+
+            if (!refreshToken) {
+                return ApiError(new Error(responseMessage.METHOD_FAILED('refresh generate token')), req, next, 500)
+            }
 
             return { accessToken, refreshToken }
         } catch (error) {
-            throw new ApiError(500, `Error generating tokens: ${(error as Error).message}`)
-        }
-    }
-
-    public async removeTokenById(storeId: number): Promise<void> {
-        try {
-            await this.keyStoreRepository.delete(storeId)
-        } catch (error) {
-            throw new ApiError(500, `Error removing tokens: ${(error as Error).message}`)
+            return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('generate token')), req, next, 500)
         }
     }
 
@@ -62,7 +64,7 @@ export default class TokenServices {
      * @returns {Promise<string>} - A promise that resolves to the original reset token.
      * @throws {ApiError} - Throws an error if there is an issue generating the reset token.
      */
-    public async generateResetToken(userId: string): Promise<string> {
+    public async generateResetToken(req: Request, next: NextFunction, userId: string): Promise<string | void> {
         try {
             // create random and hash token
             const restToken = crypto.randomBytes(20).toString('hex')
@@ -79,39 +81,71 @@ export default class TokenServices {
 
             return restToken
         } catch (error) {
-            throw new ApiError(500, `Error generating reset token: ${(error as Error).message}`)
+            return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('generate reset token')), req, next, 500)
         }
     }
 
-    public async verifyRefreshToken(token: string): Promise<string> {
+    /**
+     * Verifies the provided refresh token.
+     *
+     * @param token - The refresh token to verify.
+     * @returns A promise that resolves to the user ID associated with the refresh token.
+     * @throws {ApiError} If the refresh token is not associated with any user, if the user does not have any refresh token key, if the refresh token is invalid, or if there is an error during verification.
+     */
+
+    public async removeRefreshToken(req: Request, next: NextFunction, userId: string, token: string): Promise<void> {
         try {
-            // Decode token
-            const userRefreshToken = await decode(token)
+            const decodedToken = await decode(req, next, token)
 
-            if (!userRefreshToken) {
-                throw new ApiError(403, 'Invalid refresh token')
+            if (!decodedToken) {
+                return ApiError(new Error(responseMessage.INVALID_TOKEN), req, next, 400)
             }
 
-            // Find key store by userId
-            const keyStore = await this.keyStoreRepository.findByUserId(userRefreshToken.subject)
-            
+            const keyStore = await this.keyStoreRepository.findKeyStoreByUserId(userId)
+
             if (!keyStore) {
-                throw new ApiError(403, 'Invalid refresh token')
+                return ApiError(new Error(responseMessage.NOT_FOUND('key store')), req, next, 404)
             }
 
-            // Check if refresh token is valid
-            if (userRefreshToken.param !== keyStore.refreshKey) {
-                throw new ApiError(403, 'Invalid refresh token')
+            if (keyStore.refreshKey !== decodedToken.param) {
+                return ApiError(new Error(responseMessage.INVALID_TOKEN), req, next, 400)
             }
 
-            // Delete key store
             await this.keyStoreRepository.delete(keyStore.id)
-            
-            return keyStore.userId
-
         } catch (error) {
-            throw new ApiError(500, `Error verifying refresh token: ${(error as Error).message}`)
-        }   
+            return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('verify refresh token')), req, next, 500)
+        }
+    }
+
+    public async refreshTokenService(req: Request, next: NextFunction, token: string): Promise<Tokens | void> {
+        try {
+            const decodedToken = await decode(req, next, token)
+
+            if (!decodedToken) {
+                return ApiError(new Error(responseMessage.INVALID_TOKEN), req, next, 400)
+            }
+
+            const keyStore = await this.keyStoreRepository.findKeyStoreByUserId(decodedToken.subject)
+
+            if (!keyStore) {
+                return ApiError(new Error(responseMessage.NOT_FOUND('key store')), req, next, 404)
+            }
+
+            if (keyStore.refreshKey !== decodedToken.param) {
+                return ApiError(new Error(responseMessage.INVALID_TOKEN), req, next, 400)
+            }
+
+            // Generate access and refresh token
+            const tokens = await this.generateAccessAndRefreshTokenService(req, next, decodedToken.subject)
+
+            if (!tokens) {
+                return ApiError(new Error(responseMessage.METHOD_FAILED('generate token')), req, next, 500)
+            }
+
+            return tokens
+        } catch (error) {
+            return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('refresh token')), req, next, 500)
+        }
     }
 
     /**
@@ -125,26 +159,25 @@ export default class TokenServices {
      * @returns {Promise<string>} - A promise that resolves to the user ID associated with the reset token.
      * @throws {ApiError} - Throws an error if the token does not exist, has expired, or if there is an error during verification.
      */
-    public async verifyResetToken(token: string): Promise<string> {
+    public async verifyResetToken(req: Request, next: NextFunction, token: string): Promise<string | void> {
         try {
             const hashToken = crypto.createHash('sha256').update(token).digest('hex')
 
             // Find token in database
             const resetToken = await this.resetPasswordRepository.findByToken(hashToken)
-            
+
             if (!resetToken) {
-                throw new ApiError(404, 'Reset token does not exist')
+                return ApiError(new Error(responseMessage.INVALID_TOKEN), req, next, 400)
             }
 
             // Check if token has expired
             if (this.timeExpired(resetToken.expiresAt)) {
-                throw new ApiError(400, 'Reset token has expired')
+                return ApiError(new Error(responseMessage.TOKEN_EXPIRED), req, next, 400)
             }
 
             return resetToken.userId
-
         } catch (error) {
-            throw new ApiError(500, `Error verifying reset token: ${(error as Error).message}`)
+            return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('verify reset token')), req, next, 500)
         }
     }
 
@@ -169,7 +202,7 @@ export default class TokenServices {
      * @returns A promise that resolves to void when the key store is successfully created.
      * @throws {ApiError} Throws an error if the key store creation fails.
      */
-    private async createStore(userId: string, accessKey: string, refreshKey: string): Promise<void> {
+    private async createStore(req: Request, next: NextFunction, userId: string, accessKey: string, refreshKey: string): Promise<void> {
         try {
             const keystoreData = {
                 userId,
@@ -177,15 +210,17 @@ export default class TokenServices {
                 refreshKey
             }
 
-            // Create key store using UserTokenKeys
-            const createdStore = await this.keyStoreRepository.create(keystoreData)
+            const keyStore = await this.keyStoreRepository.findKeyStoreByUserId(userId)
 
-            if (!createdStore) {
-                throw new ApiError(500, 'Error creating key store')
+            if (!keyStore) {
+                // Create key store using UserTokenKeys
+                await this.keyStoreRepository.create(keystoreData)
+            } else {
+                // Update key store using UserTokenKeys
+                await this.keyStoreRepository.update(keyStore.id, keystoreData)
             }
-            
         } catch (error) {
-            throw new ApiError(500, (error as Error).message)
+            return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('create key store')), req, next, 500)
         }
     }
 
@@ -199,7 +234,7 @@ export default class TokenServices {
      * @returns A promise that resolves to the generated token string.
      * @throws {ApiError} If there is an error generating the token or encoding the payload.
      */
-    private async generatePayloadToken(id: string, name: string, key: string, expiry: string): Promise<string> {
+    private async generatePayloadTokenService(req: Request, next: NextFunction, id: string, key: string, expiry: string): Promise<string | void> {
         try {
             const tokenPayload = {
                 issuer: tokenInfo.token_issuer || '',
@@ -209,15 +244,9 @@ export default class TokenServices {
                 validity: parseInt(expiry)
             }
 
-            const token = await encode(tokenPayload)
-
-            if (!token) {
-                throw new ApiError(403, `Error generating ${name} token`)
-            }
-
-            return token
+            return await encode(req, next, tokenPayload)
         } catch (error) {
-            throw new ApiError(500, (error as Error).message)
+            return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('generate token')), req, next, 500)
         }
     }
 
