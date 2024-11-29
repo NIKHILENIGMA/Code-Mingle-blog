@@ -1,5 +1,4 @@
-import { Request, Response } from 'express'
-import { z } from 'zod'
+import { NextFunction, Request, Response } from 'express'
 import { AsyncHandler } from '../utils/AsyncHandler'
 import { User } from '../Lib/Models/User'
 import UserServices from '../services/user.service'
@@ -17,19 +16,18 @@ const userServices = new UserServices()
  * @returns Promise<User> - updated user details
  */
 
-export const updateUser = AsyncHandler(async (req: Request, res: Response) => {
+export const updateUser = AsyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     try {
         const user = req.body as User
         const id = req.params.id
         await userServices.updateUserDetails(id, user)
 
-        res.status(200).json(new ApiResponse(200, user, id))
+        ApiResponse(req, res, 200, 'User updated successfully', {
+            user: user
+        })
+
     } catch (error) {
-        if (error instanceof z.ZodError) {
-            res.status(400).json(new ApiError(400, error.errors.map((err) => err.message).join(', ')))
-        } else {
-            throw new ApiError(500, (error as Error).message)
-        }
+        ApiError(new Error(`${(error instanceof Error)}`), req, next, 403)
     }
 })
 
@@ -42,7 +40,7 @@ export const updateUser = AsyncHandler(async (req: Request, res: Response) => {
 
 export const getUser = AsyncHandler(async (_: Request, res: Response) => {
     await Promise.resolve()
-    res.status(200).json(new ApiResponse(200, null, 'User details fetched successfully'))
+    ApiResponse(_, res, 200, 'User fetched successfully')
 })
 
 /**
@@ -54,7 +52,8 @@ export const getUser = AsyncHandler(async (_: Request, res: Response) => {
 
 export const getAllUsers = AsyncHandler(async (_: Request, res: Response) => {
     await Promise.resolve()
-    res.status(200).json(new ApiResponse(200, null, 'All users fetched successfully'))
+
+    ApiResponse(_, res, 200, 'Users fetched successfully')
 })
 
 /**
@@ -66,7 +65,7 @@ export const getAllUsers = AsyncHandler(async (_: Request, res: Response) => {
 
 export const removeUser = AsyncHandler(async (_: Request, res: Response) => {
     await Promise.resolve()
-    res.status(200).json(new ApiResponse(200, null, 'User deleted successfully'))
+    ApiResponse(_, res, 200, 'User deleted successfully')
 })
 
 
@@ -79,7 +78,7 @@ export const removeUser = AsyncHandler(async (_: Request, res: Response) => {
 
 export const getFollowers = AsyncHandler(async (_: Request, res: Response) => {
     await Promise.resolve()
-    res.status(200).json(new ApiResponse(200, null, 'Followers fetched successfully'))
+    ApiResponse(_, res, 200, 'Followers fetched successfully')
 })
 
 /**
@@ -91,7 +90,7 @@ export const getFollowers = AsyncHandler(async (_: Request, res: Response) => {
 
 export const getFollowing = AsyncHandler(async (_: Request, res: Response) => {
     await Promise.resolve()
-    res.status(200).json(new ApiResponse(200, null, 'Following fetched successfully'))
+    ApiResponse(_, res, 200, 'Following fetched successfully')
 })
 
 /**
@@ -103,7 +102,7 @@ export const getFollowing = AsyncHandler(async (_: Request, res: Response) => {
 
 export const followUser = AsyncHandler(async (_: Request, res: Response) => {
     await Promise.resolve()
-    res.status(200).json(new ApiResponse(200, null, 'User followed successfully'))
+    ApiResponse(_, res, 200, 'User followed successfully')
 })
 
 /**
@@ -115,5 +114,5 @@ export const followUser = AsyncHandler(async (_: Request, res: Response) => {
 
 export const unfollowUser = AsyncHandler(async (_: Request, res: Response) => {
     await Promise.resolve()
-    res.status(200).json(new ApiResponse(200, null, 'User unfollowed successfully'))
+    ApiResponse(_, res, 200, 'User unfollowed successfully')
 })

@@ -1,19 +1,38 @@
-import { Request, Response } from 'express'
-import { AsyncHandler } from '../utils/AsyncHandler'
+import { NextFunction, Request, Response } from 'express'
 import { ApiResponse } from '../utils/ApiResponse'
 import { ApiError } from '../utils/ApiError'
-import { ILoginUser, ISignupUser } from '../Lib/Models/User'
-import { cookieOptions } from '../constant/cookieOptions'
-import AuthService from '../services/auth.service'
+import { AsyncHandler } from '../utils/AsyncHandler'
 import { ProtectedRequest } from '../types/app-request'
-import { KeyStore } from '../Lib/Models/KeyStore'
+import { ILoginUser, ISignupUserBody, IForgotPassword } from '../Lib/Models/User'
+import AuthService from '../services/auth.service'
 import TokenServices from '../services/token.service'
 import MailService from '../services/mail.service'
-// import logger from '../utils/logger'
+import responseMessage from '../constant/responseMessage'
+import config, { tokenInfo } from '../config/config'
+import { EApplicationEnvironment } from '../constant/application'
+
 
 const authServices = new AuthService()
 const tokenService = new TokenServices()
 const mailService = new MailService()
+
+/**
+ * Interface for Signup User Request
+ * @interface ISignupUserRequest
+ * @extends {Request}
+ * @property {ISignupUserBody} body - The user details to create a new account.
+ */
+interface ISignupUserRequest extends Request {
+    body: ISignupUserBody
+}
+
+interface ILoginUserRequest extends Request {
+    body: ILoginUser
+}
+
+interface IForgotPasswordRequest extends Request {
+    body: IForgotPassword
+}
 
 /**
  * Create a new User
@@ -24,25 +43,21 @@ const mailService = new MailService()
  * @throws {ApiError} - Throws an error if user creation fails.
  */
 
-export const signup = AsyncHandler(async (req: Request, res: Response): Promise<void> => {
+export const signup = AsyncHandler(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-        const user = req.body as ISignupUser
+        const { body } = req as ISignupUserRequest
 
-        const newUser = await authServices.createUser(user)
+        const newUser = await authServices.userRegisterService(req, next, body)
 
-        const tokens = await tokenService.generateTokens(newUser.id)
-
-        // Check if user was created successfully
-        if (!tokens || !newUser) {
-            throw new ApiError(500, 'Error occur while creating user account')
+        if (!newUser) {
+            ApiError(new Error(responseMessage.METHOD_FAILED('new user')), req, next, 403)
         }
 
-        res.status(200)
-            .cookie('access_token', tokens.accessToken, cookieOptions)
-            .cookie('refresh_token', tokens.refreshToken, cookieOptions)
-            .json(new ApiResponse(201, { newUser, tokens }, 'User created successfully'))
+        return ApiResponse(req, res, 200, 'User created successfully', {
+            user: newUser
+        })
     } catch (error) {
-        throw new ApiError(500, `Error creating user: ${(error as Error).message}`)
+        return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('register  user')), req, next, 500)
     }
 })
 
@@ -53,24 +68,42 @@ export const signup = AsyncHandler(async (req: Request, res: Response): Promise<
  * @returns res - The response object containing the user data and tokens.
  */
 
-export const login = AsyncHandler(async (req: Request, res: Response) => {
+export const login = AsyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const user = req.body as ILoginUser
+        const { body } = req as ILoginUserRequest
 
-        const userData = await authServices.loginUser(user)
+        const userData = await authServices.userLoginService(req, next, body)
 
-        const tokens = await tokenService.generateTokens(userData.id)
-
-        if (!tokens || !userData) {
-            throw new ApiError(500, 'Error logging in user')
+        if (!userData) {
+            return ApiError(new Error(responseMessage.METHOD_FAILED('retriving user')), req, next, 403)
         }
 
-        res.status(200)
-            .cookie('access_token', tokens.accessToken, cookieOptions)
-            .cookie('refresh_token', tokens.refreshToken, cookieOptions)
-            .json(new ApiResponse(200, { tokens, userData }, 'User logged in successfully'))
+        const tokens = await tokenService.generateAccessAndRefreshTokenService(req, next, userData.id)
+
+        if (!tokens) {
+            return ApiError(new Error(responseMessage.METHOD_FAILED('generating tokens')), req, next, 403)
+        }
+
+        res
+          .cookie('access_token', tokens.accessToken, {
+            httpOnly: true,
+            secure: !(config.ENV === EApplicationEnvironment.PRODUCTION),
+            sameSite: 'strict',
+            maxAge: 1000 * parseInt(tokenInfo.access_validity as string)
+        })
+          .cookie('refresh_token', tokens.refreshToken, {
+            httpOnly: true,
+            secure: !(config.ENV === EApplicationEnvironment.PRODUCTION),
+            sameSite: 'strict',
+            maxAge: 1000 * parseInt(tokenInfo.refresh_validity as string)  
+        })
+
+        return ApiResponse(req, res, 200, 'User logged in successfully', {
+            token: tokens.accessToken,
+            user: userData
+        })
     } catch (error) {
-        throw new ApiError(500, (error as Error).message)
+        ApiError(new Error(`Error logging in user: ${(error as Error).message}`), req, next, 403)
     }
 })
 
@@ -81,18 +114,24 @@ export const login = AsyncHandler(async (req: Request, res: Response) => {
  * @returns res - The response object containing the log out status.
  */
 
-export const logout = AsyncHandler(async (req: ProtectedRequest, res: Response): Promise<void> => {
+export const logout = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
-        const keyStoreId: number = (req.keyStore as KeyStore).id
+        const cookies = req.cookies as Record<string, string>
+        const refreshToken = cookies['refresh_token']
 
-        await tokenService.removeTokenById(keyStoreId)
+        const currentUserId = (req.user as Record<string, string>)?.id
 
-        res.status(200)
-            .clearCookie('access_token', cookieOptions)
-            .clearCookie('refresh_token', cookieOptions)
-            .json(new ApiResponse(200, null, 'User logged out successfully'))
+        if (!currentUserId) {
+            return ApiError(new Error(responseMessage.NOT_FOUND('user')), req, next, 404)
+        }
+
+        if (refreshToken) {
+            await tokenService.removeRefreshToken(req, next, currentUserId, refreshToken)
+        }
+
+        return ApiResponse(req, res, 200, 'User logged out successfully')
     } catch (error) {
-        throw new ApiError(500, (error as Error).message)
+        return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('logout')), req, next, 500)
     }
 })
 
@@ -103,19 +142,30 @@ export const logout = AsyncHandler(async (req: ProtectedRequest, res: Response):
  * @returns res - The response object containing the password recovery status.
  */
 
-export const forgotPassword = AsyncHandler(async (req: Request, res: Response): Promise<void> => {
-    // User Requests Password Reset:
-    const { email } = req.body as { email: string }
+export const forgotPassword = AsyncHandler(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        // User Requests Password Reset:
+        const { body } = req as IForgotPasswordRequest
 
-    const user = await authServices.verifyUser(email)
+        const user = await authServices.userForgotPasswordService(req, next, body.email)
 
-    // Generate a password reset token
-    const resetToken = await tokenService.generateResetToken(user.id)
+        if (!user) {
+            return ApiError(new Error(responseMessage.NOT_FOUND('user with email')), req, next, 404)
+        }
+        // Generate a password reset token
+        const resetToken = await tokenService.generateResetToken(req, next, user.id)
 
-    // Send password reset email
-    await mailService.sendPasswordResetEmail(email, resetToken)
+        if (!resetToken) {
+            return ApiError(new Error(responseMessage.INVALID_TOKEN), req, next, 403)
+        }
 
-    res.status(200).json(new ApiResponse(200, null, 'Password reset email sent successfully'))
+        // Send password reset email
+        await mailService.sendPasswordResetEmail(user.email, resetToken)
+
+        return ApiResponse(req, res, 200, 'Password reset email sent successfully')
+    } catch (error) {
+        return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('forgot password')), req, next, 500)
+    }
 })
 
 /**
@@ -132,40 +182,60 @@ export const forgotPassword = AsyncHandler(async (req: Request, res: Response): 
  * @throws Will throw an error if the reset token is invalid or if the password change operation fails.
  */
 
-export const resetPassword = AsyncHandler(async (req: Request, res: Response): Promise<void> => {
+export const resetPassword = AsyncHandler(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const { token, newPassword } = req.body as { token: string; newPassword: string }
 
         // Verify the reset token
-        const userId = await tokenService.verifyResetToken(token)
+        const userId = await tokenService.verifyResetToken(req, next, token)
 
-        await authServices.changePassword(userId, newPassword)
+        if (!userId) {
+            return ApiError(new Error(responseMessage.INVALID_TOKEN), req, next, 403)
+        }
 
-        res.status(200).json(new ApiResponse(200, null, 'Password reset successful'))
+        await authServices.changePasswordService(req, next, userId, newPassword)
+
+        return ApiResponse(req, res, 200, responseMessage.SUCCESS('Password reset'))
     } catch (error) {
-        throw new ApiError(500, `Error resetting password: ${(error as Error).message}`)
+        return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('reset password')), req, next, 500)
     }
 })
 
-export const refreshToken = AsyncHandler(async (req: Request, res: Response): Promise<void> => {
+export const refreshAccessToken = AsyncHandler(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-        const { refresh_token: refreshToken } = (req.body as { refresh_token: string }) || (req.cookies as Record<string, string>).refresh_token
+        const tokens = req.cookies as Record<string, string>
+        // console.log(refreshCookie);
 
-        const userId = await tokenService.verifyRefreshToken(refreshToken)
+        const { access_token, refresh_token } = tokens
 
-        const tokens = await tokenService.generateTokens(userId)
-
-        if (!tokens) {
-            throw new ApiError(500, 'Error refreshing token')
+        if (access_token) {
+            return ApiResponse(req, res, 200, 'User already logged in', {
+                token: access_token
+            })
         }
 
-        res.status(200)
-            .cookie('access_token', tokens.accessToken, cookieOptions)
-            .cookie('refresh_token', tokens.refreshToken, cookieOptions)
-            .json(new ApiResponse(200, { tokens }, 'Token refreshed successfully'))
+        const newTokens = await tokenService.refreshTokenService(req, next, refresh_token)
+
+        if (!newTokens) {
+            return ApiError(new Error(responseMessage.INVALID_TOKEN), req, next, 403)
+        }
+
+        res.cookie('access_token', newTokens.accessToken, {
+            httpOnly: true,
+            secure: !(config.ENV === EApplicationEnvironment.PRODUCTION),
+            sameSite: 'strict',
+            maxAge: 1000 * parseInt(tokenInfo.access_validity as string)
+        }).cookie('refresh_token', newTokens.refreshToken, {
+            httpOnly: true,
+            secure: !(config.ENV === EApplicationEnvironment.PRODUCTION),
+            sameSite: 'strict',
+            maxAge: 1000 * parseInt(tokenInfo.refresh_validity as string)
+        })
+
+        return ApiResponse(req, res, 200, 'Token refreshed successfully', {
+            token: newTokens.accessToken
+        })
     } catch (error) {
-        throw new ApiError(500, `Error refreshing token: ${(error as Error).message}`)
-        // req.body.refresh_token as { refresh_token: string }
-        //
+        return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('refresh token')), req, next, 500)
     }
 })
