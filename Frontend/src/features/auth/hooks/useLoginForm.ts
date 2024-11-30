@@ -5,37 +5,39 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { z } from "zod";
 import { setAccessToken, setPersist } from "../authSlice";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { LoginSchema } from "@/features/auth/schema/schema";
 
-const schema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
-});
-
-type LoginFormInputs = z.infer<typeof schema>;
+type LoginFormInputs = z.infer<typeof LoginSchema>;
 
 export const useLoginForm = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const location = useLocation();
+  const from = location.state?.from?.pathname || "/";
+  console.log("From: ", location.state?.from);
+
+  
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
   } = useForm<LoginFormInputs>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(LoginSchema),
   });
 
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   /**
    * Custom hook that provides a mutation function to log in a user.
-   * 
+   *
    * @returns An object containing the `mutateAsync` function renamed to `loginUserMutation`.
-   * 
-   * 
+   *
+   *
    * @throws Will throw an error if the login service fails.
    */
-  
+
   const { mutateAsync: loginUserMutation } = useMutation({
     mutationFn: async ({ email, password }: LoginFormInputs) => {
       try {
@@ -59,20 +61,16 @@ export const useLoginForm = () => {
       console.log("Login successfully: ", response.data);
 
       // Set the access token in the store
-      dispatch(
-        setAccessToken({
-          accessToken: response.data?.token,
-        })
-      );
+      dispatch(setAccessToken({ accessToken: response.data?.token }));
 
       // Set the persist flag in the store
       dispatch(setPersist({ persist: true }));
-      
+
       // Reset the form
       reset();
 
       // Navigate to the home page
-      navigate("/");
+      navigate(from)
     } catch (error) {
       throw new Error(`Failed to login: ${error}`);
     }

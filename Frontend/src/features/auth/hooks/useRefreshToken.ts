@@ -1,4 +1,4 @@
-import { refreshTokenService } from "@/services/api/authServices";
+import { RefreshTokenResponse, refreshTokenService } from "@/services/api/authServices";
 import { setAccessToken, setPersist } from "@/features/auth/authSlice";
 import { useDispatch } from "react-redux";
 
@@ -7,16 +7,11 @@ const useRefreshToken = () => {
 
   const refreshToken = async () => {
     try {
-      const response = (await refreshTokenService()) as { data: { token: string };
-      };
+      const response  = await refreshTokenService() as RefreshTokenResponse;
+      
+      console.log("useRefeshtoken response value: ",response.data.token);
 
-      console.log(
-        "useRefeshtoken response value: ",
-        response.data.token
-      );
-      dispatch(
-        setAccessToken({ accessToken: response.data.token })
-      );
+      dispatch(setAccessToken({ accessToken: response.data.token }));
       dispatch(setPersist({ persist: true }));
 
       console.log("Refresh token store in redux state successfully: ", response.data.token);
