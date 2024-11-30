@@ -1,49 +1,35 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-interface User {
-  name: string;
-}
-
 interface AuthState {
-  isAuthenticated: boolean;
-  user: User | null;
-  token: string | null;
-  error: string | null;
+  accessToken: string | null;
+  persist: boolean;
 }
 
 const initialState: AuthState = {
-  isAuthenticated: false,
-  user: null,
-  token: null,
-  error: null,
+  accessToken: null,
+  persist: JSON.parse(localStorage.getItem("persist") || "false"),
 };
 
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    loginSuccess: (
-      state,
-      action: PayloadAction<{ user: User; token: string }>
-    ) => {
-      state.isAuthenticated = true;
-      state.user = action.payload.user;
-      state.token = action.payload.token;
-      state.error = null;
+    setAccessToken: (state, action: PayloadAction<{ accessToken: string; }>) => {
+      state.accessToken = action.payload.accessToken;
     },
 
-    loginFailed: (state, action: PayloadAction<string>) => {
-      state.isAuthenticated = false;
-      state.user = null;
-      state.token = null;
-      state.error = action.payload;
+    setPersist: (state, action: PayloadAction<{ persist: boolean}>) => {
+      state.persist = action.payload.persist;
+      localStorage.setItem("persist", JSON.stringify(action.payload.persist));
     },
 
-    logout: () => {
-      return initialState;
+    clearAuth: (state) => {
+      state.accessToken = null;
+      state.persist = false;
+      localStorage.removeItem("persist");
     },
   },
 });
 
-export const { loginSuccess, loginFailed, logout } = authSlice.actions;
+export const { setAccessToken, setPersist, clearAuth } = authSlice.actions;
 export default authSlice.reducer;
