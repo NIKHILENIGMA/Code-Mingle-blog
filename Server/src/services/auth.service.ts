@@ -48,7 +48,7 @@ export default class AuthService {
         }
     }
 
-    public async userLoginService(req: Request, next: NextFunction, credientials: ILoginUser): Promise<IUser | void> {
+    public async userLoginService(req: Request, next: NextFunction, credientials: ILoginUser): Promise<string | void> {
         try {
             const user = await this.verifyUserByEmail(credientials.email)
 
@@ -62,10 +62,7 @@ export default class AuthService {
                 return ApiError(new Error(responseMessage.INVALID_PASSWORD), req, next, 401)
             }
 
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { password, ...userDetails } = user
-
-            return userDetails
+            return user.id
         } catch (error) {
             return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('login service')), req, next, 401)
         }
