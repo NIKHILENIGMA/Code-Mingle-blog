@@ -159,7 +159,7 @@ export default class TokenServices {
      * @returns {Promise<string>} - A promise that resolves to the user ID associated with the reset token.
      * @throws {ApiError} - Throws an error if the token does not exist, has expired, or if there is an error during verification.
      */
-    public async verifyResetToken(req: Request, next: NextFunction, token: string): Promise<string | void> {
+    public async verifyResetTokenService(req: Request, next: NextFunction, token: string): Promise<string | void> {
         try {
             const hashToken = crypto.createHash('sha256').update(token).digest('hex')
 
