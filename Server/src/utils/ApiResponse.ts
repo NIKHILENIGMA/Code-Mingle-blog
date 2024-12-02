@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import { THttpResponse } from '../types/types'
 import config from '../config/config'
 import logger from './logger'
+import { EApplicationEnvironment } from '../constant/application'
 
 
 /**
@@ -21,7 +22,7 @@ export const ApiResponse = (req: Request, res: Response, responseStatusCode: num
         success: true,
         statusCode: responseStatusCode,
         request: {
-            ip: req.ip,
+            ip: req.ip || null,
             method: req.method,
             url: req.url
         },
@@ -31,7 +32,7 @@ export const ApiResponse = (req: Request, res: Response, responseStatusCode: num
 
     logger.info(`${response.request.method} ${response.request.url} ${response.statusCode} ${response.message}`)
 
-    if (config.ENV === 'production') {
+    if (config.ENV === EApplicationEnvironment.PRODUCTION) {
         delete response.request.ip
     }
 
