@@ -1,6 +1,38 @@
 import { AUTHENTICATIONURL } from "@/constants/constants";
 import { apiInstance } from "./apiInstance";
 import { RegisterUser } from "@/Types/auth";
+import axios, { AxiosResponse } from "axios";
+
+export interface RefreshTokenResponse {
+  data: {
+    token: string;
+  }
+}
+
+export interface LoginResponse {
+  accessToken: string;
+  refreshToken: string;
+}
+
+export interface ForgotPasswordResponse {
+  token: string;
+}
+
+export const currentUserService = async () => {
+  try {
+    const response = await apiInstance.get(`${AUTHENTICATIONURL}/get-user`);
+
+    if (response.status !== 200) {
+      throw new Error("Failed to get current user");
+    }
+
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+
 
 export const signup = async (user: RegisterUser) => {
   try {
@@ -35,23 +67,18 @@ export const loginService = async (email: string, password: string) => {
   }
 };
 
-export const logout = async (): Promise<unknown> => {
+export const logoutService = async (): Promise<void> => {
   try {
-    const response = await apiInstance.post(`${AUTHENTICATIONURL}/logout`);
+    await apiInstance.delete(`${AUTHENTICATIONURL}/logout`);
 
-    if (response.status !== 200) {
-      throw new Error("Failed to logout");
-    }
-
-    return response.data;
   } catch (error) {
     console.error(error);
   }
 };
 
-export const refreshTokenService = async () => {
+export const refreshTokenService = async (): Promise<RefreshTokenResponse | void> => {
   try {
-    const response = await apiInstance.post(
+    const response: AxiosResponse<RefreshTokenResponse> = await apiInstance.post(
       `${AUTHENTICATIONURL}/refresh-token`
     );
 
@@ -61,11 +88,13 @@ export const refreshTokenService = async () => {
 
     return response.data;
   } catch (error) {
-    console.error(error);
+     if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data.message);
+     }
   }
 };
 
-export const forgotPassword = async (email: string) => {
+export const forgotPassword = async (email: string): Promise<ForgotPasswordResponse | void> => {
   try {
     const response = await apiInstance.post(
       `${AUTHENTICATIONURL}/forgot-password`,
@@ -82,11 +111,11 @@ export const forgotPassword = async (email: string) => {
   }
 };
 
-export const resetPassword = async (email: string) => {
+export const resetPassword = async (password: string, confirmPassword: string) => {
   try {
     const response = await apiInstance.post(
       `${AUTHENTICATIONURL}/reset-password`,
-      { email }
+      { password, confirmPassword }
     );
 
     if (response.status !== 200) {
