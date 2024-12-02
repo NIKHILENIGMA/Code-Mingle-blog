@@ -14,4 +14,9 @@ export const CATEGORYURL = "/v1/category";
 export const SETTINGURL = "/v1/setting";
 export const CONTACTURL = "/v1/contact";
 
-
+export const NavItems = [
+  { name: "Home", path: "/" },
+  { name: "About", path: "/about" },
+  { name: "Contact", path: "/contact" },
+  { name: "write", path: "/write" },
+];
