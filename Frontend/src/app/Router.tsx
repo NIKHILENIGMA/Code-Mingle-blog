@@ -1,9 +1,9 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import HomePage from "../pages/HomePage";
+import HomePage from "../pages/Public/HomePage";
 import React from "react";
-import AboutPage from "../pages/AboutPage";
+import AboutPage from "../pages/Public/AboutPage";
 import Main from "@/Layout/Main";
-import AuthProvider from "@/components/AuthProvider";
+import AuthProvider from "@/features/auth/components/AuthProvider";
 
 const router = createBrowserRouter([
   {
@@ -37,10 +37,14 @@ const router = createBrowserRouter([
       {
         path: "/write",
         lazy: async () => {
-          const WritePage = (await import("@/pages/Blog/WriteBlogPage"))
+          const CreatePostPage = (await import("@/pages/Blog/CreatePostPage"))
             .default;
           return {
-            element: <WritePage />,
+            element: (
+              <AuthProvider>
+                <CreatePostPage />
+              </AuthProvider>
+            ),
           };
         },
       },
@@ -57,6 +61,17 @@ const router = createBrowserRouter([
   },
   {
     path: "/forgot-password",
+    lazy: async () => {
+      const ResetPasswordPage = (
+        await import("@/pages/Auth/ForgotPasswordPage")
+      ).default;
+      return {
+        element: <ResetPasswordPage />,
+      };
+    },
+  },
+  {
+    path: "/reset-password",
     lazy: async () => {
       const ResetPasswordPage = (await import("@/pages/Auth/ResetPasswordPage"))
         .default;
@@ -78,7 +93,8 @@ const router = createBrowserRouter([
   {
     path: "*",
     lazy: async () => {
-      const NotFoundPage = (await import("../pages/NotFoundPage")).default;
+      const NotFoundPage = (await import("../pages/Public/NotFoundPage"))
+        .default;
       return {
         element: <NotFoundPage />,
       };
