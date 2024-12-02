@@ -30,7 +30,7 @@ export interface IUser {
     updatedAt: Date
 }
 
-export interface ISignupUser {
+export interface ISignupUserBody {
     firstName?: string
     lastName?: string
     email: string
@@ -40,4 +40,8 @@ export interface ISignupUser {
 export interface ILoginUser {
     email: string
     password: string
+}
+
+export interface IForgotPassword {
+    email: string
 }

@@ -17,3 +17,7 @@ export const tokenInfo = {
     role: process.env.JWT_ROLE,
     reset_validity: process.env.RESET_TOKEN_VALIDITY_IN_SEC,
 }
+
+export const configMailService = {
+    resendApiKey: process.env.RESEND_MAIL_SERVICE_API_KEY,
+}

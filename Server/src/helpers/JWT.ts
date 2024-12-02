@@ -4,6 +4,8 @@ import jwt from 'jsonwebtoken'
 import { promisify } from 'node:util'
 import path from 'node:path'
 import { ProtectedRequest } from '../types/app-request'
+import { NextFunction, Request } from 'express'
+import responseMessage from '../constant/responseMessage'
 
 export type JWTPayload = {
     issuer: string
@@ -33,7 +35,7 @@ export type Payload = {
  */
 const readFileAsync = promisify(readFile)
 
-export async function readFileKey(keyName: string): Promise<string> {
+export async function readFileKey(req: Request, next: NextFunction, keyName: string): Promise<string | void> {
     try {
         let filePath: string
         if (keyName === 'private') {
@@ -41,11 +43,11 @@ export async function readFileKey(keyName: string): Promise<string> {
         } else if (keyName === 'public') {
             filePath = path.join(__dirname, '../../keys/public_key.pem')
         } else {
-            throw new ApiError(400, 'Invalid keyName provided')
+            return ApiError(new Error(responseMessage.BAD_REQUEST('file reading')), req, next, 400)
         }
         return await readFileAsync(filePath, 'utf-8')
     } catch (error) {
-        throw new ApiError(404, `Error reading key file: ${(error as Error)?.message}`)
+        return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('Read File Key failed')), req, next, 500)
     }
 }
 
@@ -62,18 +64,18 @@ export async function readFileKey(keyName: string): Promise<string> {
  * @returns The `encode` function returns a Promise that resolves to a string, which is the encoded JWT
  * token generated using the `jwt.sign` method with the RS256 algorithm.
  */
-export const encode = async (payload: Payload): Promise<string> => {
+export const encode = async (req: Request, next: NextFunction, payload: Payload): Promise<string | void> => {
     try {
-        const secret = await readFileKey('private')
+        const secret = await readFileKey(req, next, 'private')
 
         if (!secret) {
-            throw new ApiError(500, 'Error reading private key file')
+            return ApiError(new Error(responseMessage.BAD_REQUEST('reading secrete')), req, next, 400)
         }
 
         const token = jwt.sign(payload, secret, { algorithm: 'RS256' })
         return token
     } catch (error) {
-        throw new ApiError(500, `Error encoding JWT: ${(error as Error).message}`)
+        return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('Encode JWT Token failed')), req, next, 500)
     }
 }
 
@@ -87,22 +89,25 @@ export const encode = async (payload: Payload): Promise<string> => {
  * payload.
  */
 
-export const decode = async (token: string): Promise<JWTPayload> => {
+export const decode = async (req: Request, next: NextFunction, token: string): Promise<JWTPayload | void> => {
     try {
-        const publicKey = await readFileKey('public')
+        const publicKey = await readFileKey(req, next, 'public')
+
+        if (!publicKey) {
+            return ApiError(new Error(responseMessage.BAD_REQUEST('reading public key')), req, next, 400)
+        }
+        
         const decoded = jwt.verify(token, publicKey, { algorithms: ['RS256'] }) as JWTPayload
         return decoded
     } catch (error) {
-        throw new ApiError(401, `Error decoding JWT: ${(error as Error).message}`)
+        return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('Decode JWT Token failed')), req, next, 500)
     }
 }
-
 
 export const checkAccessToken = (req: ProtectedRequest): string | null => {
-    const authHeader = req.headers['authorization'];
+    const authHeader = req.headers['authorization']
     if (authHeader && authHeader.startsWith('Bearer ')) {
-        return authHeader.split(' ')[1];
+        return authHeader.split(' ')[1]
     }
-    return null;
+    return null
 }
-

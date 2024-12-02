@@ -1,6 +1,6 @@
 // Auth routes for handling user authentication and authorization.
 import { Router } from 'express'
-import { forgotPassword, login, logout, refreshAccessToken, resetPassword, signup } from '../controllers/auth.controller'
+import { currentUser, forgotPassword, login, logout, refreshAccessToken, resetPassword, signup } from '../controllers/auth.controller'
 import { isAuthenticated } from '../middleware/authentication.middleware'
 import { validateSchema } from '../middleware/validateSchema.middleware'
 import { signupSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema } from '../schemas/user.schema'
@@ -70,5 +70,17 @@ router.route('/reset-password').post(validateSchema(resetPasswordSchema),resetPa
  * @param {function} refreshToken - Controller function to handle token refresh.
  */
 router.route('/refresh-token').post(refreshAccessToken)
+
+/**
+ * Route for getting current user.
+ * @name get/get-user
+ * @function
+ * @memberof module:auth.routes
+ * @inner
+ * @param {function} isAuthenticated - Middleware to check if user is authenticated.
+ * @param {function} currentUser - Controller function to get current user.
+ */
+
+router.route('/get-user').get(isAuthenticated, currentUser)
 
 export default router

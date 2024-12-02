@@ -24,5 +24,5 @@ export const resetPasswordSchema = z.object({
 })
 
 export const refreshTokenSchema = z.object({
-    refresh_token: z.string()
+    refresh_token: z.string().optional()
 })
