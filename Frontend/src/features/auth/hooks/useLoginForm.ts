@@ -1,10 +1,10 @@
-import { loginService } from "@/services/api/authServices";
+import { currentUserService, loginService } from "@/services/api/authServices";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { z } from "zod";
-import { setAccessToken, setPersist } from "../authSlice";
+import { setAccessToken, setPersist, setUser } from "../authSlice";
 import { useLocation, useNavigate } from "react-router-dom";
 import { LoginSchema } from "@/features/auth/schema/schema";
 
@@ -42,6 +42,7 @@ export const useLoginForm = () => {
     mutationFn: async ({ email, password }: LoginFormInputs) => {
       try {
         const response = await loginService(email, password);
+
         return response;
       } catch (error) {
         throw new Error(`Login service failed: ${(error as Error).message}`);
@@ -68,6 +69,10 @@ export const useLoginForm = () => {
 
       // Reset the form
       reset();
+
+      const user = await currentUserService();
+
+      dispatch(setUser({ user }));
 
       // Navigate to the home page
       navigate(from)
