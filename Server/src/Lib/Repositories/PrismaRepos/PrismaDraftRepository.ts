@@ -1,0 +1,102 @@
+import { Post, PostStatus } from '@prisma/client'
+import prisma from '../../database/PrismaConnection'
+import { IDraftRepository } from '../Interfaces/IDraftRepository'
+import { PostDTO } from '../../Models/Blog'
+
+export class PrismaDraftRepository implements IDraftRepository {
+    public async create(payload: Partial<Post>): Promise<Post> {
+        const { authorId, status } = payload
+
+        const draft = await prisma.post.create({
+            data: {
+                authorId: authorId as string,
+                status: status as PostStatus
+            }
+        })
+
+        return draft
+    }
+
+    public async update(id: string, payload: Partial<Post>): Promise<Post> {
+        try {
+            const draft = await prisma.post.update({
+                where: {
+                    id
+                },
+                data: payload
+            })
+
+            return draft
+        } catch (error) {
+            throw new Error(`Failed to update draft ${(error as Error).message}`)
+        }
+    }
+
+    public async delete(id: string): Promise<void> {
+        try {
+            await prisma.post.delete({
+                where: {
+                    id: id
+                }
+            })
+        } catch (error) {
+            throw new Error(`Failed to delete draft ${(error as Error).message}`)
+        }
+    }
+
+    public async findDraft(id: string, authorId: string, fields: PostDTO): Promise<Partial<Post> | null> {
+        try {
+            const draft = await prisma.post.findUnique({
+                where: {
+                    id,
+                    authorId
+                },
+                select: fields
+            })
+
+            return draft
+        } catch (error) {
+            throw new Error(`Failed to find draft ${(error as Error).message}`)
+        }
+    }
+
+    public async findDraftById(id: string, authorId: string): Promise<Post | null> {
+        const draft = await prisma.post.findUnique({
+            where: {
+                id,
+                authorId
+            }
+        })
+
+        return draft
+    }
+
+    public async findDraftBySlug(slug: string): Promise<Post | null> {
+        try {
+            const draft = await prisma.post.findUnique({
+                where: {
+                    slug: slug
+                }
+            })
+
+            return draft
+        } catch (error) {
+            throw new Error(`Failed to find draft by slug ${(error as Error).message}`)
+        }
+    }
+
+    public async findDraftsByAuthorId(authorId: string): Promise<Post[] | null> {
+        try {
+            const drafts = await prisma.post.findMany({
+                where: {
+                    authorId: authorId,
+                    status: PostStatus.DRAFT || 'DRAFT'
+                }
+            })
+
+            return drafts
+        } catch (error) {
+            throw new Error(`Failed to find drafts ${(error as Error).message}`)
+        }
+    }
+}
