@@ -1,3 +1,4 @@
+import { ISaveDraftBody } from '../Lib/Models/Blog'
 import { Request } from 'express'
 import { User } from '../models/user.model'
 import { KeyStore } from '../models/key-store.model'
@@ -36,4 +37,9 @@ declare interface IResetPasswordRequest extends Request {
 
 declare interface ICurrentUser extends Request {
     user: User
+}
+
+// Draft controller
+declare interface ISaveDraftRequest extends Request {
+    body: ISaveDraftBody
 }
