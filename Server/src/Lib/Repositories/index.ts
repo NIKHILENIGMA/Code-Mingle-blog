@@ -2,11 +2,11 @@
 import { IUserRepository } from './Interfaces/IUserRepository'
 import { IKeyStoreRepository } from './Interfaces/IKeyStore'
 import { IResetPasswordRepository } from './Interfaces/IResetPasswordRepository'
-import { PrismaUserRepository } from './Prisma/PrismaUserRepository'
-import { PrismaResetPasswordRepository } from './Prisma/PrismaResetPasswordRepository'
-import { PrismaKeyStoreRepository } from './Prisma/PrismaKeyStoreRepository'
-import { PrismaBlogRepository } from './Prisma/PrismaBlogRepository'
-import { IBlogRepository } from './Interfaces/IBlogRepository'
+import { PrismaUserRepository } from './PrismaRepos/PrismaUserRepository'
+import { PrismaResetPasswordRepository } from './PrismaRepos/PrismaResetPasswordRepository'
+import { PrismaKeyStoreRepository } from './PrismaRepos/PrismaKeyStoreRepository'
+import { PrismaDraftRepository } from './PrismaRepos/PrismaDraftRepository'
+import { IDraftRepository } from './Interfaces/IDraftRepository'
 
 export class RepositoryFactory {
     static UserRepository(): IUserRepository {
@@ -21,8 +21,8 @@ export class RepositoryFactory {
         return new PrismaResetPasswordRepository()
     }
 
-    static BlogRepository(): IBlogRepository {
-        return new PrismaBlogRepository()
+    static DraftRepository(): IDraftRepository {
+        return new PrismaDraftRepository()
     }
     
 }
