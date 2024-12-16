@@ -33,15 +33,27 @@ model User {
 }
 
 model Post {
-  id        String   @id @default(cuid())
-  title     String
-  content   String
-  authorId  String
-  author    User     @relation(fields: [authorId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              String     @id @default(uuid())
+  title           String?
+  content         String?    @db.Text
+  status          PostStatus
+  authorId        String     @map("author_id")
+  author          User       @relation(fields: [authorId], references: [id])
+  createdAt       DateTime   @default(now()) @map("created_at")
+  updatedAt       DateTime   @updatedAt @map("updated_at")
+  publishedAt     DateTime?  @map("published_at")
+  slug            String?    @unique
+  metaDescription String?    @map("meta_description")
+  image           String?    @map("image_url")
 
+  @@index(status)
   @@map("posts")
+}
+
+enum PostStatus {
+  PUBLISHED
+  DRAFT
+  ARCHIVED
 }
 
 model KeyStore {
