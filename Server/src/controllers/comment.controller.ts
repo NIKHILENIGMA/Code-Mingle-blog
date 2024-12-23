@@ -145,9 +145,11 @@ export const createReplyToComment = AsyncHandler(async (req: Request, res: Respo
 
 export const getRepliesByCommentId = AsyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const commentId: string = req.params?.commentId
+    const pageNumber: number = parseInt(req.query?.page as string) || 1
+    const limit: number = parseInt(req.query?.limit as string) || 5
 
     try {
-        const commentReply = await commentServices.getRepliesByCommentIdService(req, next, commentId)
+        const commentReply = await commentServices.getRepliesByCommentIdService(req, next, commentId, pageNumber, limit)
 
         if (!commentReply) {
             return ApiError(new Error(responseMessage.NOT_FOUND('replies')), req, next, 404)
