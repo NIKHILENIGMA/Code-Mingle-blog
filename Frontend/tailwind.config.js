@@ -1,10 +1,8 @@
+import typography from "@tailwindcss/typography";
 /** @type {import('tailwindcss').Config} */
 export default {
-    darkMode: ["class"],
-    content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
+  darkMode: ["class"],
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
   	extend: {
   		borderRadius: {
@@ -52,10 +50,34 @@ export default {
   				'3': 'hsl(var(--chart-3))',
   				'4': 'hsl(var(--chart-4))',
   				'5': 'hsl(var(--chart-5))'
+  			},
+  			sidebar: {
+  				DEFAULT: 'hsl(var(--sidebar-background))',
+  				foreground: 'hsl(var(--sidebar-foreground))',
+  				primary: 'hsl(var(--sidebar-primary))',
+  				'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
+  				accent: 'hsl(var(--sidebar-accent))',
+  				'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
+  				border: 'hsl(var(--sidebar-border))',
+  				ring: 'hsl(var(--sidebar-ring))'
   			}
-  		}
+  		},
+  		typography: '({ theme }) => ({\n        DEFAULT: {\n          css: {\n            "--tw-prose-headings": theme("colors.gray[900]"),\n            p: {\n              marginTop: 0,\n              marginBottom: 0,\n            },\n            ".tiptap p.is-empty::before": {\n              color: "#adb5bd",\n              content: "attr(data-placeholder)",\n              float: "left",\n              height: "0",\n              pointerEvents: "none",\n            },\n            ".tiptap h1.is-empty::before": {\n              color: "#adb5bd",\n              content: "attr(data-placeholder)",\n              float: "left",\n              height: "0",\n              pointerEvents: "none",\n            },\n            ".tiptap h2.is-empty::before": {\n              color: "#adb5bd",\n              content: "attr(data-placeholder)",\n              float: "left",\n              height: "0",\n              pointerEvents: "none",\n            },\n            ".tiptap h3.is-empty::before": {\n              color: "#adb5bd",\n              content: "attr(data-placeholder)",\n              float: "left",\n              height: "0",\n              pointerEvents: "none",\n            },\n          },\n        },\n      })'
   	}
   },
-  plugins: [require("tailwindcss-animate")],
-}
-
+  plugins: [
+    require("tailwindcss-animate"),
+    typography,
+    // function ({ addComponents }) {
+    //   addComponents({
+    //     ".tiptap p.is-editor-empty:first-child::before": {
+    //       color: "#adb5bd",
+    //       content: "attr(data-placeholder)",
+    //       float: "left",
+    //       height: "0",
+    //       pointerEvents: "none",
+    //     },
+    //   });
+    // },
+  ],
+};
