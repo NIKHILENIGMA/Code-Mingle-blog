@@ -3,7 +3,7 @@ import HomePage from "../pages/Public/HomePage";
 import React from "react";
 import AboutPage from "../pages/Public/AboutPage";
 import Main from "@/Layout/Main";
-import AuthProvider from "@/features/auth/components/AuthProvider";
+// import AuthProvider from "@/features/auth/components/AuthProvider";
 
 const router = createBrowserRouter([
   {
@@ -25,31 +25,63 @@ const router = createBrowserRouter([
             await import("@/pages/ProfileManagement/ProfilePage")
           ).default;
           return {
-            element: (
-              <AuthProvider>
-                <ProfilePage />
-              </AuthProvider>
-            ),
+            element: <ProfilePage />,
           };
         },
         children: [],
       },
-      {
-        path: "/write",
-        lazy: async () => {
-          const CreatePostPage = (await import("@/pages/Blog/CreatePostPage"))
-            .default;
-          return {
-            element: (
-              <AuthProvider>
-                <CreatePostPage />
-              </AuthProvider>
-            ),
-          };
-        },
-      },
     ],
   },
+  {
+    path: "/draft/:id",
+    lazy: async () => {
+      const { CreatePostPage } = await import("@/pages");
+      return {
+        element: (
+          // <AuthProvider>
+          <CreatePostPage />
+          // </AuthProvider>
+        ),
+      };
+    },
+  },
+  {
+    path: "/learn-editor-commands",
+    lazy: async () => {
+      const { LearnEditorPage } = await import("@/pages");
+      return {
+        element: <LearnEditorPage />,
+      };
+    },
+  },
+  {
+    path: "/post/read/:id",
+    lazy: async () => {
+      const { ReadPostPage } = await import("@/pages");
+      return {
+        element: <ReadPostPage />,
+      };
+    },
+  },
+  {
+    path: "/edit/:id",
+    lazy: async () => {
+      const { EditPostPage } = await import("@/pages");
+      return {
+        element: <EditPostPage />,
+      };
+    },
+  },
+  {
+    path: "preview/:id",
+    lazy: async () => {
+      const { PreviewPostPage } = await import("@/pages");
+      return {
+        element: <PreviewPostPage />,
+      };
+    },
+  },
+
   {
     path: "/login",
     lazy: async () => {
