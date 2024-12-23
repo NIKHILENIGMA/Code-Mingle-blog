@@ -1,12 +1,37 @@
-import express from 'express'
-import { addComment, removeComment, editComment } from '../controllers/comment.controller'
+import { Router } from 'express'
+import { addComment, removeComment, editComment, getCommentsByPost, createReplyToComment, getRepliesByCommentId, getCommentById, removeReply } from '../controllers/comment.controller'
+import { isAuthenticated } from '../middleware/authentication.middleware'
+// import { addCommentSchema } from '../schemas/comment.schema'
+// import { validateSchema } from '../middleware/validateSchema.middleware'
 
-const router = express.Router()
+const router = Router({mergeParams: true})
 
-router.route('/:postId/comments').post(addComment)
+// Middleware to check if user is authenticated
+//---------------------------------------------------------------------------------------------
 
-router.route('/:postId/comments/:commentId').patch(editComment)
+router.use(isAuthenticated)
 
-router.route('/:postId/comments/:commentId').delete(removeComment)
+//---------------------------------------------------------------------------------------------
+
+/**
+ * Route to add a comment to a post
+ */
+
+router.route('/').post(addComment)
+
+router.route('/:commentId').patch(editComment)
+
+router.route('/:commentId').delete(removeComment)
+
+router.route('/').get(getCommentsByPost)
+
+router.route('/:commentId').get(getCommentById)
+
+router.route('/:commentId/addReply').post(createReplyToComment)
+
+router.route('/:commentId/replies').get(getRepliesByCommentId)
+
+router.route('/:commentId/replies/:replyId').delete(removeReply)
+
 
 export default router
