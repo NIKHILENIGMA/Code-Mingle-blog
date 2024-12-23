@@ -1,8 +1,8 @@
+import { validateParams } from './../middleware/validateSchema.middleware'
 import express from 'express'
 import { createDraft, getDraft, listDraft, removeDraft, saveDraft } from '../controllers/draft.controller'
 import { isAuthenticated } from '../middleware/authentication.middleware'
-// import { validateSchema } from './../middleware/validateSchema.middleware';
-// import { draftContentSchema } from '../schemas/blog.schema';
+import { postId } from '../schemas/blog.schema'
 
 const router = express.Router()
 
@@ -13,14 +13,13 @@ router.use(isAuthenticated)
 
 // ---------------------------------------------------------------------------------
 
-
 router.route('/newDraft').post(createDraft)
 
-router.route('/:id/save').patch(saveDraft)
+router.route('/:id/save').patch(validateParams(postId), saveDraft)
 
-router.route('/remove/:id').delete(removeDraft)
+router.route('/remove/:id').delete(validateParams(postId), removeDraft)
 
-router.route('/:id').get(getDraft)
+router.route('/:id').get(validateParams(postId), getDraft)
 
 router.route('/').get(listDraft)
 

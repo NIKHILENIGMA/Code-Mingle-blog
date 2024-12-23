@@ -2,7 +2,7 @@
 import { Router } from 'express'
 import { currentUser, forgotPassword, login, logout, refreshAccessToken, resetPassword, signup } from '../controllers/auth.controller'
 import { isAuthenticated } from '../middleware/authentication.middleware'
-import { validateSchema } from '../middleware/validateSchema.middleware'
+import { validateBody } from '../middleware/validateSchema.middleware'
 import { signupSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema } from '../schemas/user.schema'
 
 const router = Router()
@@ -13,10 +13,10 @@ const router = Router()
  * @function
  * @memberof module:auth.routes
  * @inner
- * @param {function} validateSchema - Middleware to validate request body against signupSchema.
+ * @param {function} validateBody - Middleware to validate request body against signupSchema.
  * @param {function} signup - Controller function to handle user signup.
  */
-router.route('/signup').post(validateSchema(signupSchema), signup)
+router.route('/signup').post(validateBody(signupSchema), signup)
 
 /**
  * Route for user login.
@@ -24,10 +24,10 @@ router.route('/signup').post(validateSchema(signupSchema), signup)
  * @function
  * @memberof module:auth.routes
  * @inner
- * @param {function} validateSchema - Middleware to validate request body against loginSchema.
+ * @param {function} validateBody - Middleware to validate request body against loginSchema.
  * @param {function} login - Controller function to handle user login.
  */
-router.route('/login').post(validateSchema(loginSchema), login)
+router.route('/login').post(validateBody(loginSchema), login)
 
 /**
  * Route for user logout.
@@ -48,7 +48,7 @@ router.route('/logout').delete(isAuthenticated, logout)
  * @inner
  * @param {function} forgotPassword - Controller function to handle password recovery.
  */
-router.route('/password-recovery').post(validateSchema(forgotPasswordSchema), forgotPassword)
+router.route('/password-recovery').post(validateBody(forgotPasswordSchema), forgotPassword)
 
 /**
  * Route for resetting password.
@@ -58,7 +58,7 @@ router.route('/password-recovery').post(validateSchema(forgotPasswordSchema), fo
  * @inner
  * @param {function} resetPassword - Controller function to handle password reset.
  */
-router.route('/reset-password').post(validateSchema(resetPasswordSchema),resetPassword)
+router.route('/reset-password').post(validateBody(resetPasswordSchema),resetPassword)
 
 
 /**
