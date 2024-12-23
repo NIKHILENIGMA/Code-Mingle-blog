@@ -26,6 +26,8 @@ model User {
   coverImg  String?   @map("cover_img")
   role      String    @default("USER")
   posts     Post[]
+  comments  Comment[]
+  replies   Reply[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
@@ -39,6 +41,7 @@ model Post {
   status          PostStatus
   authorId        String     @map("author_id")
   author          User       @relation(fields: [authorId], references: [id])
+  comments        Comment[]
   createdAt       DateTime   @default(now()) @map("created_at")
   updatedAt       DateTime   @updatedAt @map("updated_at")
   publishedAt     DateTime?  @map("published_at")
@@ -48,6 +51,32 @@ model Post {
 
   @@index(status)
   @@map("posts")
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  postId    String   @map("post_id")
+  authorId  String   @map("author_id")
+  post      Post     @relation(fields: [postId], references: [id])
+  author    User     @relation(fields: [authorId], references: [id])
+  replies   Reply[]
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("comments")
+}
+
+model Reply {
+  id        String  @id @default(cuid())
+  content   String
+  commentId String  @map("comment_id")
+  authorId  String  @map("author_id")
+  comment   Comment @relation(fields: [commentId], references: [id])
+  author    User    @relation(fields: [authorId], references: [id])
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("replies")
 }
 
 enum PostStatus {
