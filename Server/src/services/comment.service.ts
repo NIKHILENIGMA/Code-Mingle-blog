@@ -159,7 +159,7 @@ export default class CommentService {
         }
     }
 
-    public async getRepliesByCommentIdService(req: Request, next: NextFunction, commentId: string) {
+    public async getRepliesByCommentIdService(req: Request, next: NextFunction, commentId: string, numberOfPage: number, limit: number) {
         try {
             const comment = await this.commentRepository.findCommentById(commentId)
 
@@ -167,7 +167,7 @@ export default class CommentService {
                 return ApiError(new Error(responseMessage.NOT_FOUND('comment')), req, next, 404)
             }
 
-            const replies = await this.replyRepository.getRepliesByCommentId(comment.id)
+            const replies = await this.replyRepository.getRepliesByCommentId(comment.id, numberOfPage, limit)
 
             return replies
         } catch (error) {
