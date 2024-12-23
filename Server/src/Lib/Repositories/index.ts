@@ -7,6 +7,10 @@ import { PrismaResetPasswordRepository } from './PrismaRepos/PrismaResetPassword
 import { PrismaKeyStoreRepository } from './PrismaRepos/PrismaKeyStoreRepository'
 import { PrismaDraftRepository } from './PrismaRepos/PrismaDraftRepository'
 import { IDraftRepository } from './Interfaces/IDraftRepository'
+import { ICommentRepository } from './Interfaces/ICommentRepository'
+import { PrismaCommentRepository } from './PrismaRepos/PrismaCommentRepository'
+import { IReplyRepository } from './Interfaces/IReplyRepository'
+import { PrismaReplyRepository } from './PrismaRepos/PrismaReplyRepository'
 
 export class RepositoryFactory {
     static UserRepository(): IUserRepository {
@@ -23,6 +27,14 @@ export class RepositoryFactory {
 
     static DraftRepository(): IDraftRepository {
         return new PrismaDraftRepository()
+    }
+
+    static CommentRepository(): ICommentRepository {
+        return new PrismaCommentRepository()
+    }
+
+    static ReplyRepository(): IReplyRepository {
+        return new PrismaReplyRepository()
     }
     
 }
