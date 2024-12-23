@@ -25,10 +25,15 @@ export class PrismaReplyRepository implements IReplyRepository {
         })
     }
 
-    async getRepliesByCommentId(commentId: string): Promise<Reply[]> {
+    async getRepliesByCommentId(commentId: string, page: number, limit: number): Promise<Reply[]> {
         const replies = await prisma.reply.findMany({
             where: {
                 commentId
+            },
+            skip: (page - 1) * limit,
+            take: limit,
+            orderBy: {
+                createdAt: 'desc'
             }
         })
 
