@@ -3,6 +3,9 @@ import HomePage from "../pages/Public/HomePage";
 import React from "react";
 import AboutPage from "../pages/Public/AboutPage";
 import Main from "@/Layout/Main";
+import { AllPostsPage, ProfilePage, ReadPostPage } from "@/pages";
+import ProfileOverview from "@/features/ProfileManagement/components/ProfileOverview";
+import PersonalInformation from "@/features/ProfileManagement/components/PersonalInformation";
 // import AuthProvider from "@/features/auth/components/AuthProvider";
 
 const router = createBrowserRouter([
@@ -19,21 +22,34 @@ const router = createBrowserRouter([
         element: <AboutPage />,
       },
       {
-        path: "/profile",
-        lazy: async () => {
-          const ProfilePage = (
-            await import("@/pages/ProfileManagement/ProfilePage")
-          ).default;
-          return {
-            element: <ProfilePage />,
-          };
-        },
-        children: [],
+        path: "/posts",
+        element: <AllPostsPage />,
+      },
+      {
+        path: "/posts/:postId",
+        element: <ReadPostPage />,
+      },
+      {
+        path: "/profile/@username",
+        element: <ProfilePage />,
+        children: [
+          {
+            path: "posts",
+            element: <ProfileOverview />,
+          },
+          {
+            path: "personal-information",
+            element: <PersonalInformation />,
+          },
+          
+        ],
       },
     ],
   },
+  
+
   {
-    path: "/draft/:id",
+    path: "/draft/:draftId",
     lazy: async () => {
       const { CreatePostPage } = await import("@/pages");
       return {
@@ -51,15 +67,6 @@ const router = createBrowserRouter([
       const { LearnEditorPage } = await import("@/pages");
       return {
         element: <LearnEditorPage />,
-      };
-    },
-  },
-  {
-    path: "/post/read/:id",
-    lazy: async () => {
-      const { ReadPostPage } = await import("@/pages");
-      return {
-        element: <ReadPostPage />,
       };
     },
   },
