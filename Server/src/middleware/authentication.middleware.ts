@@ -31,7 +31,7 @@ export const isAuthenticated = AsyncHandler(async (req: ProtectedRequest, _: Res
         const accessToken = cookies['access_token']
 
         if (!accessToken) {
-            return ApiError(new Error(responseMessage.NOT_FOUND('access token')), req, next, 404)
+            return ApiError(new Error(responseMessage.UNAUTHORIZED), req, next, 401)
         }
 
         // Decode the token
