@@ -59,7 +59,7 @@ export const useLoginForm = () => {
         throw new Error("Invalid response structure from server");
       }
 
-      console.log("Login successfully: ", response.data);
+      console.info("Login successfully: ", response.data);
 
       // Set the access token in the store
       dispatch(setAccessToken({ accessToken: response.data?.token }));
