@@ -31,14 +31,60 @@ import {
   Pilcrow, // Hierarchy
   ArrowLeftToLine, // make short
   ArrowRightToLine, // make long
-  Wand, // ai writing 
+  Wand, // ai writing
   Mic, // voice
   Eraser, // rewrite
   SwatchBook, // simplify
   Languages, // translate
+  FileText,
+  Rss,
+  ScanEye,
+  ChevronDown,
+  Plus,
+  Calendar,
+  House,
+  NotebookTabs,
+  Pencil,
+  Heart,
+  MessageCircle,
+  Share2,
+  Bookmark,
+  ClipboardType,
+  Clipboard,
+  Moon,
+  Search,
+  CircleUser, 
+  ClipboardList,
+  Settings2,
+  Users,
+  UserCheck,
+  Fingerprint,
+  MapPin,
 } from "lucide-react";
 
+
+
 export {
+  Users,
+  UserCheck,
+  MapPin,
+  Fingerprint,
+  Settings2,
+  ClipboardList,
+  CircleUser, 
+  Clipboard,
+  Heart,
+  Search,
+  Bookmark,
+  ClipboardType,
+  Share2,
+  Moon,
+  Pencil,
+  MessageCircle,
+  NotebookTabs,
+  House,
+  Calendar,
+  Plus,
   Upload,
   ImageIcon,
   Text,
@@ -76,4 +122,8 @@ export {
   Eraser, // rewrite
   SwatchBook, // simplify
   Languages, // translate
+  Rss,
+  FileText,
+  ScanEye,
+  ChevronDown,
 };
