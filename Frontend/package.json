@@ -25,6 +25,7 @@
     "@tiptap/extension-code-block-lowlight": "^2.10.3",
     "@tiptap/extension-heading": "^2.10.3",
     "@tiptap/extension-placeholder": "^2.10.3",
+    "@tiptap/extension-underline": "^2.11.0",
     "@tiptap/pm": "^2.10.3",
     "@tiptap/react": "^2.10.3",
     "@tiptap/starter-kit": "^2.10.3",
