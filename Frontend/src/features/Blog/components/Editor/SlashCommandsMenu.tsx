@@ -8,14 +8,6 @@ import {
 } from "@/components/ui/command";
 import React, { useCallback } from "react";
 import { Editor } from "@tiptap/core";
-// import {
-//   Text,
-//   Heading1,
-//   Heading2,
-//   Heading3,
-//   List,
-//   ListOrdered,
-// } from "@/Utils/Icons";
 
 interface CommandProps {
   title: string;
