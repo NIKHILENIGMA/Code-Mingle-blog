@@ -1,7 +1,7 @@
 import React from "react";
 import { House, Moon } from "@/Utils/Icons";
 import { Textarea } from "@/components/ui/textarea";
-import TiptapEditor from "@/features/Blog/components/TipTapEditor";
+import TiptapEditor from "@/features/Blog/components/Editor/TipTapEditor";
 import { Button } from "@/components";
 import { useNavigate } from "react-router-dom";
 
@@ -41,7 +41,7 @@ const LearnEditorPage: React.FC = () => {
         </Button>
         
       </div>
-      <div className="flex flex-col h-full w-[80vw] p-2 lg:pl-32 mx-auto space-y-3  rounded-lg">
+      <div className="flex flex-col min-h-full w-[80vw] px-52  mx-auto space-y-3  rounded-lg bg-white">
         <div className="flex flex-col justify-start w-full mb-4 space-y-4 ">
           <Textarea
             placeholder="Article Title...."
@@ -57,7 +57,7 @@ const LearnEditorPage: React.FC = () => {
           />
         </div>
 
-        <div className="w-full h-full">
+        <div className="w-full min-h-full">
           <TiptapEditor onContentChange={() => {}} />
         </div>
       </div>
