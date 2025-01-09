@@ -1,5 +1,5 @@
 import { FC } from "react";
-import SideBar from "../components/Drafts/SideBar";
+import SideBar from "../components/SideBar/SideBar";
 import { Outlet } from "react-router-dom";
 
 const DraftLayout: FC = () => {
