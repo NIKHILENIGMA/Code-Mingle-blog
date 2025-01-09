@@ -1,7 +1,8 @@
 import { store } from "@/app/store/store";
 import { clearAuth } from "@/features/auth/authSlice";
-import { useRefreshToken } from "@/features/auth/hooks/useRefreshToken";
+// import { useRefreshToken } from "@/features/auth/hooks/useRefreshToken";
 import axios from "axios";
+import { refreshTokenService } from "./authServices";
 
 const API_URL = "/api";
 
@@ -28,9 +29,9 @@ apiInstance.interceptors.response.use(
   (response) => {
     return response;
   },
-  (error) => {
-    if (error.response.status === 401) {
-      const newAccessToken = useRefreshToken();
+  async(error) => {
+    if (error.response.status === 401 || error.response.data.status === 404) {
+      const newAccessToken = await refreshTokenService();
       if (newAccessToken) {
         error.config.headers.Authorization = `Bearer ${newAccessToken}`;
         return axios.request(error.config);
@@ -40,4 +41,4 @@ apiInstance.interceptors.response.use(
     }
     return Promise.reject(error);
   }
-)
+);
