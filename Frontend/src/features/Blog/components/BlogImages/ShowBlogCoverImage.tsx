@@ -2,7 +2,7 @@ import { Button, Img } from "@/components";
 import { Cross2Icon } from "@radix-ui/react-icons";
 import React from "react";
 import { useDispatch } from "react-redux";
-import { resetCoverImage } from "../../blogSlice";
+import { resetCoverImage } from "../../slices/blogSlice";
 
 interface ShowBlogCoverImageProps {
   image: string;

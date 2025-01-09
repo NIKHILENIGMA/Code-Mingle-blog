@@ -3,7 +3,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import unsplashService from "@/services/unsplashApi/unsplashService";
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { setCoverImage } from "../../blogSlice";
+import { setCoverImage } from "../../slices/blogSlice";
 
 const UploadUnslashImage: React.FC = () => {
   const [search, setSearch] = React.useState<string>("");

@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import { Button, Input } from "@/components";
 import { useDispatch } from "react-redux";
-import { setCoverImage } from "../../blogSlice";
+import { setCoverImage } from "../../slices/blogSlice";
 
 const UploadImage: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
