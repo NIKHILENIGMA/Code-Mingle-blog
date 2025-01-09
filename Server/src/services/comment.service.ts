@@ -19,6 +19,8 @@ interface AddReplyComment {
     content: string
 }
 
+const { METHOD_FAILED, NOT_FOUND, UNAUTHORIZED } = responseMessage
+
 export default class CommentService {
     private commentRepository: ICommentRepository
     private replyRepository: IReplyRepository
@@ -37,7 +39,7 @@ export default class CommentService {
         try {
             return await this.commentRepository.create(payload)
         } catch (error) {
-            return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('add comment')), req, next, 500)
+            return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('add comment').message), req, next, METHOD_FAILED().code)
         }
     }
 
@@ -54,18 +56,18 @@ export default class CommentService {
             const comment = await this.checkCommentExistence(req, next, commentId, postId)
 
             if (!comment) {
-                return ApiError(new Error(responseMessage.NOT_FOUND('comment')), req, next, 404)
+                return ApiError(new Error(NOT_FOUND('comment').message), req, next, NOT_FOUND().code)
             }
 
             if (comment.authorId !== userId) {
-                return ApiError(new Error(responseMessage.UNAUTHORIZED), req, next, 401)
+                return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
             }
 
             const payload = { content }
 
-            await this.commentRepository.update(commentId, payload)
+            await this.commentRepository.update({id: commentId}, payload)
         } catch (error) {
-            return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('edit comment')), req, next, 500)
+            return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('edit comment').message), req, next, METHOD_FAILED().code)
         }
     }
 
@@ -75,11 +77,11 @@ export default class CommentService {
             const comment = await this.checkCommentExistence(req, next, commentId, postId)
 
             if (!comment) {
-                return ApiError(new Error(responseMessage.NOT_FOUND('comment')), req, next, 404)
+                return ApiError(new Error(NOT_FOUND('comment').message), req, next, NOT_FOUND().code)
             }
 
             if (comment.authorId !== userId) {
-                return ApiError(new Error(responseMessage.UNAUTHORIZED), req, next, 401)
+                return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
             }
 
             await prisma.comment.delete({
@@ -88,7 +90,7 @@ export default class CommentService {
                 }
             })
         } catch (error) {
-            return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('remove comment')), req, next, 500)
+            return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('remove comment').message), req, next, METHOD_FAILED().code)
         }
     }
 
@@ -114,7 +116,7 @@ export default class CommentService {
 
             return comments
         } catch (error) {
-            return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('get comments')), req, next, 500)
+            return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('get comments').message), req, next, METHOD_FAILED().code)
         }
     }
 
@@ -128,12 +130,12 @@ export default class CommentService {
             })
 
             if (!comment) {
-                return ApiError(new Error(responseMessage.NOT_FOUND('comment')), req, next, 404)
+                return ApiError(new Error(NOT_FOUND('comment').message), req, next, NOT_FOUND().code)
             }
 
             return comment
         } catch (error) {
-            return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('get comment')), req, next, 500)
+            return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('get comment').message), req, next, METHOD_FAILED().code)
         }
     }
 
@@ -142,7 +144,7 @@ export default class CommentService {
             const parentContent = await this.checkParentCommentExist(req, next, userId, commentId)
 
             if (!parentContent) {
-                return ApiError(new Error(responseMessage.NOT_FOUND('comment')), req, next, 404)
+                return ApiError(new Error(NOT_FOUND('comment').message), req, next, NOT_FOUND().code)
             }
 
             const payload: AddReplyComment = {
@@ -155,7 +157,7 @@ export default class CommentService {
                 data: payload
             })
         } catch (error) {
-            return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('add reply to comment')), req, next, 500)
+            return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('add reply to comment').message), req, next, METHOD_FAILED().code)
         }
     }
 
@@ -164,14 +166,14 @@ export default class CommentService {
             const comment = await this.commentRepository.findCommentById(commentId)
 
             if (!comment) {
-                return ApiError(new Error(responseMessage.NOT_FOUND('comment')), req, next, 404)
+                return ApiError(new Error(NOT_FOUND('comment').message), req, next, NOT_FOUND().code)
             }
 
             const replies = await this.replyRepository.getRepliesByCommentId(comment.id, numberOfPage, limit)
 
             return replies
         } catch (error) {
-            return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('get replies by comment')), req, next, 500)
+            return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('get replies by comment').message), req, next, METHOD_FAILED().code)
         }
     }
 
@@ -180,12 +182,12 @@ export default class CommentService {
             const reply = await this.replyRepository.getReplyById(replyId, commentId)
 
             if (!reply) {
-                return ApiError(new Error(responseMessage.NOT_FOUND('reply')), req, next, 404)
+                return ApiError(new Error(NOT_FOUND('reply').message), req, next, NOT_FOUND().code)
             }
 
             return reply
         } catch (error) {
-            return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('get reply by id')), req, next, 500)
+            return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('get reply by id').message), req, next, METHOD_FAILED().code)
         }
     }
 
@@ -194,12 +196,12 @@ export default class CommentService {
             const reply = await this.replyRepository.getReplyById(replyId, commentId)
 
             if (!reply) {
-                return ApiError(new Error(responseMessage.NOT_FOUND('reply')), req, next, 404)
+                return ApiError(new Error(NOT_FOUND('reply').message), req, next, NOT_FOUND().code)
             }
 
             await this.replyRepository.delete(replyId)
         } catch (error) {
-            return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('remove reply')), req, next, 500)
+            return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('remove reply').message), req, next, METHOD_FAILED().code)
         }
     }
 
@@ -210,7 +212,7 @@ export default class CommentService {
 
             return existedComment
         } catch (error) {
-            return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('check comment existence')), req, next, 500)
+            return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('check comment existence').message), req, next, METHOD_FAILED().code)
         }
     }
 
@@ -221,7 +223,7 @@ export default class CommentService {
 
             return parentComment
         } catch (error) {
-            return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('check comment existence')), req, next, 500)
+            return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('check comment existence').message), req, next, METHOD_FAILED().code)
         }
     }
 

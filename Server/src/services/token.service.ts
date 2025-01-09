@@ -9,6 +9,8 @@ import { IKeyStoreRepository } from '../Lib/Repositories/Interfaces/IKeyStore'
 import { IResetPasswordRepository } from '../Lib/Repositories/Interfaces/IResetPasswordRepository'
 import responseMessage from '../constant/responseMessage'
 
+const { INVALID_TOKEN, TOKEN_EXPIRED, METHOD_FAILED, NOT_FOUND } = responseMessage
+
 export default class TokenServices {
     private keyStoreRepository: IKeyStoreRepository
     private resetPasswordRepository: IResetPasswordRepository
@@ -38,19 +40,19 @@ export default class TokenServices {
             const accessToken = await this.generatePayloadTokenService(req, next, userId, accessKey, tokenInfo?.access_validity || '0')
 
             if (!accessToken) {
-                return ApiError(new Error(responseMessage.METHOD_FAILED('access generate token')), req, next, 500)
+                return ApiError(new Error(METHOD_FAILED('access generate token').message), req, next, METHOD_FAILED().code)
             }
 
             // Generate refresh token
             const refreshToken = await this.generatePayloadTokenService(req, next, userId, refreshKey, tokenInfo?.refresh_validity || '0')
 
             if (!refreshToken) {
-                return ApiError(new Error(responseMessage.METHOD_FAILED('refresh generate token')), req, next, 500)
+                return ApiError(new Error(METHOD_FAILED('refresh generate token').message), req, next, METHOD_FAILED().code)
             }
 
             return { accessToken, refreshToken }
         } catch (error) {
-            return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('generate token')), req, next, 500)
+            return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('generate token').message), req, next, METHOD_FAILED().code)
         }
     }
 
@@ -81,7 +83,7 @@ export default class TokenServices {
 
             return restToken
         } catch (error) {
-            return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('generate reset token')), req, next, 500)
+            return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('generate reset token').message), req, next, METHOD_FAILED().code)
         }
     }
 
@@ -98,22 +100,22 @@ export default class TokenServices {
             const decodedToken = await decode(req, next, token)
 
             if (!decodedToken) {
-                return ApiError(new Error(responseMessage.INVALID_TOKEN), req, next, 400)
+                return ApiError(new Error(INVALID_TOKEN.message), req, next, 400)
             }
 
             const keyStore = await this.keyStoreRepository.findKeyStoreByUserId(userId)
 
             if (!keyStore) {
-                return ApiError(new Error(responseMessage.NOT_FOUND('key store')), req, next, 404)
+                return ApiError(new Error(NOT_FOUND('key store').message), req, next, NOT_FOUND().code)
             }
 
             if (keyStore.refreshKey !== decodedToken.param) {
-                return ApiError(new Error(responseMessage.INVALID_TOKEN), req, next, 400)
+                return ApiError(new Error(INVALID_TOKEN.message), req, next, INVALID_TOKEN.code)
             }
 
-            await this.keyStoreRepository.delete(keyStore.id)
+            await this.keyStoreRepository.delete({ id: keyStore.id })
         } catch (error) {
-            return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('verify refresh token')), req, next, 500)
+            return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('verify refresh token').message), req, next, METHOD_FAILED().code)
         }
     }
 
@@ -122,29 +124,29 @@ export default class TokenServices {
             const decodedToken = await decode(req, next, token)
 
             if (!decodedToken) {
-                return ApiError(new Error(responseMessage.INVALID_TOKEN), req, next, 400)
+                return ApiError(new Error(INVALID_TOKEN.message), req, next, INVALID_TOKEN.code)
             }
 
             const keyStore = await this.keyStoreRepository.findKeyStoreByUserId(decodedToken.subject)
 
             if (!keyStore) {
-                return ApiError(new Error(responseMessage.NOT_FOUND('key store')), req, next, 404)
+                return ApiError(new Error(NOT_FOUND('key store').message), req, next, NOT_FOUND().code)
             }
 
             if (keyStore.refreshKey !== decodedToken.param) {
-                return ApiError(new Error(responseMessage.INVALID_TOKEN), req, next, 400)
+                return ApiError(new Error(INVALID_TOKEN.message), req, next, INVALID_TOKEN.code)
             }
 
             // Generate access and refresh token
             const tokens = await this.generateAccessAndRefreshTokenService(req, next, decodedToken.subject)
 
             if (!tokens) {
-                return ApiError(new Error(responseMessage.METHOD_FAILED('generate token')), req, next, 500)
+                return ApiError(new Error(METHOD_FAILED('generate token').message), req, next, METHOD_FAILED().code)
             }
 
             return tokens
         } catch (error) {
-            return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('refresh token')), req, next, 500)
+            return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('refresh token').message), req, next, METHOD_FAILED().code)
         }
     }
 
@@ -167,17 +169,17 @@ export default class TokenServices {
             const resetToken = await this.resetPasswordRepository.findByToken(hashToken)
 
             if (!resetToken) {
-                return ApiError(new Error(responseMessage.INVALID_TOKEN), req, next, 400)
+                return ApiError(new Error(INVALID_TOKEN.message), req, next, INVALID_TOKEN.code)
             }
 
             // Check if token has expired
             if (this.timeExpired(resetToken.expiresAt)) {
-                return ApiError(new Error(responseMessage.TOKEN_EXPIRED), req, next, 400)
+                return ApiError(new Error(TOKEN_EXPIRED.message), req, next, INVALID_TOKEN.code)
             }
 
             return resetToken.userId
         } catch (error) {
-            return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('verify reset token')), req, next, 500)
+            return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('verify reset token').message), req, next, METHOD_FAILED().code)
         }
     }
 
@@ -217,10 +219,10 @@ export default class TokenServices {
                 await this.keyStoreRepository.create(keystoreData)
             } else {
                 // Update key store using UserTokenKeys
-                await this.keyStoreRepository.update(keyStore.id, keystoreData)
+                await this.keyStoreRepository.update({id: keyStore.id}, keystoreData)
             }
         } catch (error) {
-            return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('create key store')), req, next, 500)
+            return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('create key store').message), req, next, METHOD_FAILED().code)
         }
     }
 
@@ -246,7 +248,7 @@ export default class TokenServices {
 
             return await encode(req, next, tokenPayload)
         } catch (error) {
-            return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('generate token')), req, next, 500)
+            return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('generate token').message), req, next, METHOD_FAILED().code)
         }
     }
 

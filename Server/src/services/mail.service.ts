@@ -3,6 +3,7 @@ import { resend } from '../helpers/resend'
 import { ApiError } from '../utils/ApiError'
 import responseMessage from '../constant/responseMessage'
 
+const { METHOD_FAILED } = responseMessage
 export default class MailService {
     /**
      * Sends an email to the user with a link to reset their password.
@@ -23,7 +24,7 @@ export default class MailService {
             Thank you, \n The CodeMingle Team`
             })
         } catch (error) {
-            ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('Error sending password reset email')), req, next, 500)
+            ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('Error sending password reset email').message), req, next, 500)
         }
     }
 }

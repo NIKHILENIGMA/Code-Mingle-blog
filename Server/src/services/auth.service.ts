@@ -6,6 +6,8 @@ import { ILoginUser, ISignupUserBody, IUser, User } from '../Lib/Models/User'
 import { NextFunction, Request } from 'express'
 import responseMessage from '../constant/responseMessage'
 
+const { METHOD_FAILED, NOT_FOUND, INVALID_PASSWORD, ALREADY_EXIST } = responseMessage
+
 export default class AuthService {
     private UserRepository: IUserRepository
 
@@ -29,7 +31,7 @@ export default class AuthService {
             const hashPassword = await this.hashedPassword(req, next, user.password)
 
             if (!hashPassword) {
-                return ApiError(new Error(responseMessage.METHOD_FAILED('hashing password')), req, next, 500)
+                return ApiError(new Error(METHOD_FAILED('hashing password').message), req, next, METHOD_FAILED().code)
             }
 
             user.password = hashPassword
@@ -38,13 +40,12 @@ export default class AuthService {
             const newUser = await this.UserRepository.create(user)
 
             if (!newUser) {
-                return ApiError(new Error(responseMessage.METHOD_FAILED('new user')), req, next, 500)
+                return ApiError(new Error(METHOD_FAILED('new user').message), req, next, METHOD_FAILED().code)
             }
 
             return this.removePassword(newUser)
-            
         } catch (error) {
-            return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('register service')), req, next, 500)
+            return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('register service').message), req, next, METHOD_FAILED().code)
         }
     }
 
@@ -53,18 +54,18 @@ export default class AuthService {
             const user = await this.verifyUserByEmail(credientials.email)
 
             if (!user) {
-                return ApiError(new Error(responseMessage.NOT_FOUND('user with email')), req, next, 404)
+                return ApiError(new Error(NOT_FOUND('user with email').message), req, next, 404)
             }
             // Compare passwords
             const passwordMatch = await this.comparePassword(credientials.password, user.password)
 
             if (!passwordMatch) {
-                return ApiError(new Error(responseMessage.INVALID_PASSWORD), req, next, 401)
+                return ApiError(new Error(INVALID_PASSWORD.message), req, next, 401)
             }
 
             return user.id
         } catch (error) {
-            return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('login service')), req, next, 401)
+            return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('login service').message), req, next, METHOD_FAILED().code)
         }
     }
 
@@ -72,7 +73,7 @@ export default class AuthService {
         const user = await this.verifyUserByEmail(email)
 
         if (user === null) {
-            return ApiError(new Error(responseMessage.NOT_FOUND('user with email')), req, next, 404)
+            return ApiError(new Error(NOT_FOUND('user with email').message), req, next, NOT_FOUND().code)
         }
 
         return user
@@ -89,11 +90,10 @@ export default class AuthService {
 
     private async checkEmailExists(email: string, req: Request, next: NextFunction): Promise<void> {
         const userExist = await this.UserRepository.findUserByEmail(email)
-        
-        if (userExist) {
-            ApiError(new Error(responseMessage.ALREADY_EXIST(email)), req, next, 409)
-        }
 
+        if (userExist) {
+            ApiError(new Error(ALREADY_EXIST(email).message), req, next, 409)
+        }
     }
 
     private async verifyUserByEmail(email: string): Promise<User | null> {
@@ -109,16 +109,21 @@ export default class AuthService {
             const hashedPassword = await this.hashedPassword(req, next, newPassword)
 
             if (!hashedPassword) {
-                return ApiError(new Error(responseMessage.METHOD_FAILED('hashing password')), req, next, 500)
+                return ApiError(new Error(METHOD_FAILED('hashing password').message), req, next, METHOD_FAILED().code)
             }
 
-            const changePassword = await this.UserRepository.update(userId, { password: hashedPassword })
+            const changePassword = await this.UserRepository.update(
+                {
+                    id: userId
+                },
+                { password: hashedPassword }
+            )
 
             if (!changePassword) {
-                return ApiError(new Error(responseMessage.METHOD_FAILED('changing password')), req, next, 500)
+                return ApiError(new Error(METHOD_FAILED('changing password').message), req, next, METHOD_FAILED().code)
             }
         } catch (error) {
-            return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('login service')), req, next, 401)
+            return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('login service').message), req, next, METHOD_FAILED().code)
         }
     }
 
@@ -136,7 +141,7 @@ export default class AuthService {
      * @returns A promise that resolves to the hashed password string.
      * @throws {ApiError} If an error occurs during the hashing process.
      */
-    private async hashedPassword(req: Request, next: NextFunction,password: string): Promise<string | void> {
+    private async hashedPassword(req: Request, next: NextFunction, password: string): Promise<string | void> {
         // Hash password
         try {
             const saltRounds = process.env.HASH_PASSWORD_SALT ? parseInt(process.env.HASH_PASSWORD_SALT) : 10
@@ -144,13 +149,10 @@ export default class AuthService {
             const salt = await bcrypt.genSalt(saltRounds)
 
             return await bcrypt.hash(password, salt)
-
-             
         } catch (error) {
-            return ApiError(error instanceof Error ? error : new Error(responseMessage.INTERNAL_SERVICE('hashing')), req, next, 500)
+            return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('hashing').message), req, next, METHOD_FAILED().code)
         }
     }
-
 
     /**
      * Compares a plain text password with a hashed password.
