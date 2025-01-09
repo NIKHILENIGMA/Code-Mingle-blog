@@ -7,6 +7,8 @@ import { ProtectedRequest } from '../types/app-request'
 import { NextFunction, Request } from 'express'
 import responseMessage from '../constant/responseMessage'
 
+const { BAD_REQUEST, METHOD_FAILED } = responseMessage
+
 export type JWTPayload = {
     issuer: string
     audience: string
@@ -43,11 +45,11 @@ export async function readFileKey(req: Request, next: NextFunction, keyName: str
         } else if (keyName === 'public') {
             filePath = path.join(__dirname, '../../keys/public_key.pem')
         } else {
-            return ApiError(new Error(responseMessage.BAD_REQUEST('file reading')), req, next, 400)
+            return ApiError(new Error(BAD_REQUEST('file reading').message), req, next, BAD_REQUEST().code)
         }
         return await readFileAsync(filePath, 'utf-8')
     } catch (error) {
-        return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('Read File Key failed')), req, next, 500)
+        return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('Read File Key failed').message), req, next, METHOD_FAILED().code)
     }
 }
 
@@ -69,13 +71,13 @@ export const encode = async (req: Request, next: NextFunction, payload: Payload)
         const secret = await readFileKey(req, next, 'private')
 
         if (!secret) {
-            return ApiError(new Error(responseMessage.BAD_REQUEST('reading secrete')), req, next, 400)
+            return ApiError(new Error(BAD_REQUEST('reading secrete').message), req, next, BAD_REQUEST().code)
         }
 
         const token = jwt.sign(payload, secret, { algorithm: 'RS256' })
         return token
     } catch (error) {
-        return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('Encode JWT Token failed')), req, next, 500)
+        return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('Encode JWT Token failed').message), req, next, METHOD_FAILED().code)
     }
 }
 
@@ -94,13 +96,13 @@ export const decode = async (req: Request, next: NextFunction, token: string): P
         const publicKey = await readFileKey(req, next, 'public')
 
         if (!publicKey) {
-            return ApiError(new Error(responseMessage.BAD_REQUEST('reading public key')), req, next, 400)
+            return ApiError(new Error(BAD_REQUEST('reading public key').message), req, next, BAD_REQUEST().code)
         }
-        
+
         const decoded = jwt.verify(token, publicKey, { algorithms: ['RS256'] }) as JWTPayload
         return decoded
     } catch (error) {
-        return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('Decode JWT Token failed')), req, next, 500)
+        return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('Decode JWT Token failed').message), req, next, METHOD_FAILED().code)
     }
 }
 

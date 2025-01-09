@@ -9,6 +9,8 @@ import responseMessage from '../constant/responseMessage'
 const userRepository = RepositoryFactory.UserRepository()
 const keyStoreRepository = RepositoryFactory.KeyStoreRepository()
 
+const { UNAUTHORIZED, INVALID_TOKEN, NOT_FOUND, INTERNAL_SERVICE } = responseMessage
+
 /**
  * Middleware to check if the user is authenticated.
  *
@@ -31,21 +33,21 @@ export const isAuthenticated = AsyncHandler(async (req: ProtectedRequest, _: Res
         const accessToken = cookies['access_token']
 
         if (!accessToken) {
-            return ApiError(new Error(responseMessage.UNAUTHORIZED), req, next, 401)
+            return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
         }
 
         // Decode the token
         const decodedToken = await decode(req, next, accessToken)
 
         if (!decodedToken) {
-            return ApiError(new Error(responseMessage.INVALID_TOKEN), req, next, 500)
+            return ApiError(new Error(INVALID_TOKEN.message), req, next, INVALID_TOKEN.code)
         }
 
         // Find user by id
         const user = await userRepository.findUserById(decodedToken?.subject)
 
         if (!user) {
-            return ApiError(new Error(responseMessage.NOT_FOUND('User')), req, next, 401)
+            return ApiError(new Error(NOT_FOUND('User').message), req, next, NOT_FOUND().code)
         }
 
         // Attach user to request object
@@ -67,6 +69,6 @@ export const isAuthenticated = AsyncHandler(async (req: ProtectedRequest, _: Res
 
         next()
     } catch (error) {
-        return ApiError(error instanceof Error ? error : new Error(responseMessage.INTERNAL_SERVICE('Authentication')), req, next, 500)
+        return ApiError(error instanceof Error ? error : new Error(INTERNAL_SERVICE('Authentication').message), req, next, INTERNAL_SERVICE().code)
     }
 })
