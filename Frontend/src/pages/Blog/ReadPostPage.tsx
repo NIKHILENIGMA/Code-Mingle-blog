@@ -2,8 +2,8 @@ import React from "react";
 import { postCardData, PostCardProps } from "@/constants/dummyData";
 import { useNavigate, useParams } from "react-router-dom";
 import { Bookmark, Heart } from "@/Utils/Icons";
-import CommentButton from "@/features/Blog/components/CommentButton";
-import SharePostLink from "@/features/Blog/components/SharePostLink";
+import CommentButton from "@/features/Blog/components/Comments/CommentButton";
+import SharePostLink from "@/features/Blog/components/Drafts/SharePostLink";
 
 // import { RootState } from "@/app/store/store";
 // import { useSelector } from "react-redux";

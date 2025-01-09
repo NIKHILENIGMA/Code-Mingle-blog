@@ -1,31 +1,32 @@
-import React from "react";
-import { PanelLeft, PanelRight } from "lucide-react";
-import SideBar from "@/features/Blog/components/SideBar";
-import DraftForm from "@/features/Blog/components/DraftForm";
-import { Button } from "@/components";
-import DraftActions from "@/features/Blog/components/DraftActions";
+import { RootState } from "@/app/store/store";
+import DraftActions from "@/features/Blog/components/Drafts/DraftActions";
+import DraftForm from "@/features/Blog/components/Drafts/DraftForm";
+import { useDraft } from "@/features/Blog/hooks/useDraft";
+import { FC } from "react";
+import { useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 
-const CreatePostPage: React.FC = () => {
-  const [showSidebar, setShowSidebar] = React.useState<boolean>(true);
+const CreatePostPage: FC = () => {
+  const sideBarState = useSelector((state: RootState) => state.blog.sideBar);
+  const { draftId } = useParams<{ draftId: string }>();
+  const { Draft } = useDraft(draftId as string);
+
 
   return (
     <div>
-      <Button
-        variant="link"
-        onClick={() => setShowSidebar(!showSidebar)}
-        className={`fixed z-30 px-4 py-2 top-4 ${
-          showSidebar ? "left-32" : "left-4"
-        } transition-all duration-500 ease-in-out`}
+      <DraftActions />
+      <div
+        className={`${
+          sideBarState
+            ? "md:ml-[12vw] md:w-[80vw] overflow-x-hidden transform translate-x-20"
+            : "w-full transform -translate-x-0"
+        } h-full transition-transform duration-500 ease-in-out`}
       >
-        {showSidebar ? <PanelRight size={18} /> : <PanelLeft size={18} />}
-      </Button>
-      <SideBar sideBar={showSidebar} />
-      <div className="w-full h-full space-y-10 lg:space-y-12">
-        <DraftActions />
-        <DraftForm />
+        {Draft && <DraftForm draft={Draft} />}
       </div>
     </div>
   );
 };
 
 export default CreatePostPage;
+//

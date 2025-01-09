@@ -1,4 +1,4 @@
-import PostCard from "@/features/Blog/components/PostCard";
+import PostCard from "@/features/Blog/components/Cards/PostCard";
 import React from "react";
 import { postCardData } from "@/constants/dummyData";
 import { Button, Input, Label } from "@/components";
