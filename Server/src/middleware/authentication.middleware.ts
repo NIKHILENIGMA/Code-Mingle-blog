@@ -5,6 +5,7 @@ import { ProtectedRequest } from '../types/app-request'
 import { ApiError } from '../utils/ApiError'
 import { AsyncHandler } from '../utils/AsyncHandler'
 import responseMessage from '../constant/responseMessage'
+import { User } from '../Lib/Models/User'
 
 const userRepository = RepositoryFactory.UserRepository()
 const keyStoreRepository = RepositoryFactory.KeyStoreRepository()
@@ -44,7 +45,7 @@ export const isAuthenticated = AsyncHandler(async (req: ProtectedRequest, _: Res
         }
 
         // Find user by id
-        const user = await userRepository.findUserById(decodedToken?.subject)
+        const user: User | null = await userRepository.findUserById(decodedToken?.subject)
 
         if (!user) {
             return ApiError(new Error(NOT_FOUND('User').message), req, next, NOT_FOUND().code)
