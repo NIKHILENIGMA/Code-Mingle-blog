@@ -7,6 +7,7 @@ import responseMessage from '../constant/responseMessage'
 import CommentService from '../services/comment.service'
 import { ApiResponse } from '../utils/ApiResponse'
 
+const { UNAUTHORIZED, MISSING_BODY, METHOD_FAILED, NOT_FOUND, SUCCESS } = responseMessage
 const commentServices = new CommentService()
 
 export const addComment = AsyncHandler(async (req: Request, res: Response, next: NextFunction) => {
@@ -16,7 +17,7 @@ export const addComment = AsyncHandler(async (req: Request, res: Response, next:
 
 
     if (!user || typeof user === 'undefined') {
-        return ApiError(new Error(responseMessage.UNAUTHORIZED), req, next, 401)
+        return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
     }
 
     const userId: string = (user as unknown as User)?.id
@@ -24,7 +25,7 @@ export const addComment = AsyncHandler(async (req: Request, res: Response, next:
     
 
     if (!body) {
-        return ApiError(new Error(responseMessage.MISSING_BODY), req, next, 400)
+        return ApiError(new Error(MISSING_BODY.message), req, next, MISSING_BODY.code)
     }
 
     try {
@@ -32,7 +33,7 @@ export const addComment = AsyncHandler(async (req: Request, res: Response, next:
 
         return ApiResponse(req, res, 201, 'Comment added successfully')
     } catch (error) {
-        return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('add comment')), req, next, 500)
+        return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('add comment').message), req, next, METHOD_FAILED().code)
     }
 })
 
@@ -45,13 +46,13 @@ export const editComment = AsyncHandler(async (req: ProtectedRequest, res: Respo
     const user = req.user as User | undefined
 
     if (!user || user === undefined) {
-        return ApiError(new Error(responseMessage.UNAUTHORIZED), req, next, 401)
+        return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
     }
     const userId: string = user?.id
     const { body } = req as { body: { content: string } }
 
     if (!body) {
-        return ApiError(new Error(responseMessage.MISSING_BODY), req, next, 400)
+        return ApiError(new Error(MISSING_BODY.message), req, next, MISSING_BODY.code)
     }
 
     try {
@@ -59,7 +60,7 @@ export const editComment = AsyncHandler(async (req: ProtectedRequest, res: Respo
 
         return ApiResponse(req, res, 200, 'Comment updated successfully')
     } catch (error) {
-        return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('edit comment')), req, next, 500)
+        return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('edit comment').message), req, next, METHOD_FAILED().code)
     }
 })
 
@@ -69,7 +70,7 @@ export const removeComment = AsyncHandler(async (req: ProtectedRequest, res: Res
     const user = req?.user as User | undefined
 
     if (!user || typeof user === 'undefined') {
-        return ApiError(new Error(responseMessage.UNAUTHORIZED), req, next, 401)
+        return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
     }
 
     const userId: string = (user as unknown as User)?.id
@@ -79,7 +80,7 @@ export const removeComment = AsyncHandler(async (req: ProtectedRequest, res: Res
 
         return ApiResponse(req, res, 200, 'Comment deleted successfully')
     } catch (error) {
-        return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('delete comment')), req, next, 500)
+        return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('delete comment').message), req, next, METHOD_FAILED().code)
     }
 })
 
@@ -92,12 +93,12 @@ export const getCommentsByPost = AsyncHandler(async (req: Request, res: Response
         const comments = await commentServices.getCommentsByPostService(req, next, pageNumber, limit, postId)
 
         if (!comments) {
-            return ApiError(new Error(responseMessage.NOT_FOUND('comments')), req, next, 404)
+            return ApiError(new Error(NOT_FOUND('comments').message), req, next, NOT_FOUND().code)
         }
 
         return ApiResponse(req, res, 200, 'Comments fetched successfully', comments)
     } catch (error) {
-        return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('get comments')), req, next, 500)
+        return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('get comments').message), req, next, METHOD_FAILED().code)
     }
 })
 
@@ -109,12 +110,12 @@ export const getCommentById = AsyncHandler(async (req: Request, res: Response, n
         const comment = await commentServices.getCommentByIdService(req, next, postId, commentId)
 
         if (!comment) {
-            return ApiError(new Error(responseMessage.NOT_FOUND('comment')), req, next, 404)
+            return ApiError(new Error(NOT_FOUND('comment').message), req, next, NOT_FOUND().code)
         }
 
         return ApiResponse(req, res, 200, 'Comment fetched successfully', comment)
     } catch (error) {
-        return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('get comment')), req, next, 500)
+        return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('get comment').message), req, next, METHOD_FAILED().code)
     }
 })
 
@@ -123,7 +124,7 @@ export const createReplyToComment = AsyncHandler(async (req: Request, res: Respo
     const user = (req as ProtectedRequest)?.user as User | undefined
 
     if (!user || user === undefined) {
-        return ApiError(new Error(responseMessage.UNAUTHORIZED), req, next, 401)
+        return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
     }
 
     const userId: string = (user as unknown as User)?.id
@@ -131,15 +132,15 @@ export const createReplyToComment = AsyncHandler(async (req: Request, res: Respo
     const { body } = req as { body: { comment: string } }
 
     if (!body) {
-        return ApiError(new Error(responseMessage.MISSING_BODY), req, next, 400)
+        return ApiError(new Error(MISSING_BODY.message), req, next, MISSING_BODY.code)
     }
 
     try {
         await commentServices.addReplyToCommentService(req, next, commentId, userId, body.comment)
 
-        return ApiResponse(req, res, 201, 'Reply added successfully')
+        return ApiResponse(req, res, SUCCESS().code, 'Reply added successfully')
     } catch (error) {
-        return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('add comment')), req, next, 500)
+        return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('add comment').message), req, next, METHOD_FAILED().code)
     }
 })
 
@@ -152,12 +153,12 @@ export const getRepliesByCommentId = AsyncHandler(async (req: Request, res: Resp
         const commentReply = await commentServices.getRepliesByCommentIdService(req, next, commentId, pageNumber, limit)
 
         if (!commentReply) {
-            return ApiError(new Error(responseMessage.NOT_FOUND('replies')), req, next, 404)
+            return ApiError(new Error(NOT_FOUND('replies').message), req, next, NOT_FOUND().code)
         }
 
         return ApiResponse(req, res, 200, 'Replies fetched successfully', commentReply)
     } catch (error) {
-        return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('get replies')), req, next, 500)
+        return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('get replies').message), req, next, METHOD_FAILED().code)
     }
 })
 
@@ -169,12 +170,12 @@ export const getReplyById = AsyncHandler(async (req: Request, res: Response, nex
         const reply = await commentServices.getReplyByIdService(req, next, commentId, replyId)
 
         if (!reply) {
-            return ApiError(new Error(responseMessage.NOT_FOUND('reply')), req, next, 404)
+            return ApiError(new Error(NOT_FOUND('reply').message), req, next, NOT_FOUND().code)
         }
 
         return ApiResponse(req, res, 200, 'Reply fetched successfully', reply)
     } catch (error) {
-        return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('get reply')), req, next, 500)
+        return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('get reply').message), req, next, METHOD_FAILED().code)
     }
 })
 
@@ -187,6 +188,6 @@ export const removeReply = AsyncHandler(async (req: Request, res: Response, next
 
         return ApiResponse(req, res, 200, 'Reply deleted successfully')
     } catch (error) {
-        return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('delete reply')), req, next, 500)
+        return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('delete reply').message), req, next, METHOD_FAILED().code)
     }
 })

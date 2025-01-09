@@ -4,9 +4,11 @@ import { ApiError } from '../utils/ApiError'
 import responseMessage from '../constant/responseMessage'
 import { ApiResponse } from '../utils/ApiResponse'
 
+const { MISSING_FILE, METHOD_FAILED } = responseMessage
+
 export const uploadMedia = AsyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     if (!req.file) {
-        return ApiError(new Error(responseMessage.MISSING_FILE), req, next, 400)
+        return ApiError(new Error(MISSING_FILE.message), req, next, MISSING_FILE.code)
     }
 
     try {
@@ -16,7 +18,7 @@ export const uploadMedia = AsyncHandler(async (req: Request, res: Response, next
 
         return ApiResponse(req, res, 200, path)
     } catch (error) {
-        return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('upload image')), req, next, 500)
+        return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('upload image').message), req, next, METHOD_FAILED().code)
     }
 })
 

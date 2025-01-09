@@ -15,8 +15,10 @@ const authServices = new AuthService()
 const tokenService = new TokenServices()
 const mailService = new MailService()
 
+const { METHOD_FAILED, NOT_FOUND, SUCCESS } = responseMessage
+
 /**
- * Create a new User
+ ** Create a new User
  * @description Accepts user details (username, email, password) to create a new account.
  * @param {Request} req - The request object containing user data.
  * @param {Response} res - The response object containing the newly created user.
@@ -31,14 +33,14 @@ export const signup = AsyncHandler(async (req: Request, res: Response, next: Nex
         const newUser = await authServices.userRegisterService(req, next, body)
 
         if (!newUser) {
-            ApiError(new Error(responseMessage.METHOD_FAILED('new user')), req, next, 403)
+            ApiError(new Error(METHOD_FAILED('create user').message), req, next, METHOD_FAILED().code)
         }
 
         return ApiResponse(req, res, 200, 'User created successfully', {
             user: newUser
         })
     } catch (error) {
-        return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('register  user')), req, next, 500)
+        return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('register  user').message), req, next, METHOD_FAILED().code)
     }
 })
 
@@ -61,13 +63,13 @@ export const login = AsyncHandler(async (req: Request, res: Response, next: Next
         const userId = await authServices.userLoginService(req, next, body)
 
         if (!userId) {
-            return ApiError(new Error(responseMessage.METHOD_FAILED('finding user')), req, next, 401)
+            return ApiError(new Error(METHOD_FAILED('finding user').message), req, next, METHOD_FAILED().code)
         }
 
         const tokens = await tokenService.generateAccessAndRefreshTokenService(req, next, userId)
 
         if (!tokens) {
-            return ApiError(new Error(responseMessage.METHOD_FAILED('generating tokens')), req, next, 500)
+            return ApiError(new Error(METHOD_FAILED('generating tokens').message), req, next, METHOD_FAILED().code)
         }
 
         res.cookie('access_token', tokens.accessToken, {
@@ -82,16 +84,16 @@ export const login = AsyncHandler(async (req: Request, res: Response, next: Next
             maxAge: 1000 * parseInt(tokenInfo.refresh_validity as string)
         })
 
-        return ApiResponse(req, res, 200, 'User logged in successfully', {
+        return ApiResponse(req, res, SUCCESS().code, SUCCESS('User logged in successfully').message, {
             token: tokens.accessToken
         })
     } catch (error) {
-        ApiError(new Error(`Error logging in user: ${(error as Error).message}`), req, next, 403)
+        ApiError(new Error(`Error logging in user: ${(error as Error).message}`), req, next)
     }
 })
 
 /**
- * Controller to get the current authenticated user.
+ ** Controller to get the current authenticated user.
  *
  * @param req - The request object, extended to include the authenticated user.
  * @param res - The response object.
@@ -106,14 +108,14 @@ export const currentUser = (req: Request, res: Response, next: NextFunction) => 
         const user = (req as ProtectedRequest)?.user as ICurrentUser
 
         if (!user) {
-            return ApiError(new Error(responseMessage.NOT_FOUND('user')), req, next, 404)
+            return ApiError(new Error(NOT_FOUND('user').message), req, next, NOT_FOUND().code)
         }
 
-        return ApiResponse(req, res, 200, 'Current user', {
+        return ApiResponse(req, res, SUCCESS().code, SUCCESS('Current user').message, {
             user
         })
     } catch (error) {
-        ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('current user')), req, next, 500)
+        return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('current user').message), req, next, METHOD_FAILED().code)
     }
 }
 
@@ -136,7 +138,7 @@ export const logout = AsyncHandler(async (req: ProtectedRequest, res: Response, 
         const currentUserId = (req.user as Record<string, string>)?.id
 
         if (!currentUserId) {
-            return ApiError(new Error(responseMessage.NOT_FOUND('user')), req, next, 404)
+            return ApiError(new Error(NOT_FOUND('user').message), req, next, NOT_FOUND().code)
         }
 
         if (refreshToken) {
@@ -145,9 +147,9 @@ export const logout = AsyncHandler(async (req: ProtectedRequest, res: Response, 
 
         res.clearCookie('access_token').clearCookie('refresh_token')
 
-        return ApiResponse(req, res, 200, 'User logged out successfully')
+        return ApiResponse(req, res, SUCCESS().code, SUCCESS('User logged out successfully').message)
     } catch (error) {
-        return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('logout')), req, next, 500)
+        return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('logout').message), req, next, METHOD_FAILED().code)
     }
 })
 
@@ -169,21 +171,21 @@ export const forgotPassword = AsyncHandler(async (req: Request, res: Response, n
         const user = await authServices.userForgotPasswordService(req, next, body.email)
 
         if (!user) {
-            return ApiError(new Error(responseMessage.NOT_FOUND('user with email')), req, next, 404)
+            return ApiError(new Error(NOT_FOUND('user with email').message), req, next, NOT_FOUND().code)
         }
         // Generate a password reset token
         const resetToken = await tokenService.generateResetToken(req, next, user.id)
 
         if (!resetToken) {
-            return ApiError(new Error(responseMessage.INVALID_TOKEN), req, next, 403)
+            return ApiError(new Error(METHOD_FAILED('generate reset token').message), req, next, METHOD_FAILED().code)
         }
 
         // Send password reset email
         await mailService.sendPasswordResetEmail(req, next, user.email, resetToken)
 
-        return ApiResponse(req, res, 200, responseMessage.SUCCESS('Password reset email sent'), { token: resetToken })
+        return ApiResponse(req, res, SUCCESS().code, SUCCESS('Password reset email sent').message, { token: resetToken })
     } catch (error) {
-        return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('forgot password')), req, next, 500)
+        return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('forgot password').message), req, next, METHOD_FAILED().code)
     }
 })
 
@@ -211,14 +213,14 @@ export const resetPassword = AsyncHandler(async (req: Request, res: Response, ne
         const userId = await tokenService.verifyResetTokenService(req, next, token)
 
         if (!userId) {
-            return ApiError(new Error(responseMessage.INVALID_TOKEN), req, next, 403)
+            return ApiError(new Error(METHOD_FAILED('verify reset token').message), req, next, METHOD_FAILED().code)
         }
 
         await authServices.changePasswordService(req, next, userId, newPassword)
 
-        return ApiResponse(req, res, 200, responseMessage.SUCCESS('Password reset'))
+        return ApiResponse(req, res, SUCCESS().code, SUCCESS('Password reset').message)
     } catch (error) {
-        return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('reset password')), req, next, 500)
+        return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('reset password').message), req, next, METHOD_FAILED().code)
     }
 })
 
@@ -246,7 +248,7 @@ export const refreshAccessToken = AsyncHandler(async (req: Request, res: Respons
         const { access_token, refresh_token } = tokens
 
         if (access_token) {
-            return ApiResponse(req, res, 200, 'User already logged in', {
+            return ApiResponse(req, res, SUCCESS().code, SUCCESS('User already logged in').message, {
                 token: access_token
             })
         }
@@ -254,7 +256,7 @@ export const refreshAccessToken = AsyncHandler(async (req: Request, res: Respons
         const newTokens = await tokenService.refreshTokenService(req, next, refresh_token)
 
         if (!newTokens) {
-            return ApiError(new Error(responseMessage.INVALID_TOKEN), req, next, 403)
+            return ApiError(new Error(METHOD_FAILED('refresh token').message), req, next, METHOD_FAILED().code)
         }
 
         res.cookie('access_token', newTokens.accessToken, {
@@ -269,10 +271,10 @@ export const refreshAccessToken = AsyncHandler(async (req: Request, res: Respons
             maxAge: 1000 * parseInt(tokenInfo.refresh_validity as string)
         })
 
-        return ApiResponse(req, res, 200, 'Token refreshed successfully', {
+        return ApiResponse(req, res, SUCCESS().code, SUCCESS('Token refreshed successfully').message, {
             token: newTokens.accessToken
         })
     } catch (error) {
-        return ApiError(error instanceof Error ? error : new Error(responseMessage.METHOD_FAILED('refresh token')), req, next, 500)
+        return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('refresh token').message), req, next, METHOD_FAILED().code)
     }
 })
