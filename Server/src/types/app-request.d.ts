@@ -10,7 +10,7 @@ import { IForgotPassword, ILoginUser, ISignupUserBody } from '../Lib/Models/User
 
 // app-request.d.ts
 declare interface ProtectedRequest extends Request {
-    user?: Partial<User>
+    user?: Pick<User, 'id' | 'email' | 'role'>
     keyStore?: KeyStore
     accessToken?: string
     refreshToken?: string
