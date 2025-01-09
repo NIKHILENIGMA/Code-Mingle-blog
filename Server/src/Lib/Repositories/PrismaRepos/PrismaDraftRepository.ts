@@ -3,6 +3,8 @@ import prisma from '../../database/PrismaConnection'
 import { IDraftRepository } from '../Interfaces/IDraftRepository'
 import { PostDTO } from '../../Models/Blog'
 
+type SortOrder = 'asc' | 'desc'
+
 export class PrismaDraftRepository implements IDraftRepository {
     public async create(payload: Partial<Post>): Promise<Post> {
         const { authorId, status } = payload
@@ -17,12 +19,10 @@ export class PrismaDraftRepository implements IDraftRepository {
         return draft
     }
 
-    public async update(id: string, payload: Partial<Post>): Promise<Post> {
+    public async update(where: { id: string }, payload: Partial<Post>): Promise<Post> {
         try {
             const draft = await prisma.post.update({
-                where: {
-                    id
-                },
+                where,
                 data: payload
             })
 
@@ -32,25 +32,20 @@ export class PrismaDraftRepository implements IDraftRepository {
         }
     }
 
-    public async delete(id: string): Promise<void> {
+    public async delete(where: { id: string }): Promise<void> {
         try {
             await prisma.post.delete({
-                where: {
-                    id: id
-                }
+                where: where
             })
         } catch (error) {
             throw new Error(`Failed to delete draft ${(error as Error).message}`)
         }
     }
 
-    public async findDraft(id: string, authorId: string, fields: PostDTO): Promise<Partial<Post> | null> {
+    public async findDraft(where: {id: string, authorId: string}, fields: PostDTO): Promise<Partial<Post> | null> {
         try {
             const draft = await prisma.post.findUnique({
-                where: {
-                    id,
-                    authorId
-                },
+                where: where,
                 select: fields
             })
 
@@ -60,23 +55,18 @@ export class PrismaDraftRepository implements IDraftRepository {
         }
     }
 
-    public async findDraftById(id: string, authorId: string): Promise<Post | null> {
+    public async findDraftById(where: { id: string; authorId: string }): Promise<Post | null> {
         const draft = await prisma.post.findUnique({
-            where: {
-                id,
-                authorId
-            }
+            where: where
         })
 
         return draft
     }
 
-    public async findDraftBySlug(slug: string): Promise<Post | null> {
+    public async findDraftBySlug(where: { slug: string }): Promise<Post | null> {
         try {
             const draft = await prisma.post.findUnique({
-                where: {
-                    slug: slug
-                }
+                where: where
             })
 
             return draft
@@ -85,13 +75,11 @@ export class PrismaDraftRepository implements IDraftRepository {
         }
     }
 
-    public async findDraftsByAuthorId(authorId: string): Promise<Post[] | null> {
+    public async findDraftsByAuthorId(where: { authorId: string }, orderBy: { createdAt: SortOrder }): Promise<Post[] | null> {
         try {
             const drafts = await prisma.post.findMany({
-                where: {
-                    authorId: authorId,
-                    status: PostStatus.DRAFT || 'DRAFT'
-                }
+                where: where,
+                orderBy: orderBy
             })
 
             return drafts

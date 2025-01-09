@@ -13,16 +13,14 @@ export class PrismaCommentRepository implements ICommentRepository {
                 content: content as string
             }
         })
-        
+
         return comment
     }
 
-    async update(id: string, payload: Partial<Comment>): Promise<Comment> {
+    async update(where: { id: string }, payload: Partial<Comment>): Promise<Comment> {
         try {
             const comment = await prisma.comment.update({
-                where: {
-                    id
-                },
+                where,
                 data: payload
             })
 
@@ -32,12 +30,10 @@ export class PrismaCommentRepository implements ICommentRepository {
         }
     }
 
-    async delete(id: string): Promise<void> {
+    async delete(where: { id: string }): Promise<void> {
         try {
             await prisma.comment.delete({
-                where: {
-                    id: id
-                }
+                where
             })
         } catch (error) {
             throw new Error(`Failed to delete comment ${(error as Error).message}`)
@@ -62,7 +58,7 @@ export class PrismaCommentRepository implements ICommentRepository {
             const comment = await prisma.comment.findUnique({
                 where: {
                     id: commentId,
-                    postId: postId,
+                    postId: postId
                 }
             })
 
@@ -77,7 +73,7 @@ export class PrismaCommentRepository implements ICommentRepository {
             const comment = await prisma.comment.findFirst({
                 where: {
                     id: commentId,
-                    authorId: userId,
+                    authorId: userId
                 }
             })
 

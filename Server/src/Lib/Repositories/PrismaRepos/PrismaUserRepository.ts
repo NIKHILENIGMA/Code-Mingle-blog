@@ -10,12 +10,12 @@ export class PrismaUserRepository implements IUserRepository {
         return newUser
     }
 
-    public async update(id: string, user: User): Promise<User | null> {
-        return await prisma.user.update({ where: { id }, data: user })
+    public async update(where: { id: string }, user: User): Promise<User | null> {
+        return await prisma.user.update({ where: where, data: user })
     }
 
-    public async delete(id: string): Promise<void> {
-        await prisma.user.delete({ where: { id } })
+    public async delete(where: { id: string }): Promise<void> {
+        await prisma.user.delete({ where: where })
     }
 
     public async findUserById(id: string): Promise<User | null> {

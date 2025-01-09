@@ -1,45 +1,37 @@
-import { ResetPassword  } from '../../Models/ResetPassword'
+import { ResetPassword } from '../../Models/ResetPassword'
 import prisma from '../../database/PrismaConnection'
 // import { ApiError } from '../../../utils/ApiError'
-import { IResetPasswordRepository } from '../Interfaces/IResetPasswordRepository';
-
+import { IResetPasswordRepository } from '../Interfaces/IResetPasswordRepository'
 
 export class PrismaResetPasswordRepository implements IResetPasswordRepository {
-    
-
     public async create(reset: ResetPassword): Promise<ResetPassword> {
         const resetPassword = await prisma.resetPassword.create({
             data: reset
-        });
+        })
         return {
             ...resetPassword,
             expiresAt: resetPassword.expiresAt.toISOString()
-        };
+        }
     }
 
-    public async update(id:number, reset: ResetPassword): Promise<ResetPassword> {
+    public async update(where: { id: number }, reset: ResetPassword): Promise<ResetPassword> {
         const resetPassword = await prisma.resetPassword.update({
-            where: {
-                id
-            },
+            where: where,
             data: reset
-        });
+        })
         return {
             ...resetPassword,
             expiresAt: resetPassword.expiresAt.toISOString()
-        };
+        }
     }
 
-    
-    public async delete(id: number): Promise<void>{
+    public async delete(where: {id: number}): Promise<void> {
         await prisma.resetPassword.delete({
-            where: {
-                id
-            }
+            where: where
         })
     }
 
-    public async findByToken(resetToken: string): Promise<ResetPassword | null > {
+    public async findByToken(resetToken: string): Promise<ResetPassword | null> {
         const resetStore = await prisma.resetPassword.findUnique({
             where: {
                 resetToken
@@ -47,13 +39,11 @@ export class PrismaResetPasswordRepository implements IResetPasswordRepository {
         })
 
         if (!resetStore) {
-            return null;
+            return null
         }
         return {
             ...resetStore,
             expiresAt: resetStore.expiresAt.toISOString()
-        };
+        }
     }
-
-
 }

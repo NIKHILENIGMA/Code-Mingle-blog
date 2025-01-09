@@ -11,7 +11,6 @@ export class PrismaKeyStoreRepository implements IKeyStoreRepository {
      * @throws {ApiError} Throws an error if there is an issue while creating the key store.
      */
     public async create(keyStore: Partial<KeyStore>): Promise<KeyStore> {
-
         const payload = {
             userId: keyStore.userId as string,
             accessKey: keyStore.accessKey as string,
@@ -25,20 +24,18 @@ export class PrismaKeyStoreRepository implements IKeyStoreRepository {
         return createdStore
     }
 
-    public async update(id: number, data: Partial<KeyStore>): Promise<KeyStore | null> {
+    public async update(where: { id: number }, data: Partial<KeyStore>): Promise<KeyStore | null> {
         const keyStore = await prisma.keyStore.update({
-            where: { id },
+            where: where,
             data
         })
 
         return keyStore
     }
 
-    public async delete(id: string): Promise<void> {
+    public async delete(where: { id: number }): Promise<void> {
         await prisma.keyStore.delete({
-            where: {
-                id: parseInt(id)
-            }
+            where: where
         })
     }
 
@@ -74,8 +71,10 @@ export class PrismaKeyStoreRepository implements IKeyStoreRepository {
     }
 
     public async deleteKeyStoreByRefreshKey(refreshTokenKey: string): Promise<void> {
-        await prisma.keyStore.delete({ where: { 
-            refreshKey: refreshTokenKey
-         } })
+        await prisma.keyStore.delete({
+            where: {
+                refreshKey: refreshTokenKey
+            }
+        })
     }
 }
