@@ -152,17 +152,11 @@ export const SlashCommands = Extension.create({
         key: new PluginKey("slashCommands"),
         props: {
           handleKeyDown: (view, event) => {
-            if (event.key === "/") {
-              console.log("Slash key pressed");
-              const { state } = view;
-              const { selection } = state;
-              const { $from } = selection;
-
-              // Check if the cursor is at the start of the document
-              if ($from.pos !== 1) {
-                return false;
-              }
-
+            const { state } = view;
+            const { selection } = state;
+            const { $from } = selection;
+            // Check if the key is a slash and the cursor is at the beginning of the document node
+            if (event.key === "/" && $from.parentOffset === 0) {
               // Render the SlashCommandsMenu component
               const component = new ReactRenderer(SlashCommandsMenu, {
                 props: {
