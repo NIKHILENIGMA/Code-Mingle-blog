@@ -7,7 +7,7 @@ import { NavItems } from "@/constants/constants";
 import { useLogout } from "@/features/auth/hooks/useLogout";
 import { HamburgerMenuIcon } from "@radix-ui/react-icons";
 import { Pencil } from "@/Utils/Icons";
-import SearchBar from "@/features/Blog/components/SearchBar";
+import SearchBar from "@/features/Blog/components/Drafts/SearchBar";
 
 const Header: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -16,6 +16,10 @@ const Header: React.FC = () => {
   );
   const navigate = useNavigate();
   const { logout } = useLogout();
+
+  const handleNewDraft = () => {
+    navigate("/draft/new");
+  };
 
   const handleLogout = async (): Promise<void> => {
     try {
@@ -63,7 +67,7 @@ const Header: React.FC = () => {
         </div>
         <div className="items-center justify-around px-4 py-2 space-x-4 lg:flex">
           <span className="px-2 py-2 bg-orange-500 rounded-full cursor-pointer">
-            <Pencil size={20} color="white" onClick={() => navigate("/drafts/:draftId")} />
+            <Pencil size={20} color="white" onClick={handleNewDraft} />
           </span>
           <SearchBar />
         </div>
@@ -158,4 +162,3 @@ const Header: React.FC = () => {
 };
 
 export default Header;
-
