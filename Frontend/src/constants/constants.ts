@@ -23,5 +23,5 @@ export const CONTACTURL = "/v1/contact";
 export const NavItems = [
   { name: "Home", path: "/", icon: House },
   { name: "Blogs", path: "/posts", icon: Rss },
-  { name: "Editor", path: "/learn-editor-commands", icon: ClipboardType },
+  { name: "Editor", path: "/learn", icon: ClipboardType },
 ];
