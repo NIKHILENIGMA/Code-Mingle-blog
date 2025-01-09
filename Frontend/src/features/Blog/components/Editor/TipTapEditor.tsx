@@ -1,5 +1,5 @@
 import { useEditor, EditorContent, Editor } from "@tiptap/react";
-import { FC, useEffect, useState } from "react";
+import { FC, useState } from "react";
 import extensions from "../../core/extensions";
 import CustomBubbleMenu from "../BubbleMenu/CustomBubbleMenu";
 
@@ -39,11 +39,6 @@ const TiptapEditor: FC<TiptapEditorProps> = ({
   });
 
   // Sync initialContent when it changes
-  useEffect(() => {
-    if (editor && initialContent) {
-      editor.commands.setContent(initialContent);
-    }
-  }, [editor, initialContent]);
 
   return (
     <div className="relative w-full min-h-full space-y-2 g editor-wrapper">
