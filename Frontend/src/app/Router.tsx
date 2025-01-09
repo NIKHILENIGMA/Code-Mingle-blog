@@ -3,9 +3,14 @@ import HomePage from "../pages/Public/HomePage";
 import React from "react";
 import AboutPage from "../pages/Public/AboutPage";
 import Main from "@/Layout/Main";
-import { AllPostsPage, ProfilePage, ReadPostPage } from "@/pages";
-import ProfileOverview from "@/features/ProfileManagement/components/ProfileOverview";
-import PersonalInformation from "@/features/ProfileManagement/components/PersonalInformation";
+import {
+  AllPostsPage,
+  CreatePostPage,
+  ProfilePage,
+  ReadPostPage,
+} from "@/pages";
+import ProfileOverview from "@/features/Profile/components/ProfileOverview";
+import DraftLayout from "@/features/Blog/Layout/DraftLayout";
 // import AuthProvider from "@/features/auth/components/AuthProvider";
 
 const router = createBrowserRouter([
@@ -39,30 +44,25 @@ const router = createBrowserRouter([
           },
           {
             path: "personal-information",
-            element: <PersonalInformation />,
+            element: <ProfileOverview />,
           },
-          
         ],
       },
     ],
   },
-  
 
   {
-    path: "/draft/:draftId",
-    lazy: async () => {
-      const { CreatePostPage } = await import("@/pages");
-      return {
-        element: (
-          // <AuthProvider>
-          <CreatePostPage />
-          // </AuthProvider>
-        ),
-      };
-    },
+    path: "/draft",
+    element: <DraftLayout />,
+    children: [
+      {
+        path: ":draftId",
+        element: <CreatePostPage />,
+      },
+    ],
   },
   {
-    path: "/learn-editor-commands",
+    path: "/learn",
     lazy: async () => {
       const { LearnEditorPage } = await import("@/pages");
       return {
