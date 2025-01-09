@@ -1,23 +1,10 @@
 import { Request, NextFunction } from 'express'
 import { ApiError } from '../utils/ApiError'
-import { PostStatus } from '@prisma/client'
 import responseMessage from '../constant/responseMessage'
-import { BlogDraft, ISaveDraftBody, PostDTO } from '../Lib/Models/Blog'
 import { IDraftRepository } from '../Lib/Repositories/Interfaces/IDraftRepository'
 import { RepositoryFactory } from '../Lib/Repositories'
-import { orderBy } from '../constant/PrismaOptions'
-
-interface GenerateDraft {
-    status: PostStatus
-    authorId: string
-}
-interface SaveDraftpayload {
-    status: PostStatus
-    title: string
-    image: string
-    content: string
-    slug?: string
-}
+import { DraftContent, DraftSelectFields, DraftUpdatePayload, DraftWhere, DraftWhereStatus, GenerateDraft } from '../types/draft'
+import { Post } from '@prisma/client'
 
 const { METHOD_FAILED, BAD_REQUEST, NOT_FOUND } = responseMessage
 
@@ -27,13 +14,8 @@ class DraftService {
         this.DraftRepository = RepositoryFactory.DraftRepository()
     }
 
-    public async newDraftService(req: Request, next: NextFunction, id: string): Promise<string | void> {
+    public async newDraftService(req: Request, next: NextFunction, payload: GenerateDraft): Promise<string | void> {
         try {
-            const payload: GenerateDraft = {
-                status: 'DRAFT',
-                authorId: id
-            }
-
             const draft = await this.DraftRepository.create(payload)
 
             if (!draft) {
@@ -51,51 +33,62 @@ class DraftService {
         }
     }
 
-    public async saveDraftService(req: Request, next: NextFunction, draftId: string, userId: string, body: ISaveDraftBody): Promise<string | void> {
-        const makedSlug = this.generateSlug(body.title)
-
-        const payload: SaveDraftpayload = {
-            status: PostStatus.DRAFT,
-            title: body.title,
-            image: body.image,
-            content: body.content,
-            slug: makedSlug
+    public async saveDraftService(
+        req: Request,
+        next: NextFunction,
+        options: {
+            where: DraftWhere
+            draftContent: DraftContent
         }
-        try {
-            const draft = await this.DraftRepository.findDraftById({ draftId, userId })
+    ): Promise<string | void> {
+        // Generate payload for update
+        const payload: DraftUpdatePayload = {
+            title: options.draftContent.title,
+            content: options.draftContent.content,
+            image: options.draftContent.image
+        }
 
-            if (!draft) {
+        try {
+            // Find draft by ID and author ID
+            const existedDraft = await this.DraftRepository.findDraftById(options.where)
+
+            if (!existedDraft) {
                 return ApiError(new Error(NOT_FOUND('draft not found or draft might be deleted already').message), req, next, NOT_FOUND().code)
             }
 
-            const updatedDraft = await this.DraftRepository.update({ id: draft.id }, payload)
+            // If draft is found, update the draft
+            const updatedDraft = await this.DraftRepository.update(options.where, payload)
 
             if (!updatedDraft?.slug) {
                 return ApiError(new Error(BAD_REQUEST('Try with unique title').message), req, next, BAD_REQUEST().code)
             }
 
-            return 'Draft saved successfully'
+            // Return success message
+            const successMessage = 'Draft saved successfully'
+            return successMessage
         } catch (error) {
             return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('save draft service').message), req, next, METHOD_FAILED().code)
         }
     }
 
-    public async removeDraftService(req: Request, next: NextFunction, draftId: string, userId: string): Promise<string | void> {
+    public async removeDraftService(
+        req: Request,
+        next: NextFunction,
+        options: {
+            where: DraftWhere
+        }
+    ): Promise<string | void> {
         try {
-            const draft = await this.DraftRepository.findDraftById({
-                draftId,
-                userId
-            })
+            const existedDraft = await this.DraftRepository.findDraftById(options.where)
 
-            if (!draft) {
+            if (!existedDraft) {
                 return ApiError(new Error(NOT_FOUND('draft or draft might be deleted already').message), req, next, NOT_FOUND().code)
             }
 
-            const draftIdToDelete: string = draft.id // draft.id is not null here
+            await this.DraftRepository.delete({ id: existedDraft.id })
 
-            await this.DraftRepository.delete({ draftIdToDelete, userId })
-
-            return 'Draft removed successfully'
+            const successMessage = 'Draft removed successfully'
+            return successMessage
         } catch (error) {
             return ApiError(
                 error instanceof Error ? error : new Error(METHOD_FAILED('remove draft service').message),
@@ -106,38 +99,32 @@ class DraftService {
         }
     }
 
-    public async getDraftService(req: Request, next: NextFunction, draftId: string, userId: string): Promise<Partial<BlogDraft> | void> {
-        const postDTO: PostDTO = {
-            id: true,
-            authorId: true,
-            title: true,
-            content: true,
-            status: true,
-            image: true,
-            slug: true,
-            createdAt: true
+    public async getDraftService(
+        req: Request,
+        next: NextFunction,
+        options: {
+            where: DraftWhere
+            selectedFields: DraftSelectFields
         }
-
+    ): Promise<Partial<Post> | void> {
         try {
-            const currentDraft = await this.DraftRepository.findDraft({ id: draftId, authorId: userId }, postDTO)
-
+            /// Find draft
+            const currentDraft = await this.DraftRepository.findDraft(options.where, options.selectedFields)
             if (!currentDraft) {
                 return ApiError(new Error(NOT_FOUND('draft').message), req, next, NOT_FOUND().code)
             }
 
+            /// Return draft
             return currentDraft
         } catch (error) {
             return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('get draft service').message), req, next, METHOD_FAILED().code)
         }
     }
 
-    public async listDraftService(req: Request, next: NextFunction, id: string) {
-        const where = {
-            authorId: id
-        }
+    public async listDraftService(req: Request, next: NextFunction) {
 
         try {
-            const drafts = await this.DraftRepository.findDraftsByAuthorId(where, orderBy('desc'))
+            const drafts = await this.DraftRepository.findDrafts()
 
             if (!drafts || drafts.length === 0) {
                 return ApiError(new Error(NOT_FOUND('drafts').message), req, next, NOT_FOUND().code)
@@ -149,13 +136,9 @@ class DraftService {
         }
     }
 
-    public async getUserDraftService(req: Request, next: NextFunction, userId: string) {
-        const where = {
-            authorId: userId
-        }
-
+    public async getUserDraftsService(req: Request, next: NextFunction, options: { where: DraftWhereStatus }): Promise<Post[] | void> {
         try {
-            const drafts = await this.DraftRepository.findDraftsByAuthorId(where, orderBy('desc'))
+            const drafts: Post[] | null = await this.DraftRepository.findDraftsByAuthorId(options.where)
 
             if (!drafts) {
                 return ApiError(new Error(NOT_FOUND('drafts').message), req, next, NOT_FOUND().code)
@@ -172,10 +155,7 @@ class DraftService {
         }
     }
 
-    private generateSlug(title: string | undefined): string {
-        if (!title || title === undefined) return ''
-        return title?.toLowerCase().replace(/ /g, '-') ?? ''
-    }
+
 }
 
 export default DraftService
