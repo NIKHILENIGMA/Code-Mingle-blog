@@ -1,24 +1,25 @@
-import { DRAFTURL } from "@/constants/constants";
+import { DRAFT_URL } from "@/constants/constants";
 import { apiInstance } from "./apiInstance";
 import { Draft } from "@/Types/draft";
-import { AxiosError, AxiosResponse } from "axios";
+import { AxiosError } from "axios";
 import { PostContent } from "@/features/Blog/components/Drafts/DraftForm";
+import { ApiResponse } from "@/Types/app-response";
 
 /**
- * Description: Service to register a user.
+ * @name createDraftService
  *
- * @param {RegisterUser} data The user data to be registered.
- *
- * @returns {Promise<AxiosResponse>} The response from the server.
- *
- * @throws Will throw an error if the registration fails.
+ * @description Service to create a new draft.
+ * @returns {Promise<ApiResponse<{ draft: Draft }>>} A promise that resolves to an ApiResponse containing the created draft.
+ * @throws {Error} if draft generation fails.
  */
 
-export const createDraftService = async (): Promise<{ data: Draft }> => {
+export const createDraftService = async (): Promise<
+  ApiResponse<{ draft: Draft }>
+> => {
   try {
-    const response = await apiInstance.post(`${DRAFTURL}/newDraft`);
+    const response = await apiInstance.post(`${DRAFT_URL}/newDraft`);
 
-    if (!response.data) {
+    if (response.status !== 201) {
       throw new Error(`Draft generation failed: ${response.data}`);
     }
 
@@ -31,29 +32,42 @@ export const createDraftService = async (): Promise<{ data: Draft }> => {
   }
 };
 
-export const updateDraftService = async (
+/**
+ * @name autoSaveService
+ *
+ * @description Service to automatically save a draft.
+ * @param {string} id - The ID of the draft to save.
+ * @param {PostContent} data - The content to save in the draft.
+ * @returns {Promise<void>} A promise that resolves when the draft is successfully saved.
+ * @throws {Error} if auto-saving the draft fails.
+ */
+
+export const autoSaveService = async (
   id: string,
-  data: { title: string; content: string }
-): Promise<AxiosResponse> => {
+  data: PostContent
+): Promise<void> => {
   try {
-    const response = await apiInstance.patch(`${DRAFTURL}/${id}`, data);
-
-    if (!response.data) {
-      throw new Error(`Draft generation failed: ${response.data}`);
-    }
-
-    console.log("Draft updated successfully: ", response.data);
-
-    return response;
+    await apiInstance.patch(`${DRAFT_URL}/${id}/save`, data);
   } catch (error) {
-    console.error(error);
-    throw new Error("Draft generation failed");
+    throw new Error(`${(error as AxiosError)?.message}`);
   }
 };
 
-export const getDraftService = async (id: string): Promise<AxiosResponse> => {
+
+/**
+ * @name getDraftService
+ *
+ * @description Service to retrieve a draft by its ID.
+ * @param {string} id - The ID of the draft to retrieve.
+ * @returns {Promise<ApiResponse<{ draft: Draft }>>} A promise that resolves to an ApiResponse containing the requested draft.
+ * @throws {Error} if draft retrieval fails.
+ */
+
+export const getDraftService = async (
+  id: string
+): Promise<ApiResponse<{ draft: Draft }>> => {
   try {
-    const response = await apiInstance.get(`${DRAFTURL}/${id}`);
+    const response = await apiInstance.get(`${DRAFT_URL}/${id}`);
 
     if (!response.data) {
       throw new Error(`Draft generation failed: ${response.data}`);
@@ -66,33 +80,48 @@ export const getDraftService = async (id: string): Promise<AxiosResponse> => {
   }
 };
 
+/**
+ * @name deleteDraftService
+ *
+ * @description Service to delete a draft by its ID.
+ * @param {string} id - The ID of the draft to delete.
+ * @returns {Promise<void>} A promise that resolves when the draft is successfully deleted.
+ * @throws {Error} if draft deletion fails.
+ */
+
 export const deleteDraftService = async (id: string): Promise<void> => {
   try {
-    await apiInstance.delete(`${DRAFTURL}/${id}`);
+    await apiInstance.delete(`${DRAFT_URL}/${id}`);
   } catch (error) {
     throw new Error(`${(error as AxiosError)?.message}`);
   }
 };
 
-export const allDraftsService = async (): Promise<AxiosResponse> => {
+/**
+ * @name allDraftsService
+ *
+ * @description Service to retrieve all drafts.
+ * @returns {Promise<ApiResponse<{ draft: Draft[] }>>} A promise that resolves to an ApiResponse containing an array of all drafts.
+ * @throws {Error} if retrieval of all drafts fails.
+ */
+
+
+export const allDraftsService = async (): Promise<
+  ApiResponse<{ draft: Draft[] }>
+> => {
   try {
-    const response = await apiInstance.get(`${DRAFTURL}`);
+    const response = await apiInstance.get(`${DRAFT_URL}/users-drafts`);
 
     if (!response.data) {
       throw new Error(`Draft generation failed: ${response.data}`);
     }
 
-    return response;
+    return response.data;
   } catch (error) {
     console.error(error);
     throw new Error("Draft generation failed");
   }
 };
 
-export const autoSaveService = async (id: string, data: PostContent): Promise<void> => {
-  try {
-    await apiInstance.patch(`${DRAFTURL}/${id}/save`, data);
-  } catch (error) {
-    throw new Error(`${(error as AxiosError)?.message}`);
-  }
-};
+
+

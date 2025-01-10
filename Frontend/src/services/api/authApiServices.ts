@@ -1,4 +1,4 @@
-import { AUTHENTICATIONURL } from "@/constants/constants";
+import { AUTHENTICATION_URL } from "@/constants/constants";
 import { apiInstance } from "./apiInstance";
 import { RegisterUser } from "@/Types/auth";
 import axios, { AxiosResponse } from "axios";
@@ -20,7 +20,7 @@ export interface ForgotPasswordResponse {
 
 export const currentUserService = async () => {
   try {
-    const response = await apiInstance.get(`${AUTHENTICATIONURL}/get-user`);
+    const response = await apiInstance.get(`${AUTHENTICATION_URL}/get-user`);
 
     if (response.status !== 200) {
       throw new Error("Failed to get current user");
@@ -37,7 +37,7 @@ export const currentUserService = async () => {
 export const signup = async (user: RegisterUser) => {
   try {
     const response = await apiInstance.post(
-      `${AUTHENTICATIONURL}/signup`,
+      `${AUTHENTICATION_URL}/signup`,
       user
     );
 
@@ -52,7 +52,7 @@ export const signup = async (user: RegisterUser) => {
 
 export const loginService = async (email: string, password: string) => {
   try {
-    const response = await apiInstance.post(`${AUTHENTICATIONURL}/login`, {
+    const response = await apiInstance.post(`${AUTHENTICATION_URL}/login`, {
       email,
       password,
     });
@@ -69,7 +69,7 @@ export const loginService = async (email: string, password: string) => {
 
 export const logoutService = async (): Promise<void> => {
   try {
-    await apiInstance.delete(`${AUTHENTICATIONURL}/logout`);
+    await apiInstance.delete(`${AUTHENTICATION_URL}/logout`);
 
   } catch (error) {
     console.error(error);
@@ -79,7 +79,7 @@ export const logoutService = async (): Promise<void> => {
 export const refreshTokenService = async (): Promise<RefreshTokenResponse | void> => {
   try {
     const response: AxiosResponse<RefreshTokenResponse> = await apiInstance.post(
-      `${AUTHENTICATIONURL}/refresh-token`
+      `${AUTHENTICATION_URL}/refresh-token`
     );
 
     if (response.status !== 200) {
@@ -97,7 +97,7 @@ export const refreshTokenService = async (): Promise<RefreshTokenResponse | void
 export const forgotPassword = async (email: string): Promise<ForgotPasswordResponse | void> => {
   try {
     const response = await apiInstance.post(
-      `${AUTHENTICATIONURL}/forgot-password`,
+      `${AUTHENTICATION_URL}/forgot-password`,
       { email }
     );
 
@@ -114,7 +114,7 @@ export const forgotPassword = async (email: string): Promise<ForgotPasswordRespo
 export const resetPassword = async (password: string, confirmPassword: string) => {
   try {
     const response = await apiInstance.post(
-      `${AUTHENTICATIONURL}/reset-password`,
+      `${AUTHENTICATION_URL}/reset-password`,
       { password, confirmPassword }
     );
 
