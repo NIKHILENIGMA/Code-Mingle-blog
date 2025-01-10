@@ -17,10 +17,10 @@ const SideBar: FC = () => {
         sideBarState ? "transform translate-x-0" : "transform -translate-x-full"
       }`}
     >
-      <SideBarToogleButton /> 
+      <SideBarToogleButton />
       <NewDraft />
       <div className="flex flex-col items-center justify-between w-full  h-[80vw] space-y-3 overflow-hidden ">
-        <SideBarMyDrafts />
+        <SideBarMyDrafts isVisible={sideBarState} />
         <SideBarSuggested />
       </div>
     </div>
