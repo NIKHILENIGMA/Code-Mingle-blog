@@ -1,8 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { allDraftsService } from "@/services/api/draftServices";
-import { useDraftsProps, useDraftsReturn } from "../types/useDrafts.types";
+import { allDraftsService } from "@/services/api/draftApiServices";
+import { DRAFT_GC_TIME, DRAFT_STALE_TIME } from "@/constants/constants";
 
-export const useDrafts = ({ isOpen }: useDraftsProps): useDraftsReturn => {
+
+export const useDrafts = (isVisible: boolean) => {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["drafts"],
     queryFn: async () => {
@@ -13,15 +14,16 @@ export const useDrafts = ({ isOpen }: useDraftsProps): useDraftsReturn => {
           throw new Error(`Draft generation failed: ${response}`);
         }
 
-        return response.data
+        return response.data;
       } catch (error) {
         console.error(error);
       }
     },
-    enabled: !!isOpen,
+    enabled: !!isVisible,
+    staleTime: DRAFT_STALE_TIME,
+    gcTime: DRAFT_GC_TIME,
     refetchOnWindowFocus: false,
-    staleTime: 1000 * 60 * 5,
   });
 
-  return { Drafts: data, isLoading, isError };
+  return { data, isLoading, isError };
 };
