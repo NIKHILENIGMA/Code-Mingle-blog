@@ -3,11 +3,11 @@ import { z } from 'zod'
 export const draftContentSchema = z.object({
     title: z.string().min(0, 'Title is required'),
     content: z.string().min(0, 'Content is required'),
-    image: z.string().min(0, 'Image is required')
+    image: z.string().min(0, 'Image is required').optional()
 })
 
 export const postId = z.object({
-    postId: z.string().uuid('Invalid post id')
+    id: z.string().uuid('Invalid post id')
 })
 
 export const queryDraftSchema = z.object({
