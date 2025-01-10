@@ -57,7 +57,7 @@ export const saveDraft = AsyncHandler(async (req: ProtectedRequest, res: Respons
     }
 
     /// Get user
-    const userId: string = (req.user as User)?.id // Get user ID
+    const userId: string = (req.user as User)?.id 
     if (!userId) {
         return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
     }
