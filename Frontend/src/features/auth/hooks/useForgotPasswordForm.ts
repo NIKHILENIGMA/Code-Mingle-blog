@@ -1,5 +1,5 @@
-import { ForgotPasswordResponse } from "./../../../services/api/authServices";
-import { forgotPassword } from "@/services/api/authServices";
+import { ForgotPasswordResponse } from "../../../services/api/authApiServices";
+import { forgotPassword } from "@/services/api/authApiServices";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { SubmitHandler, useForm } from "react-hook-form";

@@ -1,4 +1,4 @@
-import { currentUserService, loginService } from "@/services/api/authServices";
+import { currentUserService, loginService } from "@/services/api/authApiServices";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { SubmitHandler, useForm } from "react-hook-form";

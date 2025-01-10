@@ -1,8 +1,8 @@
-import { RefreshTokenResponse, refreshTokenService } from "@/services/api/authServices";
+import { RefreshTokenResponse, refreshTokenService } from "@/services/api/authApiServices";
 import { setAccessToken, setPersist } from "@/features/auth/authSlice";
 import { useDispatch } from "react-redux";
 
-const useRefreshToken = () => {
+export const useRefreshToken = () => {
   const dispatch = useDispatch();
 
   const refreshToken = async () => {
@@ -25,4 +25,4 @@ const useRefreshToken = () => {
   return { refreshToken };
 };
 
-export { useRefreshToken };
+

@@ -1,4 +1,4 @@
-import { logoutService } from "@/services/api/authServices";
+import { logoutService } from "@/services/api/authApiServices";
 import { useMutation } from "@tanstack/react-query";
 import { useDispatch } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";

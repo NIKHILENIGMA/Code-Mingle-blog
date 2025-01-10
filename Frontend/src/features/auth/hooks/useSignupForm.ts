@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
-import { signup } from "@/services/api/authServices";
+import { signup } from "@/services/api/authApiServices";
 import { useMutation } from "@tanstack/react-query";
 import { authSchema } from "@/features/auth/schema/schema";
 import { useNavigate } from "react-router-dom";

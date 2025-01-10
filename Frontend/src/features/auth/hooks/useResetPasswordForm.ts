@@ -1,4 +1,4 @@
-import { resetPassword } from "@/services/api/authServices";
+import { resetPassword } from "@/services/api/authApiServices";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
