@@ -3,13 +3,14 @@ import { ApiResponse } from '../utils/ApiResponse'
 import { ApiError } from '../utils/ApiError'
 import { AsyncHandler } from '../utils/AsyncHandler'
 import { ProtectedRequest } from '../types/app-request'
-import { IForgotPasswordRequest, ILoginUserRequest, IResetPasswordRequest, ISignupUserRequest, ICurrentUser } from '../types/app-request'
+import { IForgotPasswordRequest, ILoginUserRequest, IResetPasswordRequest, ISignupUserRequest } from '../types/app-request'
 import AuthService from '../services/auth.service'
 import TokenServices from '../services/token.service'
 import MailService from '../services/mail.service'
 import responseMessage from '../constant/responseMessage'
 import config, { tokenInfo } from '../config/config'
 import { EApplicationEnvironment } from '../constant/application'
+import { User } from '../Lib/Models/User'
 
 const authServices = new AuthService()
 const tokenService = new TokenServices()
@@ -103,9 +104,9 @@ export const login = AsyncHandler(async (req: Request, res: Response, next: Next
  *
  * @throws Will throw an error if there is an issue retrieving the current user.
  */
-export const currentUser = (req: Request, res: Response, next: NextFunction) => {
+export const currentUser = (req: ProtectedRequest, res: Response, next: NextFunction) => {
     try {
-        const user = (req as ProtectedRequest)?.user as ICurrentUser
+        const user = (req.user as User)
 
         if (!user) {
             return ApiError(new Error(NOT_FOUND('user').message), req, next, NOT_FOUND().code)
