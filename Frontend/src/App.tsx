@@ -1,9 +1,9 @@
 import AppRouter from "./app/Router";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
+import queryClient from "./Utils/queryClient";
+
 
 function App(): JSX.Element {
-  const queryClient = new QueryClient();
-
   return (
     <>
       <QueryClientProvider client={queryClient}>
