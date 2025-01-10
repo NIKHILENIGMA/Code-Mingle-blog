@@ -1,10 +1,10 @@
 import { validateParams } from './../middleware/validateSchema.middleware'
 import express from 'express'
-import { createDraft, getDraft, listDraft, removeDraft, saveDraft } from '../controllers/draft.controller'
+import { createDraft, getDraft, getUserDrafts, listDraft, removeDraft, saveDraft } from '../controllers/draft.controller'
 import { isAuthenticated } from '../middleware/authentication.middleware'
 import { postId } from '../schemas/blog.schema'
 
-const router = express.Router()
+const router = express.Router({ mergeParams: true })
 
 // Middleware to check if user is authenticated
 // ---------------------------------------------------------------------------------
@@ -14,6 +14,8 @@ router.use(isAuthenticated)
 // ---------------------------------------------------------------------------------
 
 router.route('/newDraft').post(createDraft)
+
+router.route('/users-drafts').get(getUserDrafts)
 
 router.route('/:id/save').patch(validateParams(postId), saveDraft)
 
