@@ -1,3 +1,4 @@
+import Loader from "@/components/Loader";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useRefreshToken } from "@/features/auth/hooks/useRefreshToken";
 import { ReactNode, useEffect, useState } from "react";
@@ -31,11 +32,18 @@ function AuthProvider({ children }: AuthProps): JSX.Element {
     }
   }, [token, persist, refreshToken]);
 
-  if (loading) {
-    return <div>Loading...</div>; // You can replace this with a loading spinner or any other loading indicator
-  }
 
-  return <div>{token ? children : <Navigate to="/login" replace state={{from: location}} />}</div>;
+  return (
+    <div>
+      {loading ? (
+        <Loader />
+      ) : token ? (
+        children
+      ) : (
+        <Navigate to="/login" state={{ from: location.pathname }} />
+      )}
+    </div>
+  );
 }
 
 export default AuthProvider;
