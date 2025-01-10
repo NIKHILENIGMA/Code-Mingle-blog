@@ -2,7 +2,7 @@ import { store } from "@/app/store/store";
 import { clearAuth } from "@/features/auth/authSlice";
 // import { useRefreshToken } from "@/features/auth/hooks/useRefreshToken";
 import axios from "axios";
-import { refreshTokenService } from "./authServices";
+import { refreshTokenService } from "./authApiServices";
 
 const API_URL = "/api";
 
