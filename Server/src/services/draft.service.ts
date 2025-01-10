@@ -6,7 +6,7 @@ import { RepositoryFactory } from '../Lib/Repositories'
 import { DraftContent, DraftSelectFields, DraftUpdatePayload, DraftWhere, DraftWhereStatus, GenerateDraft } from '../types/draft'
 import { Post } from '@prisma/client'
 
-const { METHOD_FAILED, BAD_REQUEST, NOT_FOUND } = responseMessage
+const { METHOD_FAILED, NOT_FOUND } = responseMessage
 
 class DraftService {
     private DraftRepository: IDraftRepository
@@ -41,7 +41,7 @@ class DraftService {
             draftContent: DraftContent
         }
     ): Promise<string | void> {
-        // Generate payload for update
+        /// Generate payload for update
         const payload: DraftUpdatePayload = {
             title: options.draftContent.title,
             content: options.draftContent.content,
@@ -49,21 +49,17 @@ class DraftService {
         }
 
         try {
-            // Find draft by ID and author ID
+            /// Find draft by ID and author ID
             const existedDraft = await this.DraftRepository.findDraftById(options.where)
 
             if (!existedDraft) {
                 return ApiError(new Error(NOT_FOUND('draft not found or draft might be deleted already').message), req, next, NOT_FOUND().code)
             }
 
-            // If draft is found, update the draft
-            const updatedDraft = await this.DraftRepository.update(options.where, payload)
+            /// If draft is found, update the draft
+            await this.DraftRepository.update(options.where, payload)
 
-            if (!updatedDraft?.slug) {
-                return ApiError(new Error(BAD_REQUEST('Try with unique title').message), req, next, BAD_REQUEST().code)
-            }
-
-            // Return success message
+            /// Return success message
             const successMessage = 'Draft saved successfully'
             return successMessage
         } catch (error) {
@@ -122,7 +118,6 @@ class DraftService {
     }
 
     public async listDraftService(req: Request, next: NextFunction) {
-
         try {
             const drafts = await this.DraftRepository.findDrafts()
 
@@ -154,8 +149,6 @@ class DraftService {
             )
         }
     }
-
-
 }
 
 export default DraftService
