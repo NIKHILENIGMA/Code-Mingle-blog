@@ -1,10 +1,11 @@
-import { getDraftService } from "@/services/api/draftServices";
+import { getDraftService } from "@/services/api/draftApiServices";
 import { useQuery } from "@tanstack/react-query";
 import { useDraftReturn } from "../types/useDraft.types";
+import { DRAFT_STALE_TIME } from "@/constants/constants";
 
 export const useDraft = (draftId: string): useDraftReturn => {
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["draft", draftId],
+    queryKey: ["drafts", draftId],
     queryFn: async () => {
       try {
         if (!draftId) return;
@@ -16,6 +17,9 @@ export const useDraft = (draftId: string): useDraftReturn => {
       }
     },
     enabled: !!draftId,
+    refetchOnWindowFocus: false,
+    staleTime: DRAFT_STALE_TIME,
+    gcTime: DRAFT_STALE_TIME,
   });
 
   return { Draft: data, isLoading, isError };
