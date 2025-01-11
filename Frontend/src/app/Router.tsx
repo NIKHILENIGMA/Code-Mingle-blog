@@ -11,7 +11,7 @@ import {
 } from "@/pages";
 import ProfileOverview from "@/features/Profile/components/ProfileOverview";
 import DraftLayout from "@/features/Blog/Layout/DraftLayout";
-// import AuthProvider from "@/features/auth/components/AuthProvider";
+import AuthProvider from "@/features/auth/components/AuthProvider";
 
 const router = createBrowserRouter([
   {
@@ -36,7 +36,12 @@ const router = createBrowserRouter([
       },
       {
         path: "/profile/@username",
-        element: <ProfilePage />,
+        element: (
+          <AuthProvider>
+            {" "}
+            <ProfilePage />{" "}
+          </AuthProvider>
+        ),
         children: [
           {
             path: "posts",
@@ -53,7 +58,12 @@ const router = createBrowserRouter([
 
   {
     path: "/draft",
-    element: <DraftLayout />,
+    element: (
+      <AuthProvider>
+        {" "}
+        <DraftLayout />{" "}
+      </AuthProvider>
+    ),
     children: [
       {
         path: ":draftId",
