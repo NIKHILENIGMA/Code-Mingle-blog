@@ -10,9 +10,9 @@ const DraftActions: FC = () => {
     console.log("Publish");
   };
 
+  /// Get the save status from the store
   const saveStatus = useSelector((state: RootState) => state.draft.saveDraft);
 
-  
   return (
     <div className="fixed top-0 z-10 flex items-center justify-end w-full h-16 px-4 backdrop:blur-md ">
       <div className="flex items-center justify-center h-full px-3 space-x-2 md:w-1/4 lg:w-1/3">
@@ -24,7 +24,7 @@ const DraftActions: FC = () => {
           </div>
         ): <div className="flex items-center justify-center h-full px-3 space-x-2 md:w-1/4 lg:w-1/3">Saving...</div>}
 
-        <Button variant="ghost">
+        <Button variant="ghost" onClick={() => console.log("More")}>
           <ChevronDown />
         </Button>
 
