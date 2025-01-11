@@ -13,7 +13,7 @@ const SideBar: FC = () => {
 
   return (
     <div
-      className={`fixed top-0 left-0 z-20 flex flex-col items-start h-full p-4 space-y-4 bg-gray-100 shadow-lg w-[85vw] md:w-[50vw] lg:w-[18vw] transition-transform duration-500 ease-in-out ${
+      className={`fixed top-0 left-0 z-20 flex flex-col items-start h-full p-4 space-y-4 bg-gray-100 shadow-lg w-[85vw] md:w-[50vw] lg:w-[22vw] transition-transform duration-500 ease-in-out ${
         sideBarState ? "transform translate-x-0" : "transform -translate-x-full"
       }`}
     >
