@@ -1,5 +1,5 @@
 export interface useCreateDraftReturn {
-  handleNewDraft: () => Promise<void>;
+  handleNewDraft: () => Promise<string | void>;
   isPending: boolean;
   isError: boolean;
 }
