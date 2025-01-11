@@ -57,6 +57,7 @@ import {
   ClipboardList,
   Settings2,
   Users,
+  Trash2,
   UserCheck,
   Fingerprint,
   MapPin,
@@ -71,6 +72,7 @@ import {
 export {
   Users,
   UserCheck,
+  Trash2,
   MapPin,
   Fingerprint,
   Settings2,
