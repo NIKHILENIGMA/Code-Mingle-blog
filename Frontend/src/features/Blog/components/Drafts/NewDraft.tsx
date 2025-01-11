@@ -2,13 +2,15 @@ import { FC } from "react";
 import { Button } from "@/components";
 import { FilePlus2 } from "@/Utils/Icons";
 import { useCreateDraft } from "../../hooks/useCreateDraft";
+import Logo from "@/components/Logo";
 
 const NewDraft: FC = () => {
   const { handleNewDraft, isPending } = useCreateDraft();
 
   return (
     <div className="w-full p-2 rounded-xl">
-      <h2 className="w-full text-xl font-bold">TechScribe</h2>
+      <Logo />
+      
       <div className="w-full px-1 py-2">
         <Button
           variant="default"
