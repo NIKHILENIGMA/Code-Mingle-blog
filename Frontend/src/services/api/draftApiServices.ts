@@ -91,7 +91,10 @@ export const getDraftService = async (
 
 export const deleteDraftService = async (id: string): Promise<void> => {
   try {
-    await apiInstance.delete(`${DRAFT_URL}/${id}`);
+    console.log("Deleting draft with ID: ", id);
+    const response = await apiInstance.delete(`${DRAFT_URL}/remove/${id}`);
+    console.log("Draft deleted successfully: ", response.data);
+    
   } catch (error) {
     throw new Error(`${(error as AxiosError)?.message}`);
   }
