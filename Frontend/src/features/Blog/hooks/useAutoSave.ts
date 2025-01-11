@@ -6,7 +6,7 @@ import { useCallback, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { setSaveDraft } from "../slices/draftSlice";
 import queryClient from "@/Utils/queryClient";
-import { Draft } from "@/Types/draft";
+
 
 export const useAutoSave = (
   id: string,
@@ -26,55 +26,10 @@ export const useAutoSave = (
         content: content.content,
       });
     },
-    onMutate: async () => {
-      dispatch(setSaveDraft({ saveDraft: false }));
 
-      // Cancel all queries related to drafts and draft
-      await queryClient.cancelQueries({ queryKey: ["drafts"] }); // Cancel all drafts queries
-      await queryClient.cancelQueries({ queryKey: ["draft", id] }); // Cancel draft query
-
-      // Snapshot the previous value
-      const previousDraft = queryClient.getQueryData<{ draft: Draft }>([
-        "draft",
-        id,
-      ]);
-
-      // Optimistically update to the new value
-      queryClient.setQueryData<{ draft: Draft }>(["draft", id], (old) => {
-        if (!old) return { draft: { title: "", content: "", id } };
-        return {
-          draft: {
-            title: content.title,
-            content: content.content,
-            id: old?.draft.id || id,
-          },
-        };
-      });
-
-      // Update the drafts query
-      queryClient.setQueryData<{ drafts: Draft[] }>(["drafts"], (old) => {
-        if (!old || !Array.isArray(old?.drafts)) {
-          return { drafts: [] }; // Return an empty drafts array if the old data is undefined or invalid
-        }
-        return {
-          drafts: old?.drafts?.map((draft) => {
-            if (draft.id === id) {
-              return { title: content.title, content: content.content, id };
-            }
-            return draft;
-          }),
-        };
-      });
-
-      // Return the previous value to rollback
-      return { previousDraft };
-    },
     onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["drafts"] });
       dispatch(setSaveDraft({ saveDraft: true }));
-
-      // Invalidate all queries related to drafts and draft
-      queryClient.invalidateQueries({ queryKey: ["drafts"] }); // Invalidate all drafts queries
-      queryClient.invalidateQueries({ queryKey: ["draft", id] }); // Invalidate draft query
     },
   });
 

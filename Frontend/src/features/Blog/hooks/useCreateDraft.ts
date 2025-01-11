@@ -1,13 +1,9 @@
-import { Draft } from "@/Types/draft";
 import { useMutation } from "@tanstack/react-query";
-import queryClient from "@/Utils/queryClient";
 import { createDraftService } from "@/services/api/draftApiServices";
 import { useCreateDraftReturn } from "../types/useCreateDraft.types";
-import { useNavigate } from "react-router-dom";
+import queryClient from "@/Utils/queryClient";
 
 export const useCreateDraft = (): useCreateDraftReturn => {
-  const navigate = useNavigate();
-
   /// Create a new draft
   const {
     mutateAsync: newDraftMutation,
@@ -20,34 +16,8 @@ export const useCreateDraft = (): useCreateDraftReturn => {
       console.log("Created user data: ", axiosResponse?.data);
       return axiosResponse?.data;
     },
-    
-    onMutate: async () => {
-      // Cancel all queries with the key "drafts"
-      await queryClient.cancelQueries({ queryKey: ["drafts"] }); 
-
-      // Snapshot the previous value
-      const previousDrafts = queryClient.getQueryData<{ drafts: Draft[] }>([
-        "drafts",
-      ]);
-      if (!previousDrafts) {
-        return;
-      }
-
-      // Return the previous value to rollback
-      return { previousDrafts };
-    },
-
-    onError: (_, __, context) => {
-      // Rollback to the previous value
-      queryClient.setQueryData<{ drafts: Draft[] }>(
-        ["drafts"],
-        context?.previousDrafts
-      );
-    },
-
-    onSettled: () => {
-      // Invalidate the cache to refetch the data
-      queryClient.invalidateQueries({ queryKey: ["drafts"] });
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey: ["drafts"]});
     },
   });
 
@@ -62,7 +32,8 @@ export const useCreateDraft = (): useCreateDraftReturn => {
       } else {
         console.log("New draft created: ", newDraft);
         const draftId = newDraft?.draft?.id;
-        navigate(`${draftId}`);
+
+        return draftId;
       }
     } catch (error) {
       console.error(error);
