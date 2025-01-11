@@ -1,32 +1,32 @@
-import React, { useState } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import  { FC, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "@/app/store/store";
-import { Button, Img } from "@/components";
-import { NavItems } from "@/constants/constants";
-import { useLogout } from "@/features/auth/hooks/useLogout";
 import { HamburgerMenuIcon } from "@radix-ui/react-icons";
 import { Pencil } from "@/Utils/Icons";
 import SearchBar from "@/features/Blog/components/Drafts/SearchBar";
+import { useCreateDraft } from "@/features/Blog/hooks/useCreateDraft";
+import Logo from "@/components/Logo";
+import HeaderNavigationLinks from "@/components/Header/HeaderNavigationLinks";
+import AuthenticatedOptions from "@/components/Header/AuthenticatedOptions";
+import NotAuthenticatedOptions from "@/components/Header/NotAuthenticatedOptions";
 
-const Header: React.FC = () => {
+const Header: FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const { handleNewDraft, isPending } = useCreateDraft();
+
   const authenticate = useSelector(
     (state: RootState) => state.auth?.accessToken
   );
-  const navigate = useNavigate();
-  const { logout } = useLogout();
 
-  const handleNewDraft = () => {
-    navigate("/draft/new");
-  };
-
-  const handleLogout = async (): Promise<void> => {
-    try {
-      await logout();
-      console.log("Logged out successfully");
-    } catch (error) {
-      console.error(error);
+  const handleNewDraftNavigate = async (): Promise<void> => {
+    const draftId: string | void = await handleNewDraft();
+    if (!draftId) {
+      navigate("/");
+    } else {
+      navigate(`/draft/${draftId}`);
     }
   };
 
@@ -39,35 +39,17 @@ const Header: React.FC = () => {
     <header className="fixed top-0 z-20 w-full h-16 p-4 text-black bg-transparent shadow-none backdrop-blur-sm">
       <nav className="flex items-center justify-between w-full h-full">
         {/* Logo */}
-        <div className="text-xl font-bold">
-          <Link to="/">
-            <Img
-              src="/Image/light-techscribe-logo-2.png"
-              alt=""
-              cn="w-32 h-32"
-            />
-          </Link>
-        </div>
+        <Logo />
         {/* Navigation Links */}
-        <div className="items-center justify-around hidden h-full px-5 py-6 space-x-4 lg:flex">
-          {NavItems.map((navOpt, index) => (
-            <NavLink
-              key={index}
-              to={navOpt.path}
-              className={({ isActive }: { isActive: boolean }): string =>
-                `${
-                  isActive ? "text-sky-500" : ""
-                } flex items-center space-x-1 font-serif font-medium hover:text-sky-700`
-              }
-            >
-              <span>{React.createElement(navOpt.icon, { size: "18" })}</span>{" "}
-              <span className="text-sm">{navOpt.name} </span>
-            </NavLink>
-          ))}
-        </div>
+        <HeaderNavigationLinks />
         <div className="items-center justify-around px-4 py-2 space-x-4 lg:flex">
           <span className="px-2 py-2 bg-orange-500 rounded-full cursor-pointer">
-            <Pencil size={20} color="white" onClick={handleNewDraft} />
+            <Pencil
+              size={20}
+              color="white"
+              className={`${isPending ? "animate-spin" : ""}`}
+              onClick={handleNewDraftNavigate}
+            />
           </span>
           <SearchBar />
         </div>
@@ -75,31 +57,14 @@ const Header: React.FC = () => {
           {
             // User Auth
             authenticate ? (
-              <div className="space-x-4">
-                <Link to="/profile" className="hover:text-gray-700">
-                  Profile
-                </Link>
-                <Button
-                  onClick={handleLogout}
-                  className="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600"
-                >
-                  Logout
-                </Button>
-              </div>
+              <AuthenticatedOptions />
             ) : (
-              <div className="space-x-4">
-                <Link to="/login" className="hover:text-gray-700">
-                  Login
-                </Link>
-                <Link to="/signup" className="hover:text-gray-700">
-                  Register
-                </Link>
-              </div>
+              <NotAuthenticatedOptions />
             )
           }
         </div>
 
-        {/* Mobile menu*/}
+        {/* /// Mobile menu */}
         <div
           className="absolute z-20 flex cursor-pointer lg:hidden top-4 right-4"
           onClick={handleMobileMenu}
@@ -113,44 +78,19 @@ const Header: React.FC = () => {
         >
           <div className="flex flex-col items-center justify-around h-full p-4 space-y-4">
             <div className="flex flex-col items-center justify-around space-y-8 ">
-              {NavItems.map((navOpt, index) => (
-                <Link
-                  key={index}
-                  to={navOpt.path}
-                  className="font-serif text-3xl font-medium hover:text-gray-700"
-                >
-                  {navOpt.name}
-                </Link>
-              ))}
+              <HeaderNavigationLinks />
               <Pencil
                 size={40}
                 className="px-4 py-2 text-3xl"
-                onClick={() => navigate("/drafts/:draftId")}
+                onClick={handleNewDraftNavigate}
               />
               <SearchBar size={40} />
               {
                 // User Auth
                 authenticate ? (
-                  <div className="flex flex-col items-center justify-around space-y-8 text-3xl">
-                    <Link to="/profile" className="hover:text-gray-700">
-                      Profile
-                    </Link>
-                    <Button
-                      onClick={handleLogout}
-                      className="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600"
-                    >
-                      Logout
-                    </Button>
-                  </div>
+                  <AuthenticatedOptions />
                 ) : (
-                  <div className="flex flex-col items-center justify-around space-y-8 text-3xl">
-                    <Link to="/login" className="hover:text-gray-700">
-                      Login
-                    </Link>
-                    <Link to="/signup" className="hover:text-gray-700">
-                      Register
-                    </Link>
-                  </div>
+                  <NotAuthenticatedOptions />
                 )
               }
             </div>
