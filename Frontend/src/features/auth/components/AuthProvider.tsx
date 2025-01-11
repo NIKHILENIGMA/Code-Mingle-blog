@@ -14,6 +14,7 @@ function AuthProvider({ children }: AuthProps): JSX.Element {
   const { refreshToken } = useRefreshToken();
   const [loading, setLoading] = useState(true);
 
+
   useEffect(() => {
     const refreshAccessToken = async () => {
       try {

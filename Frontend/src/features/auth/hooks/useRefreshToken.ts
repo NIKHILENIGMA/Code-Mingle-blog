@@ -8,13 +8,9 @@ export const useRefreshToken = () => {
   const refreshToken = async () => {
     try {
       const response  = await refreshTokenService() as RefreshTokenResponse;
-      
-      console.log("useRefeshtoken response value: ",response.data.token);
 
       dispatch(setAccessToken({ accessToken: response.data.token }));
       dispatch(setPersist({ persist: true }));
-
-      console.log("Refresh token store in redux state successfully: ", response.data.token);
       
     } catch (error) {
       throw new Error(
