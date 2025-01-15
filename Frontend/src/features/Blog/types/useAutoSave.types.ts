@@ -1,4 +1,8 @@
-import { PostContent } from "../components/Drafts/DraftForm";
+
+interface PostContent {
+    title: string;
+    body: string;
+  }
 
 export interface useAutoSaveReturn {
     handleAutoSave: () => Promise<void>;

@@ -1,0 +1,167 @@
+ver since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing L
+
+
+          {/* <SiderBarContent
+            title="Submitted Draft"
+            isOpen={openMydraft.submitted}
+            onToggle={() => handleToggle("submitted")}
+          /> */}
+          {/* <SiderBarContent
+            title="Submitted Published"
+            isOpen={openMydraft.published}
+            onToggle={() => handleToggle("published")}
+          /> */}
+
+// Create
+const {
+    mutateAsync: newDraftMutation,
+    isPending,
+    isError,
+  } = useMutation({
+    mutationKey: ["newDraft"],
+    mutationFn: async () => {
+      const axiosResponse = await createDraftService();
+      console.log("Created user data: ", axiosResponse?.data);
+      return axiosResponse?.data;
+    },
+    
+    onMutate: async () => {
+      // Cancel all queries with the key "drafts"
+      await queryClient.cancelQueries({ queryKey: ["drafts"] }); 
+
+      // Snapshot the previous value
+      const previousDrafts = queryClient.getQueryData<{ drafts: Draft[] }>([
+        "drafts",
+      ]);
+      if (!previousDrafts) {
+        return;
+      }
+
+      // Return the previous value to rollback
+      return { previousDrafts };
+    },
+
+    onError: (_, __, context) => {
+      // Rollback to the previous value
+      queryClient.setQueryData<{ drafts: Draft[] }>(
+        ["drafts"],
+        context?.previousDrafts
+      );
+    },
+
+    onSettled: () => {
+      // Invalidate the cache to refetch the data
+      queryClient.invalidateQueries({ queryKey: ["drafts"] });
+    },
+  });
+
+// Update
+   const {
+    mutateAsync: autoSaveMutation,
+    isPending,
+    isError,
+  } = useMutation({
+    mutationKey: ["updateDraft", id],
+    mutationFn: async () => {
+      await autoSaveService(id, {
+        title: content.title,
+        content: content.content,
+      });
+    },
+    onMutate: async () => {
+      dispatch(setSaveDraft({ saveDraft: false }));
+
+      // Cancel all queries related to drafts and draft
+      await queryClient.cancelQueries({ queryKey: ["drafts"] }); // Cancel all drafts queries
+      await queryClient.cancelQueries({ queryKey: ["draft", id] }); // Cancel draft query
+
+      // Snapshot the previous value
+      const previousDraft = queryClient.getQueryData<{ draft: Draft }>([
+        "draft",
+        id,
+      ]);
+
+      // Optimistically update to the new value
+      queryClient.setQueryData<{ draft: Draft }>(["draft", id], (old) => {
+        if (!old) return { draft: { title: "", content: "", id } };
+        return {
+          draft: {
+            title: content.title,
+            content: content.content,
+            id: old?.draft.id || id,
+          },
+        };
+      });
+
+      // Update the drafts query
+      queryClient.setQueryData<{ drafts: Draft[] }>(["drafts"], (old) => {
+        if (!old || !Array.isArray(old?.drafts)) {
+          return { drafts: [] }; // Return an empty drafts array if the old data is undefined or invalid
+        }
+        return {
+          drafts: old?.drafts?.map((draft) => {
+            if (draft.id === id) {
+              return { title: content.title, content: content.content, id };
+            }
+            return draft;
+          }),
+        };
+      });
+
+      // Return the previous value to rollback
+      return { previousDraft };
+    },
+    onSettled: () => {
+      dispatch(setSaveDraft({ saveDraft: true }));
+
+      // Invalidate all queries related to drafts and draft
+      queryClient.invalidateQueries({ queryKey: ["drafts"] }); // Invalidate all drafts queries
+      queryClient.invalidateQueries({ queryKey: ["draft", id] }); // Invalidate draft query
+    },
+  });
+
+
+  // Delete
+
+  export const useDeleteDraft = (id: string) => {
+  const {
+    mutateAsync: deleteDraftMutation,
+    isPending,
+    isError,
+  } = useMutation({
+    mutationKey: ["deleteDraft", id],
+    mutationFn: async () => {
+      console.log("Deleting draft");
+      await deleteDraftService(id);
+    },
+
+    onMutate: async () => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ["drafts"] });
+      // Snapshot the previous value
+      const previousDrafts = queryClient.getQueryData<{ drafts: Draft[] }>([
+        "drafts",
+      ]);
+      // Optimistically update to the new value
+      queryClient.setQueryData<{ drafts: Draft[] }>(["drafts"], (old) => {
+        if (!old) return { drafts: [] };
+        return {
+          drafts: old?.drafts?.filter((draft: Draft) => draft?.id !== id),
+        };
+      });
+
+      // Return the previous value to rollback
+      return { previousDrafts };
+    },
+
+    onError: (_, __, context) => {
+      queryClient.setQueryData<{ drafts: Draft[] }>(
+        ["drafts"],
+        context?.previousDrafts
+      );
+    },
+
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["drafts"] });
+    },
+  });

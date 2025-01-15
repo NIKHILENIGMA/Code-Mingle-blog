@@ -8,7 +8,7 @@ import { PanelLeft, PanelRight } from "@/Utils/Icons";
 const SideBarToggleButton: FC = () => {
   const dispatch = useDispatch();
   const sideBarState: boolean = useSelector(
-    (state: RootState) => state.blog.sideBar
+    (state: RootState) => state.blog?.sideBar
   );
   const handleShowSideBar = () => {
     dispatch(setSideBar({ sideBar: !sideBarState }));

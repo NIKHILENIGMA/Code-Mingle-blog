@@ -1,22 +1,27 @@
 import { FC, useEffect, useState } from "react";
-import { EllipsisVertical, FileText } from "@/Utils/Icons";
-import { Link } from "react-router-dom";
-import Loader from "@/components/Loader";
-import { useDrafts } from "@/features/Blog/hooks/useDrafts";
+import { Draft } from "@/Types/draft";
+import { useNavigate } from "react-router-dom";
+import Loader from "@/components/Loader/Loader";
 import truncate from "@/Utils/truncate";
 import SideBarDraftDropDownActions from "./SideBarDraftDropDownActions";
 import { useDispatch } from "react-redux";
-import { setDrafts } from "../../slices/draftSlice";
-
+import { useDrafts } from "@/features/Blog/hooks/useDrafts";
+import { setSelectedDraft } from "../../slices/draftSlice";
+import { EllipsisVertical, FileText } from "@/Utils/Icons";
 
 const SideBarMyDrafts: FC<{ isVisible: boolean }> = ({ isVisible }) => {
   const [isComponentVisible, setIsComponentVisible] = useState<boolean>(false);
-  const { data: drafts, isLoading, isError } = useDrafts(isComponentVisible);
+
   const dispatch = useDispatch();
-  
+  const navigate = useNavigate();
 
-  dispatch(setDrafts({ drafts: drafts?.draft || [] }));
+  const draftLength = drafts?.draft?.length;
 
+  const handleSelectDraft = (draft: Draft | null) => {
+    if (!draft) return null;
+    dispatch(setSelectedDraft({ selectedDraft: draft }));
+    navigate(`/draft/${draft.id}`);
+  };
 
   useEffect(() => {
     setIsComponentVisible(isVisible);
@@ -55,7 +60,7 @@ const SideBarMyDrafts: FC<{ isVisible: boolean }> = ({ isVisible }) => {
         <div className="w-full min-h-10">
           <h3 className="w-full font-bold px-2 py-2 text-[13px] text-nowrap uppercase cursor-pointer">
             <span className="text-xs">
-              My Drafts ({drafts && drafts.draft?.length})
+              My Drafts ({drafts ? draftLength : 0})
             </span>
           </h3>
           <div className="w-full min-h-10">
@@ -66,15 +71,14 @@ const SideBarMyDrafts: FC<{ isVisible: boolean }> = ({ isVisible }) => {
                 <div className="flex flex-col items-center justify-around w-full px-2 py-1 space-y-2">
                   {drafts &&
                     Array.isArray(drafts) &&
-                    drafts?.map((draft, index) => (
+                    drafts?.map((draft: Draft, index) => (
                       <div className="flex" key={draft.id || index}>
-                        <Link
+                        <div
                           className="flex items-center justify-between w-full px-4 hover:bg-slate-200"
-                          to={`${draft.id}`}
-                          // Remove key from here since it's now on the parent div
+                          onClick={() => handleSelectDraft(draft)}
                         >
                           <div className="flex items-center">
-                            <FileText size={22} />
+                            
                             <div className="flex items-center w-[10vw] h-6">
                               <span className="flex w-full px-2 font-semibold text-md text-nowrap">
                                 {truncate(
@@ -84,7 +88,7 @@ const SideBarMyDrafts: FC<{ isVisible: boolean }> = ({ isVisible }) => {
                               </span>
                             </div>
                           </div>
-                        </Link>
+                        </div>
                         <SideBarDraftDropDownActions draftId={draft?.id} />
                       </div>
                     ))}

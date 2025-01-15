@@ -66,11 +66,19 @@ import {
   Newspaper,
   PanelLeft,
   PanelRight,
+  LoaderCircle,
   Settings,
+  CloudAlert,
+  ShieldAlert,
+  Save,
 } from "lucide-react";
 
 export {
+  ShieldAlert,
+  Save,
   Users,
+  CloudAlert,
+  LoaderCircle,
   UserCheck,
   Trash2,
   MapPin,

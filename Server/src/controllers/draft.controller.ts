@@ -57,24 +57,26 @@ export const saveDraft = AsyncHandler(async (req: ProtectedRequest, res: Respons
     }
 
     /// Get user
-    const userId: string = (req.user as User)?.id 
+    const userId: string = (req.user as User)?.id
     if (!userId) {
         return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
     }
 
     /// Get draft content
-    const draftContent: DraftContent = req.body as DraftContent
+    const draftContent: DraftContent = (req.body as DraftContent)
     if (!draftContent) {
         return ApiError(new Error(MISSING_BODY.message), req, next, MISSING_BODY.code)
+    }
+
+    const where = {
+        id: draftId,
+        authorId: userId
     }
 
     try {
         // Save draft
         const successMessage = await draftService.saveDraftService(req, next, {
-            where: {
-                id: draftId,
-                authorId: userId
-            },
+            where,
             draftContent
         })
 
@@ -184,7 +186,7 @@ export const getDraft = AsyncHandler(async (req: ProtectedRequest, res: Response
 
 /**
  * Retrieves all drafts for a specific user.
- * 
+ *
  ** This function is an asynchronous handler that processes the request to retrieve all drafts for a specific user.
  ** It retrieves the user from the request, validates the user, and then calls the draft service to retrieve all drafts.
  */
@@ -213,7 +215,7 @@ export const getUserDrafts = AsyncHandler(async (req: ProtectedRequest, res: Res
 
 /**
  ** Retrieves all drafts.
- * 
+ *
  ** This function is an asynchronous handler that processes the request to retrieve all drafts.
  ** It calls the draft service to retrieve all drafts.
  */

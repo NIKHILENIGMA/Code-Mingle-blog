@@ -1,4 +1,4 @@
-import Loader from "@/components/Loader";
+import Loader from "@/components/Loader/Loader";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useRefreshToken } from "@/features/auth/hooks/useRefreshToken";
 import { ReactNode, useEffect, useState } from "react";

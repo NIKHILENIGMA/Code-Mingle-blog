@@ -7,10 +7,9 @@ import SignupPage from "./Auth/SignupPage";
 import ProfilePage from "./ProfileManagement/ProfilePage";
 import CreatePostPage from "@/pages/Blog/CreatePostPage";
 import DraftPostPage from "@/pages/Blog/DraftPostPage";
-import EditPostPage from "@/pages/Blog/EditPostPage";
-import PreviewPostPage from "@/pages/Blog/ReadPostPage";
-import LearnEditorPage from "@/pages/Blog/LearnEditorPage";
+// import PreviewPostPage from "@/pages/Blog/ReadPostPage";
 import ReadPostPage from "@/pages/Blog/ReadPostPage";
+import LearnEditorPage from "@/pages/Blog/LearnEditorPage";
 import AllPostsPage from "@/pages/Blog/AllPostsPage";
 
 export {
@@ -23,9 +22,8 @@ export {
   ProfilePage,
   CreatePostPage,
   DraftPostPage,
-  EditPostPage,
   ReadPostPage,
-  PreviewPostPage,
+  // PreviewPostPage,
   LearnEditorPage,
   AllPostsPage
 };

@@ -1,29 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
 import { allDraftsService } from "@/services/api/draftApiServices";
 import { DRAFT_GC_TIME, DRAFT_STALE_TIME } from "@/constants/constants";
+import { ApiResponse } from "@/Types/app-response";
+import { Draft } from "@/Types/draft";
 
-
-export const useDrafts = (isVisible: boolean) => {
-  const { data, isLoading, isError } = useQuery({
+export const useDrafts = () => {
+  const { data, isLoading, isError } = useQuery<ApiResponse<{ drafts: Draft[] }>, Error>({
     queryKey: ["drafts"],
     queryFn: async () => {
-      try {
-        const response = await allDraftsService();
-
-        if (!response) {
-          throw new Error(`Draft generation failed: ${response}`);
-        }
-
-        return response.data;
-      } catch (error) {
-        console.error(error);
-      }
+      return await allDraftsService();
     },
-    enabled: !!isVisible,
     staleTime: DRAFT_STALE_TIME,
     gcTime: DRAFT_GC_TIME,
     refetchOnWindowFocus: false,
   });
+  const drafts = data?.data
 
-  return { data, isLoading, isError };
+  return { drafts, isLoading, isError };
 };

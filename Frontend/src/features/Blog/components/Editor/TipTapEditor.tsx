@@ -1,13 +1,14 @@
 import { useEditor, EditorContent, Editor } from "@tiptap/react";
-import { FC, useState } from "react";
+import { FC, useEffect } from "react";
 import extensions from "../../core/extensions";
 import CustomBubbleMenu from "../BubbleMenu/CustomBubbleMenu";
 
 interface TiptapEditorProps {
-  initialContent?: string;
+  initialContent: string;
   onContentChange?: (content: string) => void;
-}
 
+}
+// 
 /**
  *  TiptapEditor
  */
@@ -16,13 +17,12 @@ const TiptapEditor: FC<TiptapEditorProps> = ({
   initialContent,
   onContentChange,
 }) => {
-  const [content, setContent] = useState(initialContent || `<p></p>`);
+  
   const editor: Editor | null = useEditor({
     extensions: extensions,
-    content: content, // Initial content if no content present
+    content: initialContent || `<p></p>`, // Initial content if no content present
     onUpdate: ({ editor }) => {
       const htmlContent = editor.getHTML();
-      setContent(htmlContent);
       if (onContentChange) {
         onContentChange(htmlContent);
       }
@@ -37,8 +37,21 @@ const TiptapEditor: FC<TiptapEditorProps> = ({
       },
     },
   });
+  useEffect(() => {
+    // Set initial content if it changes after the editor is mounted and content is not the same
+    if (editor && initialContent !== editor.getHTML()) {
+      editor.commands.setContent(initialContent);
+    }
+      
+  }, [initialContent, editor]);
 
-  // Sync initialContent when it changes
+  useEffect(() => {
+    // Cleanup the editor
+    return () => {
+      editor?.destroy();
+    }; 
+  }, [editor]);
+  
 
   return (
     <div className="relative w-full min-h-full space-y-2 g editor-wrapper">
