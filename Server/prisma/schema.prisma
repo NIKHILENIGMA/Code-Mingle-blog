@@ -30,6 +30,7 @@ model User {
   replies   Reply[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  Like      Like[]
 
   @@map("users")
 }
@@ -38,16 +39,22 @@ model Post {
   id              String     @id @default(uuid())
   title           String?
   content         String?    @db.Text
-  status          PostStatus
-  authorId        String     @map("author_id")
-  author          User       @relation(fields: [authorId], references: [id])
-  comments        Comment[]
-  createdAt       DateTime   @default(now()) @map("created_at")
-  updatedAt       DateTime   @updatedAt @map("updated_at")
   publishedAt     DateTime?  @map("published_at")
   slug            String?    @unique
   metaDescription String?    @map("meta_description")
   image           String?    @map("image_url")
+  thumbnailImage  String?    @map("thumbnail_image_url")
+  readTime        Int?       @map("read_time")
+  authorId        String     @map("author_id")
+  categoryId      Int?       @map("category_id")
+  category        Category?  @relation(fields: [categoryId], references: [id])
+  author          User       @relation(fields: [authorId], references: [id])
+  comments        Comment[]
+  postTags        Tag[]
+  Like            Like[]
+  status          PostStatus
+  createdAt       DateTime   @default(now()) @map("created_at")
+  updatedAt       DateTime   @updatedAt @map("updated_at")
 
   @@index(status)
   @@map("posts")
@@ -61,6 +68,7 @@ model Comment {
   post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
   replies   Reply[]
+  like      Like[]
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -68,15 +76,45 @@ model Comment {
 }
 
 model Reply {
-  id        String  @id @default(cuid())
+  id        String   @id @default(cuid())
   content   String
-  commentId String  @map("comment_id")
-  authorId  String  @map("author_id")
-  comment   Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
-  author    User    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  commentId String   @map("comment_id")
+  authorId  String   @map("author_id")
+  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  like      Like[]
   createdAt DateTime @default(now()) @map("created_at")
 
   @@map("replies")
+}
+
+model Tag {
+  id     Int     @id @default(autoincrement())
+  postId String  @map("post_id")
+  tag    String?
+  post   Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@map("tags")
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  postId    String   @map("post_id")
+  commentId String   @map("comment_id")
+  replyId   String   @map("reply_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  reply     Reply?    @relation(fields: [replyId], references: [id], onDelete: Cascade)
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  posts     Post[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum PostStatus {
