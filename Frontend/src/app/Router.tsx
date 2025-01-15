@@ -12,6 +12,7 @@ import {
 import ProfileOverview from "@/features/Profile/components/ProfileOverview";
 import DraftLayout from "@/features/Blog/Layout/DraftLayout";
 import AuthProvider from "@/features/auth/components/AuthProvider";
+import PreviewPostPage from "@/pages/Blog/PreviewPostPage";
 
 const router = createBrowserRouter([
   {
@@ -81,22 +82,8 @@ const router = createBrowserRouter([
     },
   },
   {
-    path: "/edit/:id",
-    lazy: async () => {
-      const { EditPostPage } = await import("@/pages");
-      return {
-        element: <EditPostPage />,
-      };
-    },
-  },
-  {
-    path: "preview/:id",
-    lazy: async () => {
-      const { PreviewPostPage } = await import("@/pages");
-      return {
-        element: <PreviewPostPage />,
-      };
-    },
+    path: "/preview/:id",
+    element: <PreviewPostPage />,
   },
 
   {
