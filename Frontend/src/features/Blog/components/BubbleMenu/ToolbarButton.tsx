@@ -16,7 +16,7 @@ const ToolbarButton: React.FC<ToolbarButtonProps> = ({
     <Button
       variant={"link"}
       onClick={onClick}
-      className={isActive ? "bg-black text-slate-200" : ""}
+      className={isActive ? "" : ""}
     >
       {icon}
     </Button>

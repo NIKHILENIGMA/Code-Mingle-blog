@@ -20,12 +20,12 @@ const DraftSideBarCard: FC<DraftSideBarCardProps> = ({ draft }) => {
   return (
     <div
       key={draft.id}
-      className="flex items-center justify-between p-3 transition bg-white rounded-md shadow-sm draft-card hover:shadow-md"
+      className="flex items-center justify-between p-3 transition rounded-md shadow-sm draft-card hover:shadow-md"
     >
       <NavLink
         to={`/draft/${draft.id}`}
         onClick={() => handleSelectDraft(draft)}
-        className={({isActive}: {isActive: boolean}): string => `${isActive ? ' text-orange-500': ''} flex items-center text-black truncate w-full`}
+        className={({isActive}: {isActive: boolean}): string => `${isActive ? ' text-orange-500': ''} flex items-center truncate w-full`}
       >
         <FileText size={22} />
         {draft?.title ? truncate(draft?.title, 20) : "Untitled"}
