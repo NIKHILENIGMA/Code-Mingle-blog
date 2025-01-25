@@ -7,7 +7,7 @@ const AllPostsPage: React.FC = () => {
   // const navigate = useNavigate();
   return (
     <div className="flex flex-col justify-start w-full min-h-screen p-5 pl-20 mx-auto my-14">
-      <h1 className="p-4 my-4 text-5xl font-semibold text-center text-black uppercase">
+      <h1 className="p-4 my-4 text-5xl font-semibold text-center uppercase">
         Community Posts
       </h1>
       <div className="flex items-center mb-6 justify-evenly">
@@ -18,7 +18,7 @@ const AllPostsPage: React.FC = () => {
             placeholder="Search posts..."
             className="w-full max-w-md px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-          <button className="px-4 py-2 text-white bg-blue-500 rounded-md focus:outline-none">
+          <button className="px-4 py-2  bg-blue-500 rounded-md focus:outline-none">
             Search
           </button>
         </div>
@@ -48,7 +48,7 @@ const AllPostsPage: React.FC = () => {
 
       {/* Load More */}
       <div className="flex items-center justify-center mt-10">
-        <button className="px-4 py-2 text-white bg-blue-500 rounded-md focus:outline-none">
+        <button className="px-4 py-2  bg-blue-500 rounded-md focus:outline-none">
           Load More
         </button>
       </div>

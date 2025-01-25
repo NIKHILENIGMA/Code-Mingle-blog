@@ -1,9 +1,10 @@
 import React from "react";
-import { House, Moon } from "@/Utils/Icons";
+import { House } from "@/Utils/Icons";
 import { Textarea } from "@/components/ui/textarea";
 import TiptapEditor from "@/features/Blog/components/Editor/TipTapEditor";
 import { Button } from "@/components";
 import { useNavigate } from "react-router-dom";
+import { ModeToggle } from "@/components/mode-toggle";
 
 interface LearnEditorPageProps {
   title: string;
@@ -32,16 +33,10 @@ const LearnEditorPage: React.FC = () => {
           >
           <House size={20} />
         </Button>
-        <Button
-          onClick={() => navigate("/")}
-          variant={"secondary"}
-          className="flex items-center justify-center rounded-lg text-md"
-        >
-          <Moon size={20} />
-        </Button>
+        <ModeToggle />
         
       </div>
-      <div className="flex flex-col min-h-full w-[80vw] px-52  mx-auto space-y-3  rounded-lg bg-white">
+      <div className="flex flex-col min-h-full w-[80vw] px-52  mx-auto space-y-3  rounded-lg ">
         <div className="flex flex-col justify-start w-full mb-4 space-y-4 ">
           <Textarea
             placeholder="Article Title...."
@@ -58,7 +53,7 @@ const LearnEditorPage: React.FC = () => {
         </div>
 
         <div className="w-full min-h-full">
-          <TiptapEditor onContentChange={() => {}} />
+          <TiptapEditor initialContent="<p></p>" onContentChange={() => {}} />
         </div>
       </div>
     </div>

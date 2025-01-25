@@ -1,22 +1,22 @@
 import React from "react";
 import { cards } from "@/constants/cardsContent";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { Bookmark, Heart } from "@/Utils/Icons";
 // import CommentButton from "@/features/Blog/components/Comments/CommentButton";
 import SharePostLink from "@/features/Blog/components/Drafts/SharePostLink";
 import ReactHtmlParser from "react-html-parser";
+import { Button } from "@/components";
 
 const ReadPostPage: React.FC = () => {
   const { postId } = useParams<{ postId: string }>();
   const [liked, setLiked] = React.useState<boolean>(false);
   const [isBookmarked, setIsBookmarked] = React.useState<boolean>(false);
-  const navigate = useNavigate();
   const postCard = cards.find((card) => card.id === postId);
-  const postContent = postCard?.description || "";
+  const postContent = postCard?.description ?? "";
   const parsedContent = ReactHtmlParser(postContent);
 
   return (
-    <div className="w-full min-h-screen p-5 mx-auto mt-20 bg-[#ffffff7b] scroll-bar-wdith">
+    <div className="w-full min-h-screen p-5 mx-auto mt-20 scroll-bar-wdith">
       <div className="w-full h-full mx-auto space-x-4">
         <div className="w-full h-[100%] px-12 py-5 shadow-sm space-y-3 ">
           {/* Cover Image */}
@@ -30,10 +30,7 @@ const ReadPostPage: React.FC = () => {
 
           {/* User Details */}
           <div className="w-full h-[80%] px-6 py-2 mb-2">
-            <div
-              className="flex items-center justify-evenly"
-              onClick={() => navigate("/profile/@username")}
-            >
+            <div className="flex items-center justify-evenly">
               <div className="flex items-center justify-center p-4">
                 <img
                   src={postCard?.author.image}
@@ -41,10 +38,10 @@ const ReadPostPage: React.FC = () => {
                   className="object-cover rounded-full w-14 h-14"
                 />
                 <div className="flex flex-col items-center justify-center p-5 rounded-3xl ">
-                  <p className="px-8 text-2xl font-medium text-black text-start ">
+                  <p className="px-8 text-2xl font-medium  text-start ">
                     @{postCard?.author.name}
                   </p>
-                  <p className="text-sm text-black/50 text-start">
+                  <p className="text-sm text-start">
                     {postCard?.date} -{" "}
                     <span className="font-medium">{postCard?.readTime}</span>{" "}
                     min read
@@ -56,19 +53,18 @@ const ReadPostPage: React.FC = () => {
 
           {/* Title and Content */}
           <div className="w-full h-[40%]  md:px-28 md:mx-auto text-center">
-            <h2 className="w-full text-2xl font-semibold text-center text-black lg:text-5xl ">
+            <h2 className="w-full text-2xl font-semibold text-center  lg:text-5xl ">
               {postCard?.title}
             </h2>
           </div>
           <div className="w-full min-h-[60%] md:px-44 md:mx-auto">
-            <div className="prose max-w-none">
-              {parsedContent}
-            </div>
+            <div className="prose max-w-none">{parsedContent}</div>
           </div>
 
           {/* Post Actions */}
-          <div className=" w-[40%] mx-auto h-[40%] px-2 py-3 rounded-2xl border-[1px] border-gray-200 flex justify-center sticky bottom-8 space-x-10 bg-white">
-            <span
+          <div className=" w-[40%] mx-auto h-[40%] px-2 py-3 rounded-2xl border-[1px] border-gray-200 flex justify-center sticky bottom-8 space-x-10 ">
+            <Button
+              variant={"outline"}
               className="flex items-center gap-2"
               onClick={() => setLiked((prev) => !prev)}
             >
@@ -81,14 +77,14 @@ const ReadPostPage: React.FC = () => {
               ) : (
                 <Heart className="cursor-pointer" />
               )}
-            </span>
+            </Button>
             <span className="flex items-center gap-2">
               {/* {postId && <CommentButton id={postId} />} */}
             </span>
             <span className="flex items-center gap-2">
               <SharePostLink />
             </span>
-            <span
+            <Button
               className="flex items-center gap-2"
               onClick={() => setIsBookmarked((prev) => !prev)}
             >
@@ -101,7 +97,7 @@ const ReadPostPage: React.FC = () => {
               ) : (
                 <Bookmark className="cursor-pointer" />
               )}
-            </span>
+            </Button>
           </div>
 
           {/* Tags */}
