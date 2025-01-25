@@ -44,7 +44,7 @@ const SlashCommandsMenu = ({
   );
   return (
     <div className="relative">
-      <Command className="bg-white border rounded-lg shadow-md">
+      <Command className=" border rounded-lg shadow-md">
         <CommandInput
           placeholder="Type a command or search..."
           value={search}
