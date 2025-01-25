@@ -73,6 +73,14 @@
     --sidebar-ring: 217.2 91.2% 59.8%}
 }
 
+.tiptap {
+  color: var(--tw-prose-paragraph); /* Dynamically changes based on theme */
+}
+
+.dark .tiptap {
+  color: var(--tw-prose-paragraph);
+}
+
 
 @layer base {
   * {

@@ -66,39 +66,26 @@ export default {
       typography: ({ theme }) => ({
         DEFAULT: {
           css: {
-            "--tw-prose-headings": theme("colors.gray[900]"),
-			"--tw-prose-paragraph": theme("colors.gray[800]"),
+            "--tw-prose-headings": theme("colors.gray.900"), // Light mode color
+            "--tw-prose-paragraph": theme("colors.gray.800"), // Light mode color
             p: {
               marginTop: 0,
               marginBottom: 0,
             },
             ".tiptap p.is-empty::before": {
-              color: "#adb5bd",
               content: "attr(data-placeholder)",
               float: "left",
               height: "0",
               pointerEvents: "none",
             },
-            ".tiptap h1.is-empty::before": {
-              color: "#adb5bd",
-              content: "attr(data-placeholder)",
-              float: "left",
-              height: "0",
-              pointerEvents: "none",
-            },
-            ".tiptap h2.is-empty::before": {
-              color: "#adb5bd",
-              content: "attr(data-placeholder)",
-              float: "left",
-              height: "0",
-              pointerEvents: "none",
-            },
-            ".tiptap h3.is-empty::before": {
-              color: "#adb5bd",
-              content: "attr(data-placeholder)",
-              float: "left",
-              height: "0",
-              pointerEvents: "none",
+          },
+        },
+        dark: {
+          css: {
+            "--tw-prose-headings": theme("colors.gray.100"), // Dark mode color
+            "--tw-prose-paragraph": theme("colors.gray.300"), // Dark mode color
+            ".tiptap p.is-empty::before": {
+              color: theme("colors.gray.500"), // Placeholder color in dark mode
             },
           },
         },
@@ -107,3 +94,32 @@ export default {
   },
   plugins: [require("tailwindcss-animate"), typography],
 };
+
+
+// typography: ({ theme }) => ({
+//   DEFAULT: {
+//     css: {
+//       "--tw-prose-headings": theme("colors.gray.900"), // Light mode color
+//       "--tw-prose-paragraph": theme("colors.gray.800"), // Light mode color
+//       p: {
+//         marginTop: 0,
+//         marginBottom: 0,
+//       },
+//       ".tiptap p.is-empty::before": {
+//         content: "attr(data-placeholder)",
+//         float: "left",
+//         height: "0",
+//         pointerEvents: "none",
+//       },
+//     },
+//   },
+//   dark: {
+//     css: {
+//       "--tw-prose-headings": theme("colors.gray.100"), // Dark mode color
+//       "--tw-prose-paragraph": theme("colors.gray.300"), // Dark mode color
+//       ".tiptap p.is-empty::before": {
+//         color: theme("colors.gray.500"), // Placeholder color in dark mode
+//       },
+//     },
+//   },
+// }),
