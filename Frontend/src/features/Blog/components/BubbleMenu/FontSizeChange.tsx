@@ -33,39 +33,55 @@ const fontWeightTypes = [
 
 interface FontWeightTypesProps {
   editor: Editor;
+  onChange?: (value: boolean) => void;
 }
 
 const FontSizeChange: React.FC<FontWeightTypesProps> = ({
   editor,
+  // onChange,
 }) => {
   const currentFontSize = editor.getAttributes("textStyle").fontSize || "16px";
-  const [showOptions, setShowOptions] = React.useState(false);
 
   return (
-    <div
-      className="w-28"
-      onMouseEnter={() => setShowOptions(true)}
-      onMouseLeave={() => setShowOptions(false)}
-    >
+    <div className="w-28">
       <Select
-        value={currentFontSize}
-        onValueChange={(value) =>
-          editor.chain().focus().setFontSize(value).run()
-        }
-      >
-        <SelectTrigger className="w-full">
-          <SelectValue placeholder="Medium" />
-        </SelectTrigger>
-        {showOptions && (
-          <SelectContent>
-            {fontWeightTypes.map((item) => (
-              <SelectItem key={item.value} value={item.value}>
-                {item.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        )}
-      </Select>
+            value={currentFontSize}
+            onValueChange={(value) =>
+              editor.chain().focus().setFontSize(value).run()
+            }
+          >
+            <SelectTrigger
+              className="w-full"
+              // Crucial: Prevent event from bubbling up
+              onPointerDown={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+              }}
+            >
+              <SelectValue placeholder="Medium" />
+            </SelectTrigger>
+            <SelectContent
+              // Stop event propagation
+              onPointerDown={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+              }}
+            >
+              {fontWeightTypes.map((item) => (
+                <SelectItem
+                  key={item.value}
+                  value={item.value}
+                  // Prevent event propagation
+                  onPointerDown={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                  }}
+                >
+                  {item.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
     </div>
   );
 };
