@@ -1,4 +1,4 @@
-import  { FC, useState } from "react";
+import { FC, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "@/app/store/store";
@@ -10,6 +10,7 @@ import Logo from "@/components/Logo";
 import HeaderNavigationLinks from "@/components/Header/HeaderNavigationLinks";
 import AuthenticatedOptions from "@/components/Header/AuthenticatedOptions";
 import NotAuthenticatedOptions from "@/components/Header/NotAuthenticatedOptions";
+import { ModeToggle } from "../mode-toggle";
 
 const Header: FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -36,12 +37,14 @@ const Header: FC = () => {
   };
 
   return (
-    <header className="fixed top-0 z-20 w-full h-16 p-4 text-black bg-transparent shadow-none backdrop-blur-sm">
+    <header className="fixed top-0 z-20 w-full h-16 p-4  bg-transparent shadow-none backdrop-blur-sm">
       <nav className="flex items-center justify-between w-full h-full">
         {/* Logo */}
         <Logo />
         {/* Navigation Links */}
         <HeaderNavigationLinks />
+        {/* Toggle dark mode */}
+        <ModeToggle />
         <div className="items-center justify-around px-4 py-2 space-x-4 lg:flex">
           <span className="px-2 py-2 bg-orange-500 rounded-full cursor-pointer">
             <Pencil
