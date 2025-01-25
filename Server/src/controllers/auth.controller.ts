@@ -16,7 +16,7 @@ const authServices = new AuthService()
 const tokenService = new TokenServices()
 const mailService = new MailService()
 
-const { METHOD_FAILED, NOT_FOUND, SUCCESS } = responseMessage
+const { METHOD_FAILED, NOT_FOUND, SUCCESS, UNAUTHORIZED } = responseMessage
 
 /**
  ** Create a new User
@@ -106,10 +106,10 @@ export const login = AsyncHandler(async (req: Request, res: Response, next: Next
  */
 export const currentUser = (req: ProtectedRequest, res: Response, next: NextFunction) => {
     try {
-        const user = (req.user as User)
+        const user = req.user as User
 
         if (!user) {
-            return ApiError(new Error(NOT_FOUND('user').message), req, next, NOT_FOUND().code)
+            return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
         }
 
         return ApiResponse(req, res, SUCCESS().code, SUCCESS('Current user').message, {
