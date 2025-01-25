@@ -31,7 +31,7 @@ const TiptapEditor: FC<TiptapEditorProps> = ({
     editorProps: {
       attributes: {
         class:
-          "prose prose-sm sm:prose lg:prose-md xl:prose-xl mx-1 focus:outline-none prose-headings:my-2 prose-p:my-1 rounded-lg text-wrap text-pretty",
+          "prose prose-sm sm:prose lg:prose-md xl:prose-xl mx-1 focus:outline-none prose-headings:my-2 prose-p:my-1 rounded-lg text-wrap text-pretty prose dark:prose-dark",
         style: "min-width: 98%; min-height: 30vw;",
         "aria-label": "Rich Text Editor",
       },
@@ -54,7 +54,7 @@ const TiptapEditor: FC<TiptapEditorProps> = ({
   
 
   return (
-    <div className="relative w-full min-h-full space-y-2 g editor-wrapper">
+    <div className="relative w-full min-h-full space-y-2 g editor-wrapper ">
       {editor && <CustomBubbleMenu editor={editor} />}
       <EditorContent
         editor={editor}

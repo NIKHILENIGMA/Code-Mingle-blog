@@ -23,17 +23,20 @@ interface CustomeBubbleMenuProps {
 const CustomBubbleMenu: FC<CustomeBubbleMenuProps> = ({ editor }) => {
   const [highligting, setHighligting] = useState<string>("");
   const [color, setColor] = useState<string>("");
+
   return (
     <BubbleMenu
       pluginKey="bubbleMenu"
       editor={editor}
       tippyOptions={{
-        placement: "top-start",
+        duration: 500,
       }}
-      className="flex items-center w-[20vw] px-10 py-2 bg-slate-300 shadow-md rounded-2xl"
+      className="flex justify-around items-center w-[50vw] px-10 py-2 bg-slate-100 dark:bg-slate-800 shadow-md rounded-2xl"
     >
-      <div className="z-20 space-x-1 bubble-menu">
-        <FontSizeChange editor={editor} />
+      <div className="space-x-1 flex items-center bubble-menu">
+        <div className="w-28">
+          <FontSizeChange editor={editor} />
+        </div>
 
         {/* Bold the selected text */}
         <ToolbarButton

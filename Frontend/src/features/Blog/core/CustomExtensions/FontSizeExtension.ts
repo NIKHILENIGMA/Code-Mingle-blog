@@ -1,4 +1,4 @@
-import { Extension } from "@tiptap/react";
+import { Editor, Extension } from "@tiptap/react";
 
 interface FontSizeOptions {
   types: string[];
@@ -9,6 +9,7 @@ declare module "@tiptap/react" {
     fontSize: {
       setFontSize: (fontSize: string) => ReturnType;
       unsetFontSize: () => ReturnType;
+      toggleFontSize: (fontSize: string) => ReturnType; 
     };
   }
 }
@@ -59,6 +60,27 @@ const FontSizeExtension = Extension.create<FontSizeOptions>({
         ({ commands }) => {
           return commands.unsetMark("textStyle");
         },
+
+        toggleFontSize:
+        (fontSize: string) =>
+        ({ commands }) => {
+          return commands.toggleMark("textStyle", { fontSize });
+        },
+    };
+  },
+
+  /** Add an isActive query for styling purposes */
+  addProseMirrorPlugins() {
+    return [];
+  },
+
+  /** Add editor queries for current state */
+  addStorage() {
+    return {
+      getCurrentFontSize: (editor: Editor) => {
+        const attributes = editor.getAttributes("textStyle");
+        return attributes.fontSize || "default";
+      },
     };
   },
 });
