@@ -1,7 +1,12 @@
+
 /**
- * @description This hook is used to store data in local storage
- * @param key  The key to store the data in local storage
- * @returns methods setItem, getItem, removeItem which get, set and remove the item from local storage
+ * The function `useLocalStorage` provides methods to set, get, and remove items from the local storage
+ * using a specified key.
+ * @param {string} key - The `key` parameter in the `useLocalStorage` function is a string that
+ * represents the key under which the value will be stored in the local storage.
+ * @returns The `useLocalStorage` function returns an object with three methods: `setItem`, `getItem`,
+ * and `removeItem`. These methods allow you to interact with the local storage by setting, getting,
+ * and removing items using the specified key.
  */
 
 export default function useLocalStorage<T>(key: string) {
