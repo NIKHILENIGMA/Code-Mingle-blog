@@ -15,6 +15,41 @@ export interface User {
     updatedAt: Date
 }
 
+// DTOs (Data Transfer Objects)
+export interface CreateUserDTO {
+    email: string
+    password: string
+    firstName?: string
+    lastName?: string
+    username?: string
+    dob?: Date
+    bio?: string
+}
+
+export interface UpdateUserDTO {
+    firstName?: string
+    lastName?: string
+    username?: string
+    email?: string
+    dob?: Date
+    bio?: string
+    avatarImg?: string
+    coverImg?: string
+}
+
+export interface ChangeUserPasswordDTO {
+    password: string
+}
+
+export type UserWhere = {
+    id: string,
+    username?: string
+}
+
+export type UserEmailWhere = {
+    email: string
+}
+
 export interface IUser {
     id: string
     email: string
