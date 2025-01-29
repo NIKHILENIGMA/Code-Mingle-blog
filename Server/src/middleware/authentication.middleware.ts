@@ -45,7 +45,7 @@ export const isAuthenticated = AsyncHandler(async (req: ProtectedRequest, _: Res
         }
 
         // Find user by id
-        const user: User | null = await userRepository.findUserById(decodedToken?.subject)
+        const user: User | null = await userRepository.findUserById({ id: decodedToken?.subject })
 
         if (!user) {
             return ApiError(new Error(NOT_FOUND('User').message), req, next, NOT_FOUND().code)
