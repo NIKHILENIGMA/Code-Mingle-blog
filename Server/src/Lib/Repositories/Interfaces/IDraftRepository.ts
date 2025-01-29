@@ -1,8 +1,10 @@
 import { Post } from '@prisma/client'
-import { IBaseRepository } from './IBaseRepository'
-// import { PostDTO } from '../../Models/Blog'
+import { Blog, CreateDraftDTO } from '../../Models/Blog'
 
-export interface IDraftRepository extends IBaseRepository<Post> {
+export interface IDraftRepository  {
+    create(payload: CreateDraftDTO): Promise<Blog>
+    update(where: {id: string}, payload: Partial<Post>): Promise<Post>
+    delete(where: {id: string}): Promise<void>
     findDraft(where: {id: string, authorId: string}, fields: object): Promise<Partial<Post> | null>
     findDrafts(): Promise<Post[] | null>
     findDraftById(where: Record<string, string | number>): Promise<Post | null>

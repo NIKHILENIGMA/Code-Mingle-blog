@@ -1,22 +1,15 @@
-import { Post, PostStatus } from '@prisma/client'
+import { Post } from '@prisma/client'
 import prisma from '../../database/PrismaConnection'
 import { IDraftRepository } from '../Interfaces/IDraftRepository'
-import { PostDTO } from '../../Models/Blog'
+import { Blog, CreateDraftDTO, PostDTO } from '../../Models/Blog'
 import { DraftWhere, DraftWhereSlug, DraftOrderBy } from '../../../types/draft'
 import { DRAFT_STATUS } from '../../../constant/draftStatus'
 
 export class PrismaDraftRepository implements IDraftRepository {
-    public async create(payload: Partial<Post>): Promise<Post> {
-        const { authorId, status } = payload
-
-        const draft = await prisma.post.create({
-            data: {
-                authorId: authorId as string,
-                status: status as PostStatus
-            }
+    public async create(payload: CreateDraftDTO): Promise<Blog> {
+        return await prisma.post.create({
+            data: payload
         })
-
-        return draft
     }
 
     public async update(where: DraftWhere, payload: Partial<Post>): Promise<Post> {
