@@ -6,6 +6,7 @@ import path from 'node:path'
 import { ProtectedRequest } from '../types/app-request'
 import { NextFunction, Request } from 'express'
 import responseMessage from '../constant/responseMessage'
+import { keyPath } from '../config/config'
 
 const { BAD_REQUEST, METHOD_FAILED } = responseMessage
 
@@ -41,9 +42,9 @@ export async function readFileKey(req: Request, next: NextFunction, keyName: str
     try {
         let filePath: string
         if (keyName === 'private') {
-            filePath = path.join(__dirname, '../../keys/private_key.pem')
+            filePath = path.join(__dirname, keyPath.PRIVATE_KEY_PATH)
         } else if (keyName === 'public') {
-            filePath = path.join(__dirname, '../../keys/public_key.pem')
+            filePath = path.join(__dirname, keyPath.PUBLIC_KEY_PATH)
         } else {
             return ApiError(new Error(BAD_REQUEST('file reading').message), req, next, BAD_REQUEST().code)
         }
