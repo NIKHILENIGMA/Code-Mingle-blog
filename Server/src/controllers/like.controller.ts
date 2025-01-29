@@ -36,7 +36,7 @@ export const likeStatusOfPost = AsyncHandler(async (req: ProtectedRequest, res: 
     }
 
     try {
-        const status = await likeServices.checkLikeStatusforPostService(req, next, { userId, postId })
+        const status = await likeServices.checkLikeStatusService(req, next, { userId, postId })
 
         if (status === undefined) {
             return ApiError(new Error(METHOD_FAILED('like status of the post').message), req, next, METHOD_FAILED().code)

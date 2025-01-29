@@ -1,12 +1,16 @@
 import { NextFunction, Request, Response } from 'express'
 import { AsyncHandler } from '../utils/AsyncHandler'
-import { User } from '../Lib/Models/User'
+import { UpdateUserDTO, User } from '../Lib/Models/User'
 import UserServices from '../services/user.service'
 import { ApiError } from '../utils/ApiError'
 import { ApiResponse } from '../utils/ApiResponse'
+import { ProtectedRequest } from '../types/app-request'
+import responseMessage from '../constant/responseMessage'
+
+
+const { SUCCESS, INTERNAL_SERVICE } = responseMessage
 
 const userServices = new UserServices()
-
 
 /**
  * Update user profile
@@ -16,18 +20,16 @@ const userServices = new UserServices()
  * @returns Promise<User> - updated user details
  */
 
-export const updateUser = AsyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+export const updateUser = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
+    const userId = (req.user as User)?.id
+    const userDetails = req.body as UpdateUserDTO
     try {
-        const user = req.body as User
-        const id = req.params.id
-        await userServices.updateUserDetails(id, user)
+        
+        await userServices.updateUserDetails(userId, userDetails)
 
-        ApiResponse(req, res, 200, 'User updated successfully', {
-            user: user
-        })
-
+        ApiResponse(req, res, SUCCESS().code, SUCCESS('User updated successfully').message)
     } catch (error) {
-        ApiError(new Error(`${(error instanceof Error)}`), req, next, 403)
+        return ApiError(error instanceof Error ? error : new Error(INTERNAL_SERVICE('login service').message), req, next, INTERNAL_SERVICE().code)
     }
 })
 
@@ -67,7 +69,6 @@ export const removeUser = AsyncHandler(async (_: Request, res: Response) => {
     await Promise.resolve()
     ApiResponse(_, res, 200, 'User deleted successfully')
 })
-
 
 /**
  * Fetch user's followers
