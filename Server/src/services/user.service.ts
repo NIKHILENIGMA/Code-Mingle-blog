@@ -1,8 +1,8 @@
-import { User } from '../Lib/Models/User'
+// import { NextFunction, Request } from 'express'
+import { UpdateUserDTO } from '../Lib/Models/User'
 import { RepositoryFactory } from '../Lib/Repositories'
-// import { ApiError } from '../utils/ApiError'
 import { IUserRepository } from '../Lib/Repositories/Interfaces/IUserRepository'
-// import TokenServices from './token.service'
+// import { ApiError } from '../utils/ApiError'
 
 export default class UserServices {
     private UserRepository: IUserRepository
@@ -11,13 +11,11 @@ export default class UserServices {
         this.UserRepository = RepositoryFactory.UserRepository()
     }
 
-    public async updateUserDetails(id: string, user: User) {
-        const updatedUser = await this.UserRepository.update({ id }, user)
-
-        return updatedUser
+    public async updateUserDetails(id: string, user: UpdateUserDTO) {
+        await this.UserRepository.update({ id }, user)
     }
 
     public async getUserDetails(id: string) {
-        await this.UserRepository.findUserById(id)
+        await this.UserRepository.findUserById({ id })
     }
 }
