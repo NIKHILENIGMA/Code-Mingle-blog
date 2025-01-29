@@ -1,38 +1,51 @@
 import { IUserRepository } from '../Interfaces/IUserRepository'
-import { User } from '../../Models/User'
+import { User, CreateUserDTO, UpdateUserDTO, UserWhere, UserEmailWhere } from '../../Models/User'
 import prisma from '../../database/PrismaConnection'
 
 export class PrismaUserRepository implements IUserRepository {
-    public async create(user: User): Promise<User> {
+    public async create(user: CreateUserDTO): Promise<User> {
         const newUser = await prisma.user.create({
             data: user
         })
         return newUser
     }
 
-    public async update(where: { id: string }, user: User): Promise<User | null> {
-        return await prisma.user.update({ where: where, data: user })
+    public async update(where: UserWhere, userData: UpdateUserDTO): Promise<User | null> {
+        return await prisma.user.update({ where, data: userData })
     }
 
-    public async delete(where: { id: string }): Promise<void> {
-        await prisma.user.delete({ where: where })
+    public async delete(where: UserWhere): Promise<void> {
+        await prisma.user.delete({ where })
     }
 
-    public async findUserById(id: string): Promise<User | null> {
-        return await prisma.user.findFirst({ where: { id } })
+    public async updatePassword(where: UserWhere, password: string): Promise<User | null> {
+        return await prisma.user.update({
+            where,
+            data: {
+                password
+            }
+        })
     }
 
-    public async findUserByEmail(email: string): Promise<User | null> {
-        const user = await prisma.user.findUnique({ where: { email } })
+    public async findUserById(where: UserWhere): Promise<User | null> {
+        return await prisma.user.findFirst({ where })
+    }
+
+    public async findUserByEmail(where: UserEmailWhere): Promise<User | null> {
+        const user = await prisma.user.findUnique({ where })
 
         return user
     }
 
     public async getAllUsers(): Promise<User[] | null> {
-        return await prisma.user.findMany()
+        return await prisma.user.findMany({
+            orderBy: {
+                createdAt: 'desc'
+            },
+        })
     }
 
-    public async findByEmail(email: string): Promise<User | null> {
-        return prisma.user.findUnique({ where: { email } })
+    public async findByEmail(where: UserWhere): Promise<User | null> {
+        return prisma.user.findUnique({ where })
     }
 }
