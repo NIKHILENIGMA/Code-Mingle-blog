@@ -89,7 +89,7 @@ export default class AuthService {
      */
 
     private async checkEmailExists(email: string, req: Request, next: NextFunction): Promise<void> {
-        const userExist = await this.UserRepository.findUserByEmail(email)
+        const userExist = await this.UserRepository.findUserByEmail({ email })
 
         if (userExist) {
             ApiError(new Error(ALREADY_EXIST(email).message), req, next, 409)
@@ -97,7 +97,7 @@ export default class AuthService {
     }
 
     private async verifyUserByEmail(email: string): Promise<User | null> {
-        return await this.UserRepository.findUserByEmail(email)
+        return await this.UserRepository.findUserByEmail({ email })
     }
 
     // private async verifyUserById(id: string): Promise<User | null> {
@@ -112,12 +112,7 @@ export default class AuthService {
                 return ApiError(new Error(METHOD_FAILED('hashing password').message), req, next, METHOD_FAILED().code)
             }
 
-            const changePassword = await this.UserRepository.update(
-                {
-                    id: userId
-                },
-                { password: hashedPassword }
-            )
+            const changePassword = await this.UserRepository.updatePassword({ id: userId }, hashedPassword)
 
             if (!changePassword) {
                 return ApiError(new Error(METHOD_FAILED('changing password').message), req, next, METHOD_FAILED().code)
