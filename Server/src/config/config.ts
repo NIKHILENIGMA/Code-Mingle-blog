@@ -21,3 +21,8 @@ export const tokenInfo = {
 export const configMailService = {
     resendApiKey: process.env.RESEND_MAIL_SERVICE_API_KEY,
 }
+
+export const keyPath = {
+    PUBLIC_KEY_PATH: process.env.PUBLIC_KEY_PATH as string || '../../keys/public_key.pem',
+    PRIVATE_KEY_PATH: process.env.PRIVATE_KEY_PATH as string || '../../keys/private_key.pem',
+}
