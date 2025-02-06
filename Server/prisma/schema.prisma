@@ -14,47 +14,52 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(cuid())
-  email     String    @unique
-  firstName String?   @map("first_name")
-  lastName  String?   @map("last_name")
-  username  String?   @unique @map("username")
-  password  String
-  dob       DateTime? @map("date_of_birth")
-  bio       String?   @map("bio_data")
-  avatarImg String?   @map("avatar_img")
-  coverImg  String?   @map("cover_img")
-  role      String    @default("USER")
-  posts     Post[]
-  comments  Comment[]
-  replies   Reply[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  Like      Like[]
+  id          String       @id @default(cuid())
+  email       String       @unique
+  firstName   String?      @map("first_name")
+  lastName    String?      @map("last_name")
+  username    String?      @unique @map("username")
+  password    String
+  dob         DateTime?    @map("date_of_birth")
+  bio         String?      @map("bio_data")
+  avatarImg   String?      @map("avatar_img")
+  coverImg    String?      @map("cover_img")
+  role        String       @default("USER")
+  collections Collection[]
+  posts       Post[]
+  comments    Comment[]
+  replies     Reply[]
+  Like        Like[]
+  followers   Follow[]     @relation("user_followers")
+  following   Follow[]     @relation("user_followings")
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 
   @@map("users")
 }
 
 model Post {
-  id              String     @id @default(uuid())
+  id              String      @id @default(uuid())
   title           String?
-  content         String?    @db.Text
-  publishedAt     DateTime?  @map("published_at")
-  slug            String?    @unique
-  metaDescription String?    @map("meta_description")
-  image           String?    @map("image_url")
-  thumbnailImage  String?    @map("thumbnail_image_url")
-  readTime        Int?       @map("read_time")
-  authorId        String     @map("author_id")
-  categoryId      Int?       @map("category_id")
-  category        Category?  @relation(fields: [categoryId], references: [id])
-  author          User       @relation(fields: [authorId], references: [id])
+  content         String?     @db.Text
+  publishedAt     DateTime?   @map("published_at")
+  slug            String?     @unique
+  metaDescription String?     @map("meta_description")
+  image           String?     @map("image_url")
+  thumbnailImage  String?     @map("thumbnail_image_url")
+  readTime        Int?        @map("read_time")
+  authorId        String      @map("author_id")
+  categoryId      Int?        @map("category_id")
+  category        Category?   @relation(fields: [categoryId], references: [id])
+  author          User        @relation(fields: [authorId], references: [id])
   comments        Comment[]
   postTags        Tag[]
   Like            Like[]
   status          PostStatus
-  createdAt       DateTime   @default(now()) @map("created_at")
-  updatedAt       DateTime   @updatedAt @map("updated_at")
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+  Collection      Collection? @relation(fields: [collectionId], references: [id])
+  collectionId    String?
 
   @@index(status)
   @@map("posts")
@@ -88,6 +93,31 @@ model Reply {
   @@map("replies")
 }
 
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String   @map("follower_id")
+  followingId String   @map("following_id")
+  follower    User     @relation("user_followers", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User     @relation("user_followings", fields: [followingId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@unique([followerId, followingId]) 
+  @@map("follows") 
+}
+
+model Collection {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  userId      String   @map("user_id")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  posts       Post[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("collections")
+}
+
 model Tag {
   id     Int     @id @default(autoincrement())
   postId String  @map("post_id")
@@ -106,7 +136,9 @@ model Like {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   post      Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
   comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
-  reply     Reply?    @relation(fields: [replyId], references: [id], onDelete: Cascade)
+  reply     Reply?   @relation(fields: [replyId], references: [id], onDelete: Cascade)
+
+  @@map("likes")
 }
 
 model Category {
@@ -115,6 +147,8 @@ model Category {
   posts     Post[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@map("categories")
 }
 
 enum PostStatus {
