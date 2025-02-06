@@ -20,6 +20,7 @@ pids
 code_mingle_data/
 techscribe_data/
 
+credentials.txt
 # keys and certificates
 private_key.pem
 public_key.pem
