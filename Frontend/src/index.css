@@ -81,6 +81,23 @@
   color: var(--tw-prose-paragraph);
 }
 
+.drag-handle {
+  cursor: move;
+  padding: 4px;
+  opacity: 0.3;
+  position: absolute;
+  left: -24px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+[data-type] {
+  position: relative;
+}
+
+[data-type]:hover .drag-handle {
+  opacity: 1;
+}
 
 @layer base {
   * {

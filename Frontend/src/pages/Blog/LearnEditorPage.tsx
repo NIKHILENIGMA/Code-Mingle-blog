@@ -11,6 +11,7 @@ interface LearnEditorPageProps {
   setEditor: (editor: string) => void;
 }
 
+
 const LearnEditorPage: React.FC = () => {
   const navigate = useNavigate();
   const [editor, setEditor] = React.useState<LearnEditorPageProps>({
@@ -53,7 +54,7 @@ const LearnEditorPage: React.FC = () => {
         </div>
 
         <div className="w-full min-h-full">
-          <TiptapEditor initialContent="<p></p>" onContentChange={() => {}} />
+          <TiptapEditor initialContent={'<p></p>'} onContentChange={() => {}} />
         </div>
       </div>
     </div>

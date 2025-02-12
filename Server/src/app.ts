@@ -3,8 +3,8 @@ import routes from './routes'
 import cors from 'cors'
 import helmet from 'helmet'
 import cookieParser from 'cookie-parser'
-import { corsOptions } from './constant/corsOptions'
-import globalErrorHandler from './middleware/globalErrorHandler'
+import { corsOptions } from '@/constant/corsOptions'
+import globalErrorHandler from '@/middleware/globalErrorHandler'
 import { notFound } from './middleware/NotFound.middleware'
 
 const app: Application = express()

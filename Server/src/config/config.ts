@@ -26,3 +26,10 @@ export const keyPath = {
     PUBLIC_KEY_PATH: process.env.PUBLIC_KEY_PATH as string || '../../keys/public_key.pem',
     PRIVATE_KEY_PATH: process.env.PRIVATE_KEY_PATH as string || '../../keys/private_key.pem',
 }
+
+
+export const openAIConfig = {
+    OPENAI_MODEL: process.env.OPENAI_MODEL as string || 'gpt-4o-mini',
+    OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+    OPENAI_API_URL: process.env.OPENAI_API_URL
+}

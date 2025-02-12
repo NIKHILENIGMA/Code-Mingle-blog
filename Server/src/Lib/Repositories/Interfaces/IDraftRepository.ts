@@ -1,8 +1,9 @@
 import { Post } from '@prisma/client'
-import { Blog, CreateDraftDTO } from '../../Models/Blog'
+import { Blog } from '../../Models/Blog'
+import { GenerateDraft } from '@/types/draft'
 
 export interface IDraftRepository  {
-    create(payload: CreateDraftDTO): Promise<Blog>
+    create(payload: GenerateDraft): Promise<Blog>
     update(where: {id: string}, payload: Partial<Post>): Promise<Post>
     delete(where: {id: string}): Promise<void>
     findDraft(where: {id: string, authorId: string}, fields: object): Promise<Partial<Post> | null>

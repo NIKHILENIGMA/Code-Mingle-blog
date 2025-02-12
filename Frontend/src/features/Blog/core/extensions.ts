@@ -11,6 +11,7 @@ import { TextBackgroundExtension } from "./CustomExtensions/TextBackgroundExtens
 import { TextStyle } from "./CustomeMarks/TextStyle";
 import FontSizeExtension from "./CustomExtensions/FontSizeExtension";
 import TextAlign from "./CustomNode/TextAlign";
+import DraggableBlock from "./CustomNode/DraggableBlock";
 
 const extensions = [
   SlashCommands,
@@ -51,7 +52,8 @@ const extensions = [
   TextAlign.configure({
     types: ["heading", "paragraph"],
     defaultAlignment: "left",
-  })
+  }),
+  DraggableBlock,
 ];
 
 export default extensions;

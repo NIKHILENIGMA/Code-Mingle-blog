@@ -25,3 +25,15 @@ export type THttpResponse = {
     message: string
     data?: unknown
 }
+
+export interface UserDTO {
+    id: string
+    email: string
+    firstName?: string | null
+    lastName?: string | null
+    username?: string | null
+    dob?: Date | null
+    bio?: string | null
+    createdAt: Date
+    updatedAt: Date
+}
