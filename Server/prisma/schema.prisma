@@ -26,6 +26,7 @@ model User {
   coverImg    String?      @map("cover_img")
   role        String       @default("USER")
   collections Collection[]
+  savedPosts  SavedPost[]
   posts       Post[]
   comments    Comment[]
   replies     Reply[]
@@ -50,16 +51,16 @@ model Post {
   readTime        Int?        @map("read_time")
   authorId        String      @map("author_id")
   categoryId      Int?        @map("category_id")
+  collectionId    String?
   category        Category?   @relation(fields: [categoryId], references: [id])
   author          User        @relation(fields: [authorId], references: [id])
   comments        Comment[]
   postTags        Tag[]
   Like            Like[]
+  SaveBy          SavedPost[]
   status          PostStatus
   createdAt       DateTime    @default(now()) @map("created_at")
   updatedAt       DateTime    @updatedAt @map("updated_at")
-  Collection      Collection? @relation(fields: [collectionId], references: [id])
-  collectionId    String?
 
   @@index(status)
   @@map("posts")
@@ -101,21 +102,37 @@ model Follow {
   following   User     @relation("user_followings", fields: [followingId], references: [id], onDelete: Cascade)
   createdAt   DateTime @default(now()) @map("created_at")
 
-  @@unique([followerId, followingId]) 
-  @@map("follows") 
+  @@unique([followerId, followingId])
+  @@map("follows")
 }
 
 model Collection {
-  id          String   @id @default(cuid())
-  name        String
+  id          String      @id @default(cuid())
+  name        String      @unique
   description String?
-  userId      String   @map("user_id")
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  posts       Post[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  userId      String      @map("user_id")
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  savedPosts  SavedPost[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 
+  @@unique([name, userId])
   @@map("collections")
+}
+
+model SavedPost {
+  id           String     @id @default(cuid())
+  userId       String     @map("user_id")
+  postId       String     @map("post_id")
+  collectionId String     @map("collection_id")
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post         Post       @relation(fields: [postId], references: [id], onDelete: Cascade)
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@unique([userId, postId, collectionId]) // A user can only save a post once in a collection
+  @@map("save_posts") // This is the table name
 }
 
 model Tag {
