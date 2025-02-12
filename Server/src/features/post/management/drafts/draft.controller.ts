@@ -1,14 +1,14 @@
 import { NextFunction, Request, Response } from 'express'
-import { AsyncHandler } from '@/utils/AsyncHandler'
-import { ProtectedRequest } from '@/types/app-request'
-import { User } from '@/Lib/Models/User'
+import { AsyncHandler } from '../../../../utils/AsyncHandler'
+import { ProtectedRequest } from '../../../../types/app-request'
+import { User } from '../../../../Lib/Models/User'
 import { Post } from '@prisma/client'
-import { ApiResponse } from '@/utils/ApiResponse'
-import { ApiError } from '@/utils/ApiError'
-import responseMessage from '@/constant/responseMessage'
+import { ApiResponse } from '../../../../utils/ApiResponse'
+import { ApiError } from '../../../../utils/ApiError'
+import responseMessage from '../../../../constant/responseMessage'
 import DraftService from './draft.service'
-import { GenerateDraft, DraftContent, DraftWhere, DraftSelectFields, DraftWhereStatus } from '@/types/draft'
-import { DRAFT_STATUS } from '@/constant/draftStatus'
+import { GenerateDraft, DraftContent, DraftWhere, DraftSelectFields, DraftWhereStatus } from '../../../../types/draft'
+import { DRAFT_STATUS } from '../../../../constant'
 
 const draftService = new DraftService()
 

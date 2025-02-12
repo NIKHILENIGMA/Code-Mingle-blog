@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { DRAFT_STATUS } from '@/constant'
+import { DRAFT_STATUS } from '../../../../constant'
 
 export const PublishParamsSchema = z.object({
     id: z.string().uuid()

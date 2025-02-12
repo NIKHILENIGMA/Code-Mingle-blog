@@ -1,4 +1,4 @@
-import { DRAFT_STATUS } from '@/constant'
+import { DRAFT_STATUS } from '../../../../constant'
 
 // types.ts
 export interface PublishPostBody {

@@ -1,7 +1,7 @@
-import { ApiError } from '@/utils/ApiError'
+import { ApiError } from '../../../utils/ApiError'
 import { NextFunction, Request } from 'express'
-import { responseMessage } from '@/constant'
-import prisma from '@/Lib/database/PrismaConnection'
+import { responseMessage } from '../../../constant'
+import prisma from '../../../Lib/database/PrismaConnection'
 import { CategoryDTO, CategoryWhere, UpdateCategory } from './category.types'
 
 const { METHOD_FAILED, NOT_FOUND } = responseMessage

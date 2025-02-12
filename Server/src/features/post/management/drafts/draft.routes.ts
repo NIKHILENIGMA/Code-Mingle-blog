@@ -1,5 +1,5 @@
 import express from 'express'
-import { validateParams, isAuthenticated, validateBody } from '@/middleware'
+import { validateParams, isAuthenticated, validateBody } from '../../../../middleware'
 import { createDraft, getDraft, getUserDrafts, removeDraft, saveDraft } from './draft.controller'
 import { DraftParamsSchema, UpdateDraftBodySchema } from './draft.schema'
 
@@ -21,7 +21,6 @@ router.use(isAuthenticated)
  * @access Private
  */
 router.route('/new').post(createDraft)
-
 
 /**
  * !Routes for saving a draft.

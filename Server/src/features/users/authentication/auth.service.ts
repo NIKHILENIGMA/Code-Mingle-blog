@@ -1,12 +1,12 @@
 import { NextFunction, Request } from 'express'
 import { LoginCredentials, SignupCredentials } from './auth.types'
-import { User } from '@/Lib/Models/User'
-import responseMessage from '@/constant/responseMessage'
-import { ApiError } from '@/utils/ApiError'
-import { RepositoryFactory } from '@/Lib/Repositories'
-import { IUserRepository } from '@/Lib/Repositories/Interfaces/IUserRepository'
+import { User } from '../../../Lib/Models/User'
+import responseMessage from '../../../constant/responseMessage'
+import { ApiError } from '../../../utils/ApiError'
+import { RepositoryFactory } from '../../../Lib/Repositories'
+import { IUserRepository } from '../../../Lib/Repositories/Interfaces/IUserRepository'
 import bcrypt from 'bcrypt'
-import { UserDTO } from '@/types/types'
+import { UserDTO } from '../../../types/types'
 
 const { METHOD_FAILED, ALREADY_EXIST, NOT_FOUND, INVALID_PASSWORD } = responseMessage
 export default class AuthService {

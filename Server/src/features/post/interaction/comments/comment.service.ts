@@ -1,11 +1,11 @@
 import { NextFunction, Request } from 'express'
-import { ApiError } from '../utils/ApiError'
-import responseMessage from '../constant/responseMessage'
-import prisma from '../Lib/database/PrismaConnection'
+import { ApiError } from '../../../../utils/ApiError'
+import responseMessage from '../../../../constant/responseMessage'
+import prisma from '../../../../Lib/database/PrismaConnection'
 import { Comment } from '@prisma/client'
-import { RepositoryFactory } from '../Lib/Repositories'
-import { ICommentRepository } from '../Lib/Repositories/Interfaces/ICommentRepository'
-import { IReplyRepository } from '../Lib/Repositories/Interfaces/IReplyRepository'
+import { RepositoryFactory } from '../../../../Lib/Repositories'
+import { ICommentRepository } from '../../../../Lib/Repositories/Interfaces/ICommentRepository'
+import { IReplyRepository } from '../../../../Lib/Repositories/Interfaces/IReplyRepository'
 
 interface AddComment {
     postId: string

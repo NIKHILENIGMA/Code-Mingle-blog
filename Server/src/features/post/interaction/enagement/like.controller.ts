@@ -1,11 +1,11 @@
 import { NextFunction, Response } from 'express'
-import { AsyncHandler } from '../utils/AsyncHandler'
-import { ProtectedRequest } from '../types/app-request'
-import { User } from '../Lib/Models/User'
-import { ApiError } from '../utils/ApiError'
-import responseMessage from '../constant/responseMessage'
-import { ApiResponse } from '../utils/ApiResponse'
-import LikeServices from './../services/like.service'
+import { AsyncHandler } from '../../../../utils/AsyncHandler'
+import { ProtectedRequest } from '../../../../types/app-request'
+import { User } from '../../../../Lib/Models/User'
+import { ApiError } from '../../../../utils/ApiError'
+import responseMessage from '../../../../constant/responseMessage'
+import { ApiResponse } from '../../../../utils/ApiResponse'
+import LikeServices from './like.service'
 
 // Constants from responseMessage
 const { METHOD_FAILED, SUCCESS, UNAUTHORIZED, NOT_FOUND, INTERNAL_SERVICE } = responseMessage

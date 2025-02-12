@@ -1,12 +1,12 @@
 import { Post } from '@prisma/client'
 import prisma from '../../database/PrismaConnection'
 import { IDraftRepository } from '../Interfaces/IDraftRepository'
-import { Blog, CreateDraftDTO, PostDTO } from '../../Models/Blog'
-import { DraftWhere, DraftWhereSlug, DraftOrderBy } from '../../../types/draft'
+import { Blog, PostDTO } from '../../Models/Blog'
+import { DraftWhere, DraftWhereSlug, DraftOrderBy, GenerateDraft } from '../../../types/draft'
 import { DRAFT_STATUS } from '../../../constant/draftStatus'
 
 export class PrismaDraftRepository implements IDraftRepository {
-    public async create(payload: CreateDraftDTO): Promise<Blog> {
+    public async create(payload: GenerateDraft): Promise<Blog> {
         return await prisma.post.create({
             data: payload
         })

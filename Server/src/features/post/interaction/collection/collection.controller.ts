@@ -1,11 +1,11 @@
-import { ProtectedRequest } from '@/types/app-request'
-import { AsyncHandler } from '@/utils/AsyncHandler'
+import { ProtectedRequest } from '../../../../types/app-request'
+import { AsyncHandler } from '../../../../utils/AsyncHandler'
 import { NextFunction, Response } from 'express'
 import { CollectionData } from './collection.types'
-import { User } from '@/Lib/Models/User'
-import { ApiResponse } from '@/utils/ApiResponse'
-import { ApiError } from '@/utils/ApiError'
-import { responseMessage } from '@/constant'
+import { User } from '../../../../Lib/Models/User'
+import { ApiResponse } from '../../../../utils/ApiResponse'
+import { ApiError } from '../../../../utils/ApiError'
+import { responseMessage } from '../../../../constant'
 import CollectionService from './collection.service'
 
 // Create a new instance of the collection service

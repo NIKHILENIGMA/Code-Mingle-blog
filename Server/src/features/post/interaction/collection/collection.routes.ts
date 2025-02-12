@@ -1,6 +1,15 @@
 import { Router } from 'express'
-import { createCollection, getUserCollection, listCollection, removeCollection, addPostToCollection, removePostFromCollection, getPostFromCollection, listPostsInCollection } from './collection.controller'
-import { isAuthenticated, validateBody, validateParams, validateQuery } from '@/middleware'
+import {
+    createCollection,
+    getUserCollection,
+    listCollection,
+    removeCollection,
+    addPostToCollection,
+    removePostFromCollection,
+    getPostFromCollection,
+    listPostsInCollection
+} from './collection.controller'
+import { isAuthenticated, validateBody, validateParams, validateQuery } from '../../../../middleware'
 import { CollectionBodySchema, CollectionParamsSchema, CollectionQuerySchema, PostParamsSchema } from './collection.schema'
 
 const router = Router()
@@ -19,9 +28,7 @@ router.use(isAuthenticated)
  * @route /api/v1/user/collection/create-collection
  * @access Private
  */
-router
-    .route('/create')
-    .post(validateBody(CollectionBodySchema), createCollection)
+router.route('/create').post(validateBody(CollectionBodySchema), createCollection)
 
 /**
  *! Route for removing a collection.
@@ -29,9 +36,7 @@ router
  * @route /api/v1/user/collection/:collectionId
  * @access Private
  */
-router
-    .route('/:collectionId')
-    .delete(validateParams(CollectionParamsSchema.merge(PostParamsSchema)), removeCollection)
+router.route('/:collectionId').delete(validateParams(CollectionParamsSchema.merge(PostParamsSchema)), removeCollection)
 
 /**
  *! Route for adding a post to a collection.
@@ -48,9 +53,7 @@ router
  * @route /api/v1/user/collection/:collectionId/posts/:postId
  * @access Private
  */
-router
-    .route('/:collectionId/posts/:postId')
-    .delete(validateParams(CollectionParamsSchema.merge(PostParamsSchema)), removePostFromCollection)
+router.route('/:collectionId/posts/:postId').delete(validateParams(CollectionParamsSchema.merge(PostParamsSchema)), removePostFromCollection)
 
 /**
  * ! Route for getting a post from a collection.
@@ -58,9 +61,7 @@ router
  * @route /api/v1/user/collection/:collectionId/posts/:postId
  * @access Private
  */
-router
-    .route('/:collectionId/posts/:postId')
-    .get(validateParams(CollectionParamsSchema.merge(PostParamsSchema)), getPostFromCollection)
+router.route('/:collectionId/posts/:postId').get(validateParams(CollectionParamsSchema.merge(PostParamsSchema)), getPostFromCollection)
 
 /**
  * ! Route for getting a list of posts in a collection.
@@ -68,9 +69,7 @@ router
  * @route /api/v1/user/collection/:collectionId/posts
  * @access Private
  */
-router
-    .route('/:collectionId/posts')
-    .get(validateParams(CollectionParamsSchema), validateQuery(CollectionQuerySchema), listPostsInCollection)
+router.route('/:collectionId/posts').get(validateParams(CollectionParamsSchema), validateQuery(CollectionQuerySchema), listPostsInCollection)
 
 /**
  *! Route for getting a single of collections.

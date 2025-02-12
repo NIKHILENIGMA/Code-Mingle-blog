@@ -1,7 +1,7 @@
 import { NextFunction, Request } from 'express'
-import { resend } from '@/helpers/resend'
-import { ApiError } from '@/utils/ApiError'
-import responseMessage from '@/constant/responseMessage'
+import { resend } from '../../../helpers/resend'
+import { ApiError } from '../../../utils/ApiError'
+import responseMessage from '../../../constant/responseMessage'
 
 const { METHOD_FAILED } = responseMessage
 export default class MailService {

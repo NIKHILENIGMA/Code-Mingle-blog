@@ -6,6 +6,7 @@ export default {
     ALREADY_EXIST: (email?: string) => ({ code: 409, message: `The user with ${email} already exists` }),
     INTERNAL_SERVICE: (message?: string) => ({ code: 500, message: `Internal service error: ${message}` }),
     MISSING_ID: (message?: string) => ({ code: 400, message: `Missing id in request params for ${message} operation` }),
+    HEALTH_CHECK: { code: 200, message: 'Server is up and running' },
     INVALID_PASSWORD: { code: 401, message: 'Provided password is incorrect' },
     INVALID_TOKEN: { code: 401, message: 'Provided token is invalid' },
     TOKEN_EXPIRED: { code: 401, message: 'Provided token is expired' },

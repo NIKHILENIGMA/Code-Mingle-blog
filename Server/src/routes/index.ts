@@ -4,7 +4,6 @@ import oauthRoutes from '../features/users/oauth/oAuth.routes'
 import followRoutes from '../features/users/followSystem/follow.routes'
 import preferenceRoutes from '../features/users/preferences/preference.routes'
 import profileRoutes from '../features/users/profile/profile.routes'
-import uploadRoutes from './upload.routes'
 import collectionRoutes from '../features/post/interaction/collection/collection.routes'
 import likeRoutes from '../features/post/interaction/enagement/like.routes'
 import commentRoutes from '../features/post/interaction/comments/comment.routes'
@@ -164,6 +163,6 @@ router.use('/admin/seo', reportsRoutes)
 router.use('/admin/settings', reportsRoutes)
 router.use('/admin/tags', reportsRoutes)
 
-router.use('/media', uploadRoutes)
+// router.use('/media', uploadRoutes)
 
 export default router

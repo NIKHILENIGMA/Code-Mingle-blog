@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { isAuthenticated, validateBody, validateParams, validateQuery } from '@/middleware'
+import { isAuthenticated, validateBody, validateParams, validateQuery } from '../../../../middleware'
 import {
     archivePublishedPost,
     deletePublishedPost,

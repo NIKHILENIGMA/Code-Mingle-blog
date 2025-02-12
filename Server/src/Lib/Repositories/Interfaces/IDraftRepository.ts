@@ -1,6 +1,7 @@
 import { Post } from '@prisma/client'
 import { Blog } from '../../Models/Blog'
-import { GenerateDraft } from '@/types/draft'
+import { GenerateDraft } from '../../../types/draft'
+
 
 export interface IDraftRepository  {
     create(payload: GenerateDraft): Promise<Blog>

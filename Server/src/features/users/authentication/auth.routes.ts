@@ -1,8 +1,8 @@
 // Auth routes for handling user authentication and authorization.
 import { Router } from 'express'
-import { forgotPassword, login, logout, refreshAccessToken, resetPassword, signup } from '@/features/users/authentication/auth.controller'
-import { isAuthenticated, validateBody } from '@/middleware'
-import { signupSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema } from '@/features/users/authentication/auth.schema'
+import { forgotPassword, login, logout, refreshAccessToken, resetPassword, signup } from './auth.controller'
+import { isAuthenticated, validateBody } from '../../../middleware'
+import { signupSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema } from './auth.schema'
 
 
 const router = Router()

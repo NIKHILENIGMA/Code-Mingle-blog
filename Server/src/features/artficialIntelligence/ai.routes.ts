@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { getPrompt } from './ai.controller'
-import { isAuthenticated } from '@/middleware'
+import { isAuthenticated } from '../../middleware'
 
 
 const router = Router()

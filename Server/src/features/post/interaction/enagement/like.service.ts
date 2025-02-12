@@ -1,7 +1,7 @@
-import { ApiError } from '../utils/ApiError'
+import { ApiError } from '../../../../utils/ApiError'
 import { NextFunction, Request } from 'express'
-import responseMessage from '../constant/responseMessage'
-import prisma from '../Lib/database/PrismaConnection'
+import responseMessage from '../../../../constant/responseMessage'
+import prisma from '../../../../Lib/database/PrismaConnection'
 
 const { METHOD_FAILED } = responseMessage
 

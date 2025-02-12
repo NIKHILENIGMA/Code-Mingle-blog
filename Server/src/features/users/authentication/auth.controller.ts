@@ -1,21 +1,21 @@
 import { Request, Response, NextFunction } from 'express'
-import { ApiError } from '@/utils/ApiError'
-import { ApiResponse } from '@/utils/ApiResponse'
-import { AsyncHandler } from '@/utils/AsyncHandler'
+import { ApiError } from '../../../utils/ApiError'
+import { ApiResponse } from '../../../utils/ApiResponse'
+import { AsyncHandler } from '../../../utils/AsyncHandler'
 import {
     SignupCredentials,
     LoginCredentials,
     ForgotPasswordCredentials,
     ResetCredentials,
     AuthResponse
-} from '@/features/users/authentication/auth.types'
-import config, { tokenInfo } from '@/config/config'
-import { EApplicationEnvironment, responseMessage } from '@/constant'
-import { ProtectedRequest } from '@/types/app-request'
-import { UserDTO } from '@/types/types'
-import AuthService from '@/features/users/authentication/auth.service'
-import TokenServices from '@/services/token.service'
-import MailService from '@/features/mail/ResetPassword/mail.service'
+} from './auth.types'
+import config, { tokenInfo } from '../../../config/config'
+import { EApplicationEnvironment, responseMessage } from '../../../constant'
+import { ProtectedRequest } from '../../../types/app-request'
+import { UserDTO } from '../../../types/types'
+import AuthService from '../authentication/auth.service'
+import TokenServices from '../../../services/token.service'
+import MailService from '../../../features/mail/ResetPassword/mail.service'
 
 // Initialize the services
 const authServices = new AuthService()

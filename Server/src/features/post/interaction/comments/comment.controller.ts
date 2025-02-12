@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from 'express'
 import { AsyncHandler } from '../../../../utils/AsyncHandler'
 import { ProtectedRequest } from '../../../../types/app-request'
-import { User } from '@prisma/client'
+import { User } from '../../../../Lib/Models/User'
 import { ApiError } from '../../../../utils/ApiError'
 import responseMessage from '../../../../constant/responseMessage'
-import CommentService from '../services/comment.service'
+import CommentService from './comment.service'
 import { ApiResponse } from '../../../../utils/ApiResponse'
 
 const { UNAUTHORIZED, MISSING_BODY, METHOD_FAILED, NOT_FOUND, SUCCESS } = responseMessage
@@ -107,7 +107,7 @@ export const getCommentById = AsyncHandler(async (req: Request, res: Response, n
     const commentId: string = req.params?.commentId
 
     try {
-        const comment = await commentServices.getCommentByIdService(req, next, postId, commentId)
+        const comment = await commentServices.getCommentByIdService(req, next, postId, commentId) as unknown as Comment
 
         if (!comment) {
             return ApiError(new Error(NOT_FOUND('comment').message), req, next, NOT_FOUND().code)
@@ -150,7 +150,7 @@ export const getRepliesByCommentId = AsyncHandler(async (req: Request, res: Resp
     const limit: number = parseInt(req.query?.limit as string) || 5
 
     try {
-        const commentReply = await commentServices.getRepliesByCommentIdService(req, next, commentId, pageNumber, limit)
+        const commentReply = await commentServices.getRepliesByCommentIdService(req, next, commentId, pageNumber, limit) 
 
         if (!commentReply) {
             return ApiError(new Error(NOT_FOUND('replies').message), req, next, NOT_FOUND().code)

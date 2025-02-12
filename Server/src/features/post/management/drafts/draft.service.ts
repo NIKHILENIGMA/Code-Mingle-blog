@@ -1,9 +1,9 @@
 import { Request, NextFunction } from 'express'
-import { ApiError } from '@/utils/ApiError'
-import responseMessage from '@/constant/responseMessage'
-import { IDraftRepository } from '@/Lib/Repositories/Interfaces/IDraftRepository'
-import { RepositoryFactory } from '@/Lib/Repositories'
-import { DraftContent, DraftSelectFields, DraftUpdatePayload, DraftWhere, DraftWhereStatus, GenerateDraft } from '@/types/draft'
+import { ApiError } from '../../../../utils/ApiError'
+import responseMessage from '../../../../constant/responseMessage'
+import { IDraftRepository } from '../../../../Lib/Repositories/Interfaces/IDraftRepository'
+import { RepositoryFactory } from '../../../../Lib/Repositories'
+import { DraftContent, DraftSelectFields, DraftUpdatePayload, DraftWhere, DraftWhereStatus, GenerateDraft } from '../../../../types/draft'
 import { Post } from '@prisma/client'
 
 const { METHOD_FAILED, NOT_FOUND } = responseMessage

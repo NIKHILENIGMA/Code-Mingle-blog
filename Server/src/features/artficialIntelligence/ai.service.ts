@@ -1,9 +1,9 @@
 import OpenAI from 'openai'
-import { openAIConfig } from '@/config/config'
+import { openAIConfig } from '../../config/config'
 import axios from 'axios'
-import { ApiError } from '@/utils/ApiError'
+import { ApiError } from '../../utils/ApiError'
 import { NextFunction, Request, } from 'express'
-import { responseMessage } from '@/constant'
+import { responseMessage } from '../../constant'
 import { AxiosResponse } from 'axios';
 // import { OpenAICompletion } from './ai.types'
 
