@@ -1,5 +1,5 @@
 import { Reply } from '@prisma/client'
-import prisma from '../../database/PrismaConnection'
+import prisma from '../../../config/prisma.config'
 import { IReplyRepository } from '../Interfaces/IReplyRepository'
 
 export class PrismaReplyRepository implements IReplyRepository {

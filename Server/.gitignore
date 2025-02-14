@@ -17,8 +17,7 @@ pids
 *.pid.lock
 
 # Postgresql data
-code_mingle_data/
-techscribe_data/
+nodedrafts_data/
 
 credentials.txt
 # keys and certificates

@@ -1,4 +1,4 @@
-import prisma from '../../database/PrismaConnection'
+import prisma from '../../../config/prisma.config'
 import { KeyStore } from '../../Models/KeyStore'
 import { IKeyStoreRepository } from '../Interfaces/IKeyStore'
 

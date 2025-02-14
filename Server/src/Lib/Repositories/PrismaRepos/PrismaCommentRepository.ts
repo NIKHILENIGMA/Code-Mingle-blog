@@ -1,5 +1,5 @@
 import { Comment } from '@prisma/client'
-import prisma from '../../database/PrismaConnection'
+import prisma from '../../../config/prisma.config'
 import { ICommentRepository } from '../Interfaces/ICommentRepository'
 
 export class PrismaCommentRepository implements ICommentRepository {

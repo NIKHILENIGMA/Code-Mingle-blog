@@ -1,11 +1,10 @@
 import OpenAI from 'openai'
 import { openAIConfig } from '../../config/config'
-import axios from 'axios'
 import { ApiError } from '../../utils/ApiError'
 import { NextFunction, Request, } from 'express'
 import { responseMessage } from '../../constant'
 import { AxiosResponse } from 'axios';
-// import { OpenAICompletion } from './ai.types'
+import { apiInstance } from './aiRequest' 
 
 const { METHOD_FAILED, BAD_REQUEST } = responseMessage
 
@@ -16,7 +15,7 @@ const openai = new OpenAI({
 export default class AIService {
     constructor() {}
 
-    public async generateAIResponse(req: Request, next: NextFunction, prompt: string): Promise<AxiosResponse | void> {
+    public async generateAIResponse(req: Request, next: NextFunction, prompt: string) {
         const completion = await openai.chat.completions.create({
             model: openAIConfig.OPENAI_MODEL,
             store: true,
@@ -35,6 +34,6 @@ export default class AIService {
     }
 
     private async requestOpenAI(completion: unknown, url: string): Promise<AxiosResponse> {
-        return await axios.post(url, completion)
+        return await apiInstance.post(url, completion)
     }
 }

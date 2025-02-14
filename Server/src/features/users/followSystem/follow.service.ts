@@ -1,7 +1,7 @@
 import { NextFunction, Request } from 'express'
 import { ApiError } from '../../../utils/ApiError'
 import responseMessage from '../../../constant/responseMessage'
-import prisma from '../../../Lib/database/PrismaConnection'
+import prisma from '../../../config/prisma.config'
 import { FollowDTO } from './follow.types'
 
 const { METHOD_FAILED } = responseMessage

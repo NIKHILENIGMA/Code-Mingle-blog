@@ -1,7 +1,7 @@
 import { NextFunction, Request } from 'express'
 import { DRAFT_STATUS, responseMessage } from '../../../../constant'
 import { ApiError } from '../../../../utils/ApiError'
-import prisma from '../../../../Lib/database/PrismaConnection'
+import prisma from '../../../../config/prisma.config'
 import { PublishedPostDTO, PublishPostPayload, UpdatePublishedPost, PublishWhere, PublishedWhere, QueryParameter } from './publish.types'
 
 const { INTERNAL_SERVICE, NOT_FOUND } = responseMessage

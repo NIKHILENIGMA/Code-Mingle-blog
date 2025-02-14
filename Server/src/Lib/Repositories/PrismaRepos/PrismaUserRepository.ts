@@ -1,6 +1,6 @@
 import { IUserRepository } from '../Interfaces/IUserRepository'
 import { User, CreateUserDTO, UpdateUserDTO, UserWhere, UserEmailWhere } from '../../Models/User'
-import prisma from '../../database/PrismaConnection'
+import prisma from '../../../config/prisma.config'
 
 export class PrismaUserRepository implements IUserRepository {
     public async create(user: CreateUserDTO): Promise<User> {

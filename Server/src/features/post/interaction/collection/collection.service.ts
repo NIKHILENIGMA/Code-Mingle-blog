@@ -2,7 +2,7 @@ import { Request, NextFunction } from 'express'
 import { CollectionData, CollectionDTO, SavedPosts } from './collection.types'
 import { responseMessage } from '../../../../constant'
 import { ApiError } from '../../../../utils/ApiError'
-import prisma from '../../../../Lib/database/PrismaConnection'
+import prisma from '../../../../config/prisma.config'
 
 const { METHOD_FAILED, NOT_FOUND } = responseMessage
 

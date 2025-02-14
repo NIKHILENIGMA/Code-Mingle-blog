@@ -1,5 +1,5 @@
 import { ResetPassword } from '../../Models/ResetPassword'
-import prisma from '../../database/PrismaConnection'
+import prisma from '../../../config/prisma.config'
 // import { ApiError } from '../../../utils/ApiError'
 import { IResetPasswordRepository } from '../Interfaces/IResetPasswordRepository'
 
