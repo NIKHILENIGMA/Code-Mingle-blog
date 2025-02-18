@@ -16,12 +16,12 @@ export default class ProfileService {
 
     /**
      * Update user profile service
-     * 
-     * @param req 
-     * @param next 
-     * @param where 
-     * @param userDetails 
-     * @returns 
+     *
+     * @param req
+     * @param next
+     * @param where
+     * @param userDetails
+     * @returns
      */
     public async updateUserProfileService(req: Request, next: NextFunction, where: { id: string }, userDetails: UpdateUserDTO): Promise<User | void> {
         try {
@@ -66,14 +66,14 @@ export default class ProfileService {
 
     /**
      * Get user dashboard details service
-     * 
-     * @param req 
-     * @param next 
-     * @param where 
+     *
+     * @param req
+     * @param next
+     * @param where
      */
     public async getUserDashboardService(req: Request, next: NextFunction, where: { id: string }): Promise<User | void> {
         try {
-            const userDetails =  await prisma.user.findUnique({
+            const userDetails = await prisma.user.findUnique({
                 where,
                 select: {
                     id: true,
@@ -93,7 +93,6 @@ export default class ProfileService {
                 return ApiError(new Error(NOT_FOUND('user not found').message), req, next, NOT_FOUND().code)
             }
             return userDetails
-            
         } catch (error) {
             return ApiError(
                 error instanceof Error ? error : new Error(METHOD_FAILED('get user dashboard service').message),
@@ -166,6 +165,22 @@ export default class ProfileService {
             )
         }
     }
+
+    
+
+    public trimUserDetailsService(user: User): Promise<Omit<User, 'password' | 'role'>> {
+        return Promise.resolve({
+            id: user.id,
+            email: user.email,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            avatarImg: user.avatarImg,
+            coverImg: user.coverImg,
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt
+        })
+    }
+
 
     /**
      * Hashes a plain text password using bcrypt.

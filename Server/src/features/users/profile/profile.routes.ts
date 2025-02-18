@@ -13,18 +13,20 @@ import {
     userDashboard,
     userPublicProfile
 } from './profile.controller'
-import { isAuthenticated } from '../../../middleware/authentication.middleware'
+import { isAuthenticated, validateBody } from '../../../middleware'
+import { ProfileAvatarSchema, ProfileChangePasswordSchema, ProfileCoverImageSchema, ProfileUpdateBodySchema } from './profile.schema'
+import { upload } from '../../../middleware/multer.middleware'
 
 const router = Router()
 
 // Middleware to check if user is authenticated
-// --------------------------------------------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------------------------
 
 router.use(isAuthenticated)
 
-// --------------------------------------------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------------------------
 
 /**
  * Route for getting current user.
@@ -40,21 +42,21 @@ router.route('/get-user').get(currentUser)
  * @method PATCH
  * @param {string} path - /me/update
  */
-router.route('/me/update').patch(updateUserDetails)
+router.route('/me/details').patch(validateBody(ProfileUpdateBodySchema), updateUserDetails)
 
 /**
  * @description: This route is used to change user password
  * @method PATCH
  * @param {string} path - /me/change-password
  */
-router.route('/me/change-password').patch(changeUserPassword)
+router.route('/me/change-password').patch(validateBody(ProfileChangePasswordSchema), changeUserPassword)
 
 /**
  * @description: This route is used to delete user account
  * @method DELETE
  * @param {string} path - /me/delete
  */
-router.route('/me/delete').delete(deleteUserAccount)
+router.route('/me/delete-account').delete(deleteUserAccount)
 
 /**
  * @description: This route is used to get user dashboard
@@ -68,42 +70,42 @@ router.route('/me/dashboard').get(userDashboard)
  * @method POST
  * @param {string} path - /me/avatar
  */
-router.route('/me/avatar').post(uploadAvatar)
+router.route('/me/avatar/upload').post(upload.single('avatarImg'), validateBody(ProfileAvatarSchema), uploadAvatar)
 
 /**
  * @description: This route is used to change avatar
  * @method PATCH
  * @param {string} path - /me/avatar/change
  */
-router.route('/me/avatar/change').patch(changeAvatar)
+router.route('/me/avatar/change').patch(upload.single('avatarImg'), validateBody(ProfileAvatarSchema), changeAvatar)
 
 /**
  * @description: This route is used to remove avatar
  * @method DELETE
  * @param {string} path - /me/avatar/remove
  */
-router.route('/me/avatar/remove').delete(removeAvatar)
+router.route('/me/avatar/remove').delete(upload.single('avatarImg'), removeAvatar)
 
 /**
  * @description: This route is used to upload cover photo
  * @method POST
  * @param {string} path - /me/cover-image
  */
-router.route('/me/cover-image').post(uploadCoverPhoto)
+router.route('/me/cover-image/upload').post(upload.single('coverImg'), validateBody(ProfileCoverImageSchema), uploadCoverPhoto)
 
 /**
  * @description: This route is used to change cover photo
  * @method PATCH
  * @param {string} path - /me/cover-image/change
  */
-router.route('/me/cover-image/change').patch(changeCoverPhoto)
+router.route('/me/cover-image/change').patch(upload.single('coverImg'), validateBody(ProfileCoverImageSchema), changeCoverPhoto)
 
 /**
  * @description: This route is used to remove cover photo
  * @method DELETE
  * @param {string} path - /me/cover-image/remove
  */
-router.route('/me/cover-image/remove').delete(removeCoverPhoto)
+router.route('/me/cover-image/remove').delete(upload.single('coverImg'), removeCoverPhoto)
 
 /**
  * @description: This route is used to get user public profile
