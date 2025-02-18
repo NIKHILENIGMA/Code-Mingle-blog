@@ -41,7 +41,7 @@ router.use('/users/OAuth', oauthRoutes)
  * @route /api/v1/users/follow
  * @access Private
  */
-router.use('/users/follow', followRoutes)
+router.use('/users/follow-user', followRoutes)
 
 /**
  * @name Preference Routes
