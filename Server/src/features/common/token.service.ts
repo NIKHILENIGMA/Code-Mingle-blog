@@ -1,13 +1,13 @@
 import crypto from 'crypto'
 import { Request, NextFunction } from 'express'
-import { tokenInfo } from '../config/config'
-import { decode, encode } from '../helpers/JWT'
-import { RepositoryFactory } from '../Lib/Repositories'
-import { ApiError } from '../utils/ApiError'
-import { TokenKeys, Tokens } from '../Lib/Models/KeyStore'
-import { IKeyStoreRepository } from '../Lib/Repositories/Interfaces/IKeyStore'
-import { IResetPasswordRepository } from '../Lib/Repositories/Interfaces/IResetPasswordRepository'
-import responseMessage from '../constant/responseMessage'
+import { tokenInfo } from '../../config/config'
+import { decode, encode } from '../../helpers/JWT'
+import { RepositoryFactory } from '../../Lib/Repositories'
+import { ApiError } from '../../utils/ApiError'
+import { TokenKeys, Tokens } from '../../Lib/Models/KeyStore'
+import { IKeyStoreRepository } from '../../Lib/Repositories/Interfaces/IKeyStore'
+import { IResetPasswordRepository } from '../../Lib/Repositories/Interfaces/IResetPasswordRepository'
+import responseMessage from '../../constant/responseMessage'
 
 const { INVALID_TOKEN, TOKEN_EXPIRED, METHOD_FAILED, NOT_FOUND } = responseMessage
 
