@@ -37,3 +37,29 @@ export interface UserDTO {
     createdAt: Date
     updatedAt: Date
 }
+
+export interface Context {
+    alt: string
+    user: string 
+}
+
+export interface UploadOptions {
+    folder: string
+    resource_type: 'auto' | 'image' | 'raw' | 'video'
+    overwrite: boolean
+    invalidate: boolean
+    public_id: string
+    allowed_formats: string[]
+    format: 'webp'
+    quality: number 
+    max_bytes: number
+    context: Context
+}
+
+export interface CloundinaryOption {
+    folder: string
+    public_name: string
+    quality: number
+    resource: 'image' | 'auto' | 'raw' | 'video'
+    altName: string
+}
