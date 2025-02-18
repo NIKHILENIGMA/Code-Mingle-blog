@@ -14,7 +14,7 @@ import { EApplicationEnvironment, responseMessage } from '../../../constant'
 import { ProtectedRequest } from '../../../types/app-request'
 import { UserDTO } from '../../../types/types'
 import AuthService from '../authentication/auth.service'
-import TokenServices from '../../../services/token.service'
+import TokenServices from '../../../features/common/token.service'
 import MailService from '../../../features/mail/ResetPassword/mail.service'
 
 // Initialize the services
