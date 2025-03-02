@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express'
+import { NextFunction, Response } from 'express'
 import { AsyncHandler } from '../../../utils/AsyncHandler'
 import { ApiError } from '../../../utils/ApiError'
 import responseMessage from '../../../constant/responseMessage'
@@ -161,8 +161,8 @@ export const userDashboard = AsyncHandler(async (req: ProtectedRequest, res: Res
 
     // Fetch the user dashboard
     try {
-        await profileServices.getUserDashboardService(req, next, where)
-        return ApiResponse(req, res, SUCCESS().code, SUCCESS('User dashboard fetched successfully').message, {})
+        const dashboard = await profileServices.getUserDashboardService(req, next, where)
+        return ApiResponse(req, res, SUCCESS().code, SUCCESS('User dashboard fetched successfully').message, { dashboard })
     } catch (error) {
         return ApiError(new Error(INTERNAL_SERVICE((error as Error)?.message).message), req, next, INTERNAL_SERVICE().code)
     }
@@ -181,7 +181,6 @@ export const userDashboard = AsyncHandler(async (req: ProtectedRequest, res: Res
 export const uploadAvatar = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
     // Get the user id from the request object
     const avatarPath = (req.file as Express.Multer.File)?.path
-
     // Where clause for the user id
     const userId = (req.user as User)?.id
     if (!userId) {
@@ -203,7 +202,6 @@ export const uploadAvatar = AsyncHandler(async (req: ProtectedRequest, res: Resp
     //  Upload the avatar
     try {
         const avatarURL = await uploadService.uploadFile(req, next, where, avatarPath, cloudinaryOption)
-
         if (!avatarURL) {
             return ApiError(new Error(METHOD_FAILED('upload avatar').message), req, next, METHOD_FAILED().code)
         }
@@ -273,13 +271,14 @@ export const changeAvatar = AsyncHandler(async (req: ProtectedRequest, res: Resp
  * @throws Will throw an error if the user id is not found.
  */
 export const removeAvatar = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
+    // Get the user id from the request object
     const userId = (req.user as User)?.id
     if (!userId) {
         return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
     }
 
     // The public ID of the image to be deleted
-    const public_id = `user_avatar-${userId}`
+    const public_id = `avatars/user_avatar-${userId}`
 
     try {
         // Remove the avatar from Cloudinary
@@ -415,7 +414,7 @@ export const removeCoverPhoto = AsyncHandler(async (req: ProtectedRequest, res: 
     const where = { id: userId }
 
     // The public ID of the image to be deleted
-    const public_id = `cover_photo-${userId}`
+    const public_id = `cover-photos/cover_photo-${userId}`
     try {
         // Remove the cover photo from Cloudinary
         await uploadService.removeImage(req, next, public_id)
@@ -436,10 +435,29 @@ export const removeCoverPhoto = AsyncHandler(async (req: ProtectedRequest, res: 
  * @param next NextFunction
  * @returns Promise<Response> - The response object containing the user data.
  */
-export const userPublicProfile = AsyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+export const userPublicProfile = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
+    // Get the username from the request parameters
+    const username = req.params.username
+    if (!username) {
+        return ApiError(new Error(NOT_FOUND('user').message), req, next, NOT_FOUND().code)
+    }
+
+    const userId = (req.user as User)?.id
+    if (!userId) {
+        return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
+    }
+
+    // Where clause for the username
+    const where = { username }
+
     try {
-        await Promise.resolve()
-        return ApiResponse(req, res, SUCCESS().code, SUCCESS('User profile fetched successfully').message, {})
+        // Fetch the user public profile
+        const publicProfile = await profileServices.getPublicProfileService(req, next, where, userId)
+        if (!publicProfile) {
+            return ApiError(new Error(NOT_FOUND('user profile').message), req, next, NOT_FOUND().code)
+        }
+
+        return ApiResponse(req, res, SUCCESS().code, SUCCESS('User profile fetched successfully').message, { publicProfile })
     } catch (error) {
         return ApiError(new Error(INTERNAL_SERVICE((error as Error)?.message).message), req, next, INTERNAL_SERVICE().code)
     }

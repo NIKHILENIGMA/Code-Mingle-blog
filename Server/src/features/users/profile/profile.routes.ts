@@ -14,8 +14,9 @@ import {
     userPublicProfile
 } from './profile.controller'
 import { isAuthenticated, validateBody } from '../../../middleware'
-import { ProfileAvatarSchema, ProfileChangePasswordSchema, ProfileCoverImageSchema, ProfileUpdateBodySchema } from './profile.schema'
+import { ProfileChangePasswordSchema, ProfileUpdateBodySchema } from './profile.schema'
 import { upload } from '../../../middleware/multer.middleware'
+import { validateFile } from '../../../middleware/validateSchema.middleware'
 
 const router = Router()
 
@@ -70,35 +71,35 @@ router.route('/me/dashboard').get(userDashboard)
  * @method POST
  * @param {string} path - /me/avatar
  */
-router.route('/me/avatar/upload').post(upload.single('avatarImg'), validateBody(ProfileAvatarSchema), uploadAvatar)
+router.route('/me/avatar/upload').post(upload.single('avatarImg'), validateFile, uploadAvatar)
 
 /**
  * @description: This route is used to change avatar
  * @method PATCH
  * @param {string} path - /me/avatar/change
  */
-router.route('/me/avatar/change').patch(upload.single('avatarImg'), validateBody(ProfileAvatarSchema), changeAvatar)
+router.route('/me/avatar/change').patch(upload.single('avatarImg'), validateFile, changeAvatar)
 
 /**
  * @description: This route is used to remove avatar
  * @method DELETE
  * @param {string} path - /me/avatar/remove
  */
-router.route('/me/avatar/remove').delete(upload.single('avatarImg'), removeAvatar)
+router.route('/me/avatar/remove').delete(removeAvatar)
 
 /**
  * @description: This route is used to upload cover photo
  * @method POST
  * @param {string} path - /me/cover-image
  */
-router.route('/me/cover-image/upload').post(upload.single('coverImg'), validateBody(ProfileCoverImageSchema), uploadCoverPhoto)
+router.route('/me/cover-image/upload').post(upload.single('coverImg'), validateFile, uploadCoverPhoto)
 
 /**
  * @description: This route is used to change cover photo
  * @method PATCH
  * @param {string} path - /me/cover-image/change
  */
-router.route('/me/cover-image/change').patch(upload.single('coverImg'), validateBody(ProfileCoverImageSchema), changeCoverPhoto)
+router.route('/me/cover-image/change').patch(upload.single('coverImg'), validateFile, changeCoverPhoto)
 
 /**
  * @description: This route is used to remove cover photo

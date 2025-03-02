@@ -2,8 +2,9 @@ import { NextFunction, Request } from 'express'
 import { ApiError } from '../../../utils/ApiError'
 import responseMessage from '../../../constant/responseMessage'
 import prisma from '../../../config/prisma.config'
-import { UpdateUserDTO, User } from '../../../Lib/Models/User'
+import { PostCardDTO, UpdateUserDTO, User, UserProfileDTO, UserUsernameWhere } from '../../../Lib/Models/User'
 import bcrypt from 'bcrypt'
+import { UserDTO } from '../../../types/types'
 
 interface ChangePassword {
     oldPassword: string
@@ -12,16 +13,15 @@ interface ChangePassword {
 const { METHOD_FAILED, NOT_FOUND, BAD_REQUEST } = responseMessage
 
 export default class ProfileService {
-    constructor() {}
-
+    
     /**
-     * Update user profile service
+     * Updates user profile information in the database
      *
-     * @param req
-     * @param next
-     * @param where
-     * @param userDetails
-     * @returns
+     * @param req - Express Request object
+     * @param next - Express NextFunction for error handling
+     * @param where - Object containing user id to identify which user to update
+     * @param userDetails - DTO containing updated user profile information
+     * @returns Promise resolving to updated User object or void if error occurs
      */
     public async updateUserProfileService(req: Request, next: NextFunction, where: { id: string }, userDetails: UpdateUserDTO): Promise<User | void> {
         try {
@@ -42,12 +42,12 @@ export default class ProfileService {
     }
 
     /**
-     * Delete user account service
+     * Deletes user account from the database
      *
-     * @param req Request
-     * @param next NextFunction
-     * @param where { id: string }
-     * @returns Promise<User | void>
+     * @param req - Express Request object
+     * @param next - Express NextFunction for error handling
+     * @param where - Object containing user id to identify which user to delete
+     * @returns Promise resolving to deleted User object or void if error occurs
      */
     public async deleteUserAccountService(req: Request, next: NextFunction, where: { id: string }): Promise<User | void> {
         try {
@@ -65,13 +65,14 @@ export default class ProfileService {
     }
 
     /**
-     * Get user dashboard details service
+     * Retrieves user dashboard information from the database
      *
-     * @param req
-     * @param next
-     * @param where
+     * @param req - Express Request object
+     * @param next - Express NextFunction for error handling
+     * @param where - Object containing user id to identify which user to retrieve
+     * @returns Promise resolving to UserDTO object or void if error occurs
      */
-    public async getUserDashboardService(req: Request, next: NextFunction, where: { id: string }): Promise<User | void> {
+    public async getUserDashboardService(req: Request, next: NextFunction, where: { id: string }): Promise<UserDTO | void> {
         try {
             const userDetails = await prisma.user.findUnique({
                 where,
@@ -84,8 +85,29 @@ export default class ProfileService {
                     coverImg: true,
                     createdAt: true,
                     updatedAt: true,
-                    password: true,
-                    role: true
+                    role: true,
+                    posts: {
+                        select: {
+                            id: true,
+                            title: true,
+                            content: true,
+                            thumbnailImage: true,
+                            category: true,
+                            image: true,
+                            createdAt: true,
+                            updatedAt: true
+                        }
+                    },
+                    followers: {
+                        select: {
+                            followerId: true
+                        }
+                    },
+                    following: {
+                        select: {
+                            followingId: true
+                        }
+                    }
                 }
             })
 
@@ -166,7 +188,89 @@ export default class ProfileService {
         }
     }
 
-    
+    public async getPublicProfileService(req: Request, next: NextFunction, where: UserUsernameWhere, userId: string): Promise<UserProfileDTO | void> {
+        try {
+            const userProfile = await prisma.user.findUnique({
+                where,
+                include: {
+                    posts: {
+                        select: {
+                            id: true,
+                            title: true,
+                            content: true,
+                            thumbnailImage: true,
+                            category: true,
+                            image: true,
+                            createdAt: true,
+                            updatedAt: true
+                        }
+                    },
+                    followers: true,
+                    following: true
+                }
+            })
+
+            if (!userProfile) {
+                return ApiError(new Error(NOT_FOUND('user not found').message), req, next, NOT_FOUND().code)
+            }
+
+            // Get follower count
+            const followerCount = await this.countTheNumberOfFollowers(userProfile.id)
+
+            // Get following count
+            const followingCount = await this.countTheNumberOfFollowing(userProfile.id)
+
+            // Get posts count
+            const postsCount = await this.countTheNumberOfPosts(userProfile.id)
+
+            // Check if the user is followed by the logged in user
+            const isFollowedByLoggedInUser = await prisma.follow.findUnique({
+                where: {
+                    followerId_followingId: {
+                        followerId: userId,
+                        followingId: userProfile.id
+                    }
+                }
+            })  
+
+            // Fetch all posts
+            const allPosts: PostCardDTO[] = userProfile.posts.map((post) => ({
+                id: post.id,
+                title: post.title || '',
+                content: post.content || '',
+                thumbnailImage: post.thumbnailImage || '',
+                image: post.image || '',
+                category: post.category ? (typeof post.category === 'string' ? post.category : post.category.name) : '',
+                createdAt: post.createdAt,
+                updatedAt: post.updatedAt,
+              }));
+
+            const userProfileDTP: UserProfileDTO = {
+                id: userProfile.id,
+                username: userProfile.username,
+                firstName: userProfile.firstName,
+                lastName: userProfile.lastName,
+                bio: userProfile.bio,
+                avatarImg: userProfile.avatarImg,
+                coverImg: userProfile.coverImg,
+                followerCount,
+                followingCount,
+                postCount: postsCount,
+                isFollowedByLoggedInUser: !!isFollowedByLoggedInUser,
+                allPosts
+            } 
+
+            return userProfileDTP
+
+        } catch (error) {
+            return ApiError(
+                error instanceof Error ? error : new Error(METHOD_FAILED('get user dashboard service').message),
+                req,
+                next,
+                METHOD_FAILED().code
+            )
+        }
+    }
 
     public trimUserDetailsService(user: User): Promise<Omit<User, 'password' | 'role'>> {
         return Promise.resolve({
@@ -181,7 +285,17 @@ export default class ProfileService {
         })
     }
 
+    private async countTheNumberOfPosts(authorId: string): Promise<number> {
+        return await prisma.post.count({ where: { authorId } })
+    }
 
+    private async countTheNumberOfFollowers(authorId: string): Promise<number> {
+        return await prisma.follow.count({ where: { followingId: authorId } })
+    }
+
+    private async countTheNumberOfFollowing(authorId: string): Promise<number> {
+        return await prisma.follow.count({ where: { followerId: authorId } })
+    }
     /**
      * Hashes a plain text password using bcrypt.
      *
