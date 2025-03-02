@@ -19,28 +19,28 @@ router.use(isAuthenticated)
 /**
  * Follow a user
  * @method POST
- * @route /api/v1/follow/:userId
+ * @route /api/v1/follow-user/follow/:userId
  */
 router.route('/follow/:followingId').post(validateParams(followSchema), followUser)
 
 /**
  * Unfollow a user
  * @method DELETE
- * @route /api/v1/unfollow/:userId
+ * @route /api/v1/follow-user/unfollow/:userId
  */
 router.route('/unfollow/:followingId').delete(validateParams(unfollowSchema), unfollowUser)
 
 /**
  * Get followers
  * @method GET
- * @route /api/v1/followers
+ * @route /api/v1/follow-user/followers
  */
 router.route('/followers').get(validateQuery(getFollowersSchema), getFollowers)
 
 /**
  * Get following
  * @method GET
- * @route /api/v1/following
+ * @route /api/v1/follow-user/following
  */
 router.route('/following').get(validateQuery(getFollowingSchema), getFollowing)
 

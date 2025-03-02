@@ -39,7 +39,7 @@ export const getFollowersSchema = z.object({
  * @property {number} [page] - The page number for pagination (optional).
  */
 export const getFollowingSchema = z.object({
-    userId: z.string().cuid(),
+    userId: z.string().cuid().optional(),
     limit: z.number().int().positive().optional(),
     page: z.number().int().positive().optional(),
 })

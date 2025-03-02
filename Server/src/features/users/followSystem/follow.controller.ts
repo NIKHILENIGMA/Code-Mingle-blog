@@ -9,7 +9,7 @@ import FollowService from './follow.service'
 
 // Follow service instance
 const followServices = new FollowService()
-// Response messages 
+// Response messages
 const { INTERNAL_SERVICE, SUCCESS, NOT_FOUND, UNAUTHORIZED, METHOD_FAILED } = responseMessage
 
 /**
@@ -24,7 +24,7 @@ const { INTERNAL_SERVICE, SUCCESS, NOT_FOUND, UNAUTHORIZED, METHOD_FAILED } = re
  */
 export const followUser = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction): Promise<void> => {
     // Get the user id to follow
-    const followringId: string = req.params.userId
+    const followringId: string = req.params.followingId
     if (!followringId) {
         return ApiError(new Error(NOT_FOUND('User id is required').message), req, next, NOT_FOUND().code)
     }
@@ -67,7 +67,7 @@ export const unfollowUser = AsyncHandler(async (req: ProtectedRequest, res: Resp
     }
 
     // Get the user id to unfollow
-    const followingId: string = req.params.userId
+    const followingId: string = req.params.followingId
     if (!followingId) {
         return ApiError(new Error(NOT_FOUND('User id is required').message), req, next, NOT_FOUND().code)
     }
@@ -136,8 +136,14 @@ export const getFollowing = AsyncHandler(async (req: ProtectedRequest, res: Resp
 
     // Get the following of the user
     try {
+        // Get the following of the user
         const following = await followServices.getUserFollowing(req, next, userId)
-        return ApiResponse(req, res, SUCCESS().code, SUCCESS('User theme preference updated successfully').message, { following })
+        if (!following) {
+            return ApiError(new Error(METHOD_FAILED('Fetch following failed').message), req, next, METHOD_FAILED().code)
+        }
+
+        // Return the following of the user
+        return ApiResponse(req, res, SUCCESS().code, SUCCESS('User following fetch successfully').message, { following })
     } catch (error) {
         return ApiError(new Error(INTERNAL_SERVICE((error as Error)?.message).message), req, next, INTERNAL_SERVICE().code)
     }
