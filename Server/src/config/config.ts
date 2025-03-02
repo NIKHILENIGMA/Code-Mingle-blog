@@ -39,9 +39,9 @@ export const fileUploadConfig = {
 }
 
 export const cloudinaryConfig = {
-    CLOUDINARY_CLOUD_NAME: process.env.CLOUD_NAME as string,
-    API_KEY: process.env.CLOUD_API_KEY as string,
-    API_SECRET: process.env.CLOUD_API_SECRET as string
+    CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME as string,
+    API_KEY: process.env.CLOUDINARY_API_KEY as string,
+    API_SECRET: process.env.CLOUDINARY_API_SECRET as string
 }
 
 
