@@ -5,8 +5,10 @@ import responseMessage from '../../../constant/responseMessage'
 import { ApiError } from '../../../utils/ApiError'
 import { RepositoryFactory } from '../../../Lib/Repositories'
 import { IUserRepository } from '../../../Lib/Repositories/Interfaces/IUserRepository'
-import bcrypt from 'bcrypt'
 import { UserDTO } from '../../../types/types'
+import argon2 from 'argon2'
+import bcrypt from 'bcrypt'
+import prisma from '../../../config/prisma.config'
 
 const { METHOD_FAILED, ALREADY_EXIST, NOT_FOUND, INVALID_PASSWORD } = responseMessage
 export default class AuthService {
@@ -31,7 +33,7 @@ export default class AuthService {
             }
 
             // Hash password
-            const hashPassword = await this.hashedPassword(req, next, user.password)
+            const hashPassword = await this.hashedPassword(user?.password)
 
             if (!hashPassword) {
                 return ApiError(new Error(METHOD_FAILED('hashing password').message), req, next, METHOD_FAILED().code)
@@ -53,10 +55,10 @@ export default class AuthService {
 
     /**
      * Logs in a user.
-     * 
-     * This function verifies the user by email, then compares the password. 
+     *
+     * This function verifies the user by email, then compares the password.
      * If the user is found and the password is correct, the user ID is returned.
-     * 
+     *
      * @param {Request} req - The request object.
      * @param {NextFunction} next - The next function.
      * @param {LoginCredentials} credientials - The login credentials.
@@ -71,7 +73,7 @@ export default class AuthService {
                 return ApiError(new Error(NOT_FOUND('user with email').message), req, next, 404)
             }
             // Compare passwords
-            const passwordMatch = await this.comparePassword(credientials.password, user.password)
+            const passwordMatch = await this.comparePassword(credientials.password, user.password, user?.id)
 
             if (!passwordMatch) {
                 return ApiError(new Error(INVALID_PASSWORD.message), req, next, INVALID_PASSWORD.code)
@@ -85,9 +87,9 @@ export default class AuthService {
 
     /**
      * Sends a password reset email to the user.
-     * 
+     *
      * This function verifies the user by email, then sends a password reset email.
-     * 
+     *
      * @param {Request} req - The request object.
      * @param {NextFunction} next - The next function.
      * @param {string} email - The email of the user.
@@ -106,9 +108,9 @@ export default class AuthService {
 
     /**
      * Changes the password of a user.
-     * 
+     *
      * This function hashes the new password, then updates the user's password.
-     * 
+     *
      * @param {Request} req - The request object.
      * @param {NextFunction} next - The next function.
      * @param {string} userId - The ID of the user.
@@ -118,7 +120,7 @@ export default class AuthService {
      */
     public async changePasswordService(req: Request, next: NextFunction, userId: string, newPassword: string): Promise<void> {
         try {
-            const hashedPassword = await this.hashedPassword(req, next, newPassword)
+            const hashedPassword = await this.hashedPassword(newPassword)
 
             if (!hashedPassword) {
                 return ApiError(new Error(METHOD_FAILED('hashing password').message), req, next, METHOD_FAILED().code)
@@ -153,20 +155,19 @@ export default class AuthService {
      * @param {NextFunction} next - The next function.
      * @param {string} password - The plain text password to hash.
      * @returns {Promise<string | void>} - A promise that resolves to the hashed password if successful.
-     * 
+     *
      * @throws {ApiError} - Throws an error if there is an error hashing the password.
      */
-    private async hashedPassword(req: Request, next: NextFunction, password: string): Promise<string | void> {
+    private async hashedPassword(password: string): Promise<string | void> {
         // Hash password
-        try {
-            const saltRounds = process.env.HASH_PASSWORD_SALT ? parseInt(process.env.HASH_PASSWORD_SALT) : 10
-
-            const salt = await bcrypt.genSalt(saltRounds)
-
-            return await bcrypt.hash(password, salt)
-        } catch (error) {
-            return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('hashing').message), req, next, METHOD_FAILED().code)
+        const hashOptions = {
+            type: argon2.argon2id, // Use Argon2id (recommended)
+            memoryCost: 2 ** 16, // 64MB RAM usage
+            timeCost: 3, // 3 iterations
+            parallelism: 2 // Parallelism factor
         }
+
+        return await argon2.hash(password, hashOptions)
     }
 
     /**
@@ -189,9 +190,26 @@ export default class AuthService {
      * @param {string} hashedPassword - Hashed password.
      * @returns Promise<boolean> - True if passwords match, else false.
      */
-    private async comparePassword(password: string, hashedPassword: string): Promise<boolean> {
+    private async comparePassword(password: string, hashedPassword: string, userId: string): Promise<boolean> {
         // Compare password
-        return await bcrypt.compare(password, hashedPassword)
+        const match = await bcrypt.compare(password, hashedPassword)
+
+        if (match) {
+            const argonHashed = (await this.hashedPassword(password)) as string
+
+            await prisma.user.update({
+                where: {
+                    id: userId
+                },
+                data: {
+                    password: argonHashed
+                }
+            })
+
+            return match
+        }
+
+        return await argon2.verify(hashedPassword, password)
     }
 
     /**
