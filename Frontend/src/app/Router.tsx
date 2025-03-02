@@ -3,16 +3,17 @@ import HomePage from "../pages/Public/HomePage";
 import React from "react";
 import AboutPage from "../pages/Public/AboutPage";
 import Main from "@/Layout/Main";
-import {
-  AllPostsPage,
-  CreatePostPage,
-  ProfilePage,
-  ReadPostPage,
-} from "@/pages";
-import ProfileOverview from "@/features/Profile/components/ProfileOverview";
+import { AllPostsPage, CreatePostPage, ReadPostPage } from "@/pages";
 import DraftLayout from "@/features/Blog/Layout/DraftLayout";
-import AuthProvider from "@/features/auth/components/AuthProvider";
+// import AuthProvider from "@/features/auth/components/AuthProvider";
 import PreviewPostPage from "@/pages/Blog/PreviewPostPage";
+import PrivateRoute from "@/components/PrivateRoute";
+import ProfileSettings from "@/features/Profile/pages/ProfileSetting";
+import PersonalSettings from "@/features/Profile/pages/PersonalSettings";
+import ProfileSecurity from "@/features/Profile/pages/ProfileSecurity";
+import AccountSettings from "@/features/Profile/pages/AccountSettings";
+import GeneralDetails from "@/features/Profile/pages/GeneralDetails";
+import UserDashboard from "@/features/Profile/pages/UserDashboard";
 
 const router = createBrowserRouter([
   {
@@ -36,23 +37,39 @@ const router = createBrowserRouter([
         element: <ReadPostPage />,
       },
       {
-        path: "/profile/@username",
+        path: "/profile/me",
         element: (
-          <AuthProvider>
-            {" "}
-            <ProfilePage />{" "}
-          </AuthProvider>
+          <PrivateRoute>
+            <UserDashboard />
+          </PrivateRoute>
+        ),
+        children: [],
+      },
+      {
+        path: "/profile/settings",
+        element: (
+          // <PrivateRoute>
+            <ProfileSettings />
+          // </PrivateRoute>
         ),
         children: [
           {
-            path: "posts",
-            element: <ProfileOverview />,
+            path: "general-details",
+            element: <GeneralDetails />
           },
           {
-            path: "personal-information",
-            element: <ProfileOverview />,
+            path: "personal-settings",
+            element: <PersonalSettings />
           },
-        ],
+          {
+            path: "security",
+            element: <ProfileSecurity />
+          },
+          {
+            path: "account",
+            element: <AccountSettings />
+          },
+        ]
       },
     ],
   },
@@ -60,15 +77,19 @@ const router = createBrowserRouter([
   {
     path: "/draft",
     element: (
-      <AuthProvider>
+      <PrivateRoute>
         {" "}
         <DraftLayout />{" "}
-      </AuthProvider>
+      </PrivateRoute>
     ),
     children: [
       {
         path: ":draftId",
         element: <CreatePostPage />,
+      },
+      {
+        path: ":draftId/preview",
+        element: <PreviewPostPage />,
       },
     ],
   },
@@ -80,10 +101,6 @@ const router = createBrowserRouter([
         element: <LearnEditorPage />,
       };
     },
-  },
-  {
-    path: "/preview/:id",
-    element: <PreviewPostPage />,
   },
 
   {
@@ -138,6 +155,11 @@ const router = createBrowserRouter([
   },
 ]);
 
+/**
+ * AppRouter
+ * @description - This component is responsible for rendering the router provider
+ * @returns - RouterProvider
+ */
 const AppRouter: React.FC = () => {
   return <RouterProvider router={router} />;
 };
