@@ -92,7 +92,7 @@ class UploadService {
 
     private async cloudinaryDeleteService(req: Request, next: NextFunction, public_id: string): Promise<void> {
         try {
-            return await deleteFromCloudinary(req, next, public_id)
+            await deleteFromCloudinary(req, next, public_id)
         } catch (error) {
             return ApiError(
                 error instanceof Error ? error : new Error(METHOD_FAILED('Failed to delete avatar').message),
