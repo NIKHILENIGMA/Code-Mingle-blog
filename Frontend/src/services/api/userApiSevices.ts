@@ -1,5 +1,6 @@
 import { AxiosError, AxiosResponse } from "axios";
 import { apiInstance } from "./apiInstance";
+import { PROFILE_URL } from "@/constants/constants";
 
 export const createUser = async (data: unknown): Promise<AxiosResponse> => {
   try {
@@ -70,3 +71,66 @@ export const deleteUser = async (id: string): Promise<void> => {
     throw new Error(`User deletion failed ${(error as AxiosError).message}`);
   }
 };
+
+
+export const userDashboard = async (): Promise<AxiosResponse> => {
+  try {
+    const response = await apiInstance.get(`${PROFILE_URL}/me/dashboard`);
+
+    if (!response.data) {
+      throw new Error(`Dashboard fetch failed: ${response.data}`);
+    }
+    return response.data;
+  } catch (error) {
+    throw new Error(`Dashboard fetch failed ${(error as AxiosError).message}`);
+  }
+}
+
+export const uploadAvatar = async (formData: FormData): Promise<AxiosResponse> => {
+  try {
+
+    const response = await apiInstance.post(
+      `${PROFILE_URL}/me/avatar/upload`,
+      formData
+    );
+
+    if (!response.data) {
+      throw new Error(`Avatar upload failed: ${response.data}`);
+    }
+
+    return response.data;
+  } catch (error) {
+    throw new Error(`Avatar upload failed ${(error as AxiosError).message}`);
+  }
+}
+
+export const changeAvatar = async (formData: FormData): Promise<AxiosResponse> => {
+  try {
+    const response = await apiInstance.patch(
+      `${PROFILE_URL}/me/avatar/change`,
+      formData
+    );
+
+    if (!response.data) {
+      throw new Error(`Avatar change failed: ${response.data}`);
+    }
+
+    return response.data;
+  } catch (error) {
+    throw new Error(`Avatar change failed ${(error as AxiosError).message}`);
+  }
+}
+
+export const deleteAvatar = async (): Promise<AxiosResponse> => {
+  try {
+    const response = await apiInstance.delete(`${PROFILE_URL}/me/avatar/remove`);
+
+    if (!response.data) {
+      throw new Error(`Avatar deletion failed: ${response.data}`);
+    }
+
+    return response.data;
+  } catch (error) {
+    throw new Error(`Avatar deletion failed ${(error as AxiosError).message}`);
+  }
+}

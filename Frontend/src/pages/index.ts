@@ -4,7 +4,6 @@ import NotFoundPage from "./Public/NotFoundPage";
 import LoginPage from "./Auth/LoginPage";
 import ResetPasswordPage from "./Auth/ForgotPasswordPage";
 import SignupPage from "./Auth/SignupPage";
-import ProfilePage from "./ProfileManagement/ProfilePage";
 import CreatePostPage from "@/pages/Blog/CreatePostPage";
 import DraftPostPage from "@/pages/Blog/DraftPostPage";
 // import PreviewPostPage from "@/pages/Blog/ReadPostPage";
@@ -19,7 +18,6 @@ export {
   LoginPage,
   ResetPasswordPage,
   SignupPage,
-  ProfilePage,
   CreatePostPage,
   DraftPostPage,
   ReadPostPage,

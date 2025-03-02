@@ -1,10 +1,11 @@
-import { AUTHENTICATION_URL } from "@/constants/constants";
+import { AUTHENTICATION_URL, PROFILE_URL } from "@/constants/constants";
 import { apiInstance } from "./apiInstance";
 import { RegisterUser } from "@/Types/auth";
 import axios, { AxiosResponse } from "axios";
 
 export interface RefreshTokenResponse {
   data: {
+    [x: string]: string;
     token: string;
   }
 }
@@ -20,7 +21,7 @@ export interface ForgotPasswordResponse {
 
 export const currentUserService = async () => {
   try {
-    const response = await apiInstance.get(`${AUTHENTICATION_URL}/get-user`);
+    const response = await apiInstance.get(`${PROFILE_URL}/get-user`);
 
     if (response.status !== 200) {
       throw new Error("Failed to get current user");
@@ -76,7 +77,7 @@ export const logoutService = async (): Promise<void> => {
   }
 };
 
-export const refreshTokenService = async (): Promise<RefreshTokenResponse | void> => {
+export const refreshTokenService = async () => {
   try {
     const response: AxiosResponse<RefreshTokenResponse> = await apiInstance.post(
       `${AUTHENTICATION_URL}/refresh-token`

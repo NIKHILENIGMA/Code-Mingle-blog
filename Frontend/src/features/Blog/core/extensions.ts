@@ -1,7 +1,6 @@
 import { StarterKit } from "@tiptap/starter-kit";
 import Heading from "@tiptap/extension-heading";
 import Placeholder from "@tiptap/extension-placeholder";
-import { SlashCommands } from "./CustomExtensions/SlashCommands";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import Underline from "@tiptap/extension-underline";
 import { lowLightConfig } from "./lowLightConfig";
@@ -11,6 +10,7 @@ import { TextBackgroundExtension } from "./CustomExtensions/TextBackgroundExtens
 import { TextStyle } from "./CustomeMarks/TextStyle";
 import FontSizeExtension from "./CustomExtensions/FontSizeExtension";
 import TextAlign from "./CustomNode/TextAlign";
+import { SlashCommands } from "./CustomExtensions/SlashCommands";
 import DraggableBlock from "./CustomNode/DraggableBlock";
 
 const extensions = [

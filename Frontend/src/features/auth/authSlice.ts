@@ -1,43 +1,52 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { AuthState, AuthUser } from "./types/authTypes";
 
-interface AuthState {
-  accessToken: string | null;
-  persist: boolean;
-  user: object | null;
-}
 
 const initialState: AuthState = {
-  accessToken: null,
-  persist: JSON.parse(localStorage.getItem("persist") || "false"),
   user: null,
+  accessToken: localStorage.getItem("__acc") || null,
+  persist: JSON.parse(localStorage.getItem("__persist") || "false"),
+  isAuthenticated: false,
+  loading: false,
 };
 
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    setAccessToken: (state, action: PayloadAction<{ accessToken: string }>) => {
-      state.accessToken = action.payload.accessToken;
+    setCredientials(
+      state,
+      action: PayloadAction<{
+        isAuthenticated: boolean;
+        accessToken: string;
+        persist: boolean;
+      }>
+    ) {
+      const { isAuthenticated, accessToken, persist } = action.payload;
+      state.isAuthenticated = isAuthenticated;
+      state.accessToken = accessToken;
+      state.persist = persist;
     },
 
-    setPersist: (state, action: PayloadAction<{ persist: boolean }>) => {
-      state.persist = action.payload.persist;
-      localStorage.setItem("persist", JSON.stringify(action.payload.persist));
-    },
-
-    setUser(state, action: PayloadAction<{ user: object }>) {
+    setUser(state, action: PayloadAction<{ user: AuthUser }>) {
       state.user = action.payload.user;
     },
 
-    clearAuth: (state) => {
+    setLoading(state, action: PayloadAction<{ loading: boolean }>) {
+      state.loading = action.payload.loading;
+    },
+
+    setLogout: (state) => {
       state.accessToken = null;
+      state.isAuthenticated = false;
       state.persist = false;
       state.user = null;
-      localStorage.removeItem("persist");
+      localStorage.clear();
     },
   },
 });
 
-export const { setAccessToken, setPersist, setUser, clearAuth } =
+export const { setCredientials, setLoading, setUser, setLogout } =
   authSlice.actions;
+
 export default authSlice.reducer;

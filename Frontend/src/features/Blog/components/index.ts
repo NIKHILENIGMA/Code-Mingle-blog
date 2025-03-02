@@ -8,12 +8,12 @@ import FontSizeChange from "./BubbleMenu/FontSizeChange";
 import SelectToolOption from "./BubbleMenu/SelectToolOption";
 import ToolbarButton from "./BubbleMenu/ToolbarButton";
 import PostCard from "./Cards/PostCard";
-import CommentButton from "./Comments/CommentButton";
+// import CommentButton from "./Comments/CommentButton";
 import ReplyComment from "./Comments/ReplyComment";
 import DraftActions from "./Drafts/DraftActions";
 import DraftForm from "./Drafts/DraftForm";
 import DraftTitle from "./Drafts/DraftTitle";
-import NewDraft from "./Drafts/SideBarNewDraft";
+// import NewDraft from "./Drafts/";
 import PublishButton from "./Drafts/PublishButton";
 import PublishDraft from "./Drafts/PublishDraft";
 import SearchBar from "./Drafts/SearchBar";
@@ -39,12 +39,12 @@ export {
     SelectToolOption,
     ToolbarButton,
     PostCard,
-    CommentButton,
+    // CommentButton,
     ReplyComment,
     DraftActions,
     DraftForm,
     DraftTitle,
-    NewDraft,
+    // NewDraft,
     PublishButton,
     PublishDraft,
     SearchBar,

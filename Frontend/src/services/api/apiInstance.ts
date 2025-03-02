@@ -1,8 +1,8 @@
+import axios, { AxiosError } from "axios";
 import { store } from "@/app/store/store";
-import { clearAuth } from "@/features/auth/authSlice";
-// import { useRefreshToken } from "@/features/auth/hooks/useRefreshToken";
-import axios from "axios";
 import { refreshTokenService } from "./authApiServices";
+import { setCredientials, setLogout } from "@/features/auth/authSlice";
+import { removeAccessToken, setAccessToken } from "@/Utils/tokenManagement";
 
 const API_URL = "/api";
 
@@ -12,33 +12,67 @@ export const apiInstance = axios.create({
 });
 
 // Add a request interceptor to add the token to the request headers
-apiInstance.interceptors.request.use((config) => {
-  const token = store.getState().auth?.accessToken;
+apiInstance.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("__acc");
+    if (token && config) {
+      config.headers = config.headers || {};
+      config.headers.Authorization = `Bearer ${token}`;
+    } else if (config.headers) {
+      delete config.headers.Authorization;
+    }
 
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  } else {
-    delete config.headers.Authorization;
+    return config;
+  },
+
+  (error: AxiosError): Promise<never> => {
+    return Promise.reject(error);
   }
+);
 
-  return config;
-});
-
-// Add a response interceptor to handle token expiration
+// ─── RESPONSE INTERCEPTOR ─────────────────────────────────────────────
+// This interceptor handles 401 errors by attempting to refresh the token.
 apiInstance.interceptors.response.use(
   (response) => {
     return response;
   },
-  async(error) => {
-    if (error.response.status === 401 || error.response.data.status === 404) {
-      const newAccessToken = await refreshTokenService();
-      if (newAccessToken) {
-        error.config.headers.Authorization = `Bearer ${newAccessToken}`;
-        return axios.request(error.config);
-      } else {
-        store.dispatch(clearAuth());
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error && error?.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      try {
+        const newAccessToken = await refreshTokenService();
+
+        if (!newAccessToken) {
+          return;
+        } else {
+          // Remove the previous token from local sto
+          removeAccessToken("__acc");
+
+          // Update the local storage
+          setAccessToken(newAccessToken?.data.token);
+
+          store.dispatch(
+            setCredientials({
+              isAuthenticated: true,
+              persist: true,
+              accessToken: newAccessToken.data.token,
+            })
+          );
+
+          originalRequest.headers.Authorization = `Bearer ${newAccessToken.data?.token}`;
+
+          return apiInstance(originalRequest);
+        }
+      } catch (error) {
+        console.error(`Token refresh Failed: ${error}`);
+
+        store.dispatch(setLogout());
       }
     }
+
     return Promise.reject(error);
   }
 );

@@ -7,7 +7,7 @@ const Main: FC = () => {
   return (
     <div>
       <Header />
-      <main className="mt-8">
+      <main className="">
         <Outlet />
       </main>
       <Footer />

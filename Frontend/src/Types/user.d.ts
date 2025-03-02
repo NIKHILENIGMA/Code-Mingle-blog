@@ -25,3 +25,14 @@ export type SignupInputProps = {
   error?: FieldError;
   name: "email" | "password" | "firstName" | "lastName";
 };
+
+export interface User {
+  id: string;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  avatarImg?: string | null;
+  coverImg?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}

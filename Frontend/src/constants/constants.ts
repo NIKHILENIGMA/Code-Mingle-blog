@@ -5,7 +5,8 @@ import {
   Rss,
 } from "@/Utils/Icons";
 
-export const AUTHENTICATION_URL = "/v1/authentication";
+export const AUTHENTICATION_URL = "/v1/users/authentication";
+export const PROFILE_URL = "/v1/users/profile";
 export const USER_URL = "/v1/user";
 export const POST_URL = "/v1/post";
 export const DRAFT_URL = "/v1/drafts";
