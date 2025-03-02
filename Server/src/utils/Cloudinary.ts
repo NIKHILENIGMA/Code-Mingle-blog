@@ -82,9 +82,9 @@ export const uploadOnCloudinary = async (
  * @param public_id - The public ID of the image to delete from Cloudinary.
  * @returns A promise that resolves to void if the image is successfully deleted or an error if the deletion fails.
  */
-export const deleteFromCloudinary = async (req: Request, next: NextFunction, public_id: string) => {
+export const deleteFromCloudinary = async (req: Request, next: NextFunction, publicId: string) => {
     try {
-        await cloudinary.uploader.destroy(public_id)
+        await cloudinary.uploader.destroy(publicId)
     } catch (error) {
         return ApiError(
             error instanceof Error ? error : new Error(INTERNAL_SERVICE('Failed to delete image from cloudinary').message),
