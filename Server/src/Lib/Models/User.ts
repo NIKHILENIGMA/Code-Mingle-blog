@@ -1,3 +1,4 @@
+
 // src/models/User.ts
 export interface User {
     id: string
@@ -42,13 +43,45 @@ export interface ChangeUserPasswordDTO {
 }
 
 export type UserWhere = {
-    id: string,
+    id: string
     username?: string
 }
 
 export type UserEmailWhere = {
     email: string
 }
+
+export type UserUsernameWhere = {
+    username: string
+}
+
+export interface PostCardDTO {
+    id: string;
+    title: string;
+    content: string;
+    thumbnailImage: string | null;
+    image: string | null;
+    category: string;
+    createdAt: Date;
+    updatedAt: Date;
+  }
+  
+  export interface UserProfileDTO {
+    id: string;
+    username: string | null;
+    firstName: string | null;
+    lastName: string | null;
+    bio: string | null;
+    avatarImg: string | null;
+    coverImg: string | null;
+    followerCount: number;
+    followingCount: number;
+    postCount: number;
+    isFollowedByLoggedInUser: boolean;
+    allPosts: PostCardDTO[];
+  }
+  
+  
 
 export interface IUser {
     id: string
