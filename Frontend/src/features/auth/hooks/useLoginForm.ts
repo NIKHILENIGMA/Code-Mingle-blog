@@ -1,24 +1,22 @@
-import { currentUserService, loginService } from "@/services/api/authApiServices";
+import { loginService } from "@/services/api/authApiServices";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { z } from "zod";
-import { setAccessToken, setPersist, setUser } from "../authSlice";
+import { setCredientials, setUser } from "../authSlice";
 import { useLocation, useNavigate } from "react-router-dom";
 import { LoginSchema } from "@/features/auth/schema/schema";
+import { useUser } from "@/features/Profile/hooks/useUser";
 
 type LoginFormInputs = z.infer<typeof LoginSchema>;
 
 export const useLoginForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const location = useLocation();
-  const from = location.state?.from?.pathname || "/";
-  console.log("From: ", location.state?.from);
+  const destination = location.state?.from || "/";
 
-  
   const {
     register,
     handleSubmit,
@@ -28,57 +26,60 @@ export const useLoginForm = () => {
     resolver: zodResolver(LoginSchema),
   });
 
+  const { currentUser } = useUser();
 
-  /**
-   * Custom hook that provides a mutation function to log in a user.
-   *
-   * @returns An object containing the `mutateAsync` function renamed to `loginUserMutation`.
-   *
-   *
-   * @throws Will throw an error if the login service fails.
-   */
-
-  const { mutateAsync: loginUserMutation } = useMutation({
+  const loginUserMutation = useMutation({
+    mutationKey: ["login"],
     mutationFn: async ({ email, password }: LoginFormInputs) => {
       try {
-        const response = await loginService(email, password);
-
-        return response;
+        return await loginService(email, password);
       } catch (error) {
         throw new Error(`Login service failed: ${(error as Error).message}`);
       }
     },
+    onSuccess: async (response) => {
+      try {
+        // Check if the response contains a token
+        if (!response?.data?.token) {
+          throw new Error("Invalid response structure from server");
+        }
+
+        // Set the access token and persist true
+        dispatch(
+          setCredientials({
+            isAuthenticated: true,
+            persist: true,
+            accessToken: response?.data?.token,
+          })
+        );
+
+        // Persist the access token
+        localStorage.setItem("__acc", response?.data.token);
+        localStorage.setItem("__persist", "true");
+
+        // Reset the form
+        reset();
+
+        // Fetch user immediately after successful login
+        const user = currentUser;
+
+        // Set the user data
+        dispatch(setUser({ user: user }));
+
+        // Navigate to last path or home
+        navigate(destination, { replace: true });
+      } catch (error) {
+        throw new Error(`Failed to login: ${error}`);
+      }
+    },
+
+    onError: (error) => {
+      throw new Error(`Failed to login: ${error}`);
+    },
   });
 
   const onSubmit: SubmitHandler<LoginFormInputs> = async (data) => {
-    try {
-      // Call the loginService function with the email and password
-      const response = await loginUserMutation(data);
-
-      if (!response?.data?.token) {
-        throw new Error("Invalid response structure from server");
-      }
-
-      console.info("Login successfully: ", response.data);
-
-      // Set the access token in the store
-      dispatch(setAccessToken({ accessToken: response.data?.token }));
-
-      // Set the persist flag in the store
-      dispatch(setPersist({ persist: true }));
-
-      // Reset the form
-      reset();
-
-      const user = await currentUserService();
-
-      dispatch(setUser({ user }));
-
-      // Navigate to the home page
-      navigate(from)
-    } catch (error) {
-      throw new Error(`Failed to login: ${error}`);
-    }
+    await loginUserMutation.mutateAsync(data);
   };
 
   return { register, handleSubmit, errors, isSubmitting, onSubmit };

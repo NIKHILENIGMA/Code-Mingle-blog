@@ -1,24 +1,20 @@
-import { RefreshTokenResponse, refreshTokenService } from "@/services/api/authApiServices";
-import { setAccessToken, setPersist } from "@/features/auth/authSlice";
-import { useDispatch } from "react-redux";
+import { useCallback } from "react";
+import {
+  RefreshTokenResponse,
+  refreshTokenService,
+} from "@/services/api/authApiServices";
 
 export const useRefreshToken = () => {
-  const dispatch = useDispatch();
-
-  const refreshToken = async () => {
+  const refreshToken = useCallback(async () => {
     try {
-      const response  = await refreshTokenService() as RefreshTokenResponse;
+      const response = (await refreshTokenService()) as RefreshTokenResponse;
 
-      dispatch(setAccessToken({ accessToken: response.data.token }));
-      dispatch(setPersist({ persist: true }));
-      
+      return response;
     } catch (error) {
       throw new Error(
         `Failed to refresh token from the service: ${(error as Error).message}`
       );
     }
-  };
+  }, []);
   return { refreshToken };
 };
-
-
