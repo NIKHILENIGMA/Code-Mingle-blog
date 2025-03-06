@@ -20,6 +20,7 @@ export const TAGS_URL = "/v1/tag";
 export const CATEGORY_URL = "/v1/category";
 export const SETTING_URL = "/v1/setting";
 export const CONTACT_URL = "/v1/contact";
+export const OPEN_AI_URL = "/v1/openai";
 
 export const NavItems = [
   { name: "Home", path: "/", icon: House },
