@@ -78,6 +78,24 @@ export default {
               height: "0",
               pointerEvents: "none",
             },
+            ".tiptap h1.is-empty::before": {
+              content: "attr(data-placeholder)",
+              float: "left",
+              height: "0",
+              pointerEvents: "none",
+            },
+            ".tiptap h2.is-empty::before": {
+              content: "attr(data-placeholder)",
+              float: "left",
+              height: "0",
+              pointerEvents: "none",
+            },
+            ".tiptap h3.is-empty::before": {
+              content: "attr(data-placeholder)",
+              float: "left",
+              height: "0",
+              pointerEvents: "none",
+            },
           },
         },
         dark: {
