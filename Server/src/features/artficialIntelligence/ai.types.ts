@@ -1,5 +1,6 @@
 export interface Prompt {
-    prompt: string
+    type?: string
+    text: string
 }
 
 export interface Message {

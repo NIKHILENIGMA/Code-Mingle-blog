@@ -1,7 +1,6 @@
 import { Router } from 'express'
-import { getPrompt } from './ai.controller'
+import { changeTone, makeTextLong, makeTextShort, simplifiedTheText, translateText } from './ai.controller'
 // import { isAuthenticated } from '../../middleware'
-
 
 const router = Router()
 
@@ -14,17 +13,32 @@ const router = Router()
 // -------------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------------
 
-
-
 /**
  * ! Route to get prompt
- * 
+ *
  * @param prompt - The prompt to be used to generate AI response
- * @path /api/v1/ai-assistance/ 
+ * @path /api/v1/ai-assistance/
  */
-router
-    .route('/')
-    .post(getPrompt)
 
+/**
+ * @typedef {object} SimplifyText
+ * @property {string} text.required - The text to be simplified
+ * @property {string} type - The type of simplification
+ * @property {string} tone - The tone to be changed
+ * @property {string} language - The language to be translated
+ * @property {string} length - The length of the text to be made
+ * @property {string} short - The text to be made short
+ * 
+ */
+
+router.route('/simplify-text').post(simplifiedTheText)
+
+router.route('/tone-change').post(changeTone)
+
+router.route('/translate-text').post(translateText)
+
+router.route('/make-text-long').post(makeTextLong)
+
+router.route('/make-text-short').post(makeTextShort)
 
 export default router
