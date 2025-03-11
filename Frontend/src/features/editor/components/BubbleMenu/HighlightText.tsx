@@ -20,7 +20,7 @@ interface HighlightOptionProps {
 
 const HighlightOption: FC<HighlightOptionProps> = ({ editor }) => {
   return (
-    <div className="relative flex-1 border">
+    <div className="relative flex-1">
       <select
         name="highlight"
         className="block min-w-[100px] appearance-none p-2 text-black bg-[#fff] hover:bg-slate-100 dark:bg-[#1E293B] dark:text-white rounded-md transition focus:ring-2 focus:ring-blue-500 focus:outline-none"
@@ -42,17 +42,7 @@ const HighlightOption: FC<HighlightOptionProps> = ({ editor }) => {
             value={option.value}
             className="flex items-center gap-2 p-2 hover:bg-slate-100 dark:hover:bg-slate-700 space-x-3"
           >
-            <div
-              className="inline-block w-6 h-6 rounded-md p-2 "
-              style={{
-                color: option.value, // Text color
-                border: "1px solid #ccc",
-                padding: "0.5rem",
-              }}
-            >
-              A
-            </div>{" "}
-            <span className="font-medium">{option?.label}</span>
+            A {option?.label}
           </option>
         ))}
       </select>

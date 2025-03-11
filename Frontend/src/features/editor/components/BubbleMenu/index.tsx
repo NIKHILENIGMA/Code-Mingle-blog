@@ -26,13 +26,14 @@ const CustomBubbleMenu: FC<CustomeBubbleMenuProps> = ({ editor }) => {
     <BubbleMenu
       pluginKey="bubbleMenu"
       editor={editor}
+      tippyOptions={{ duration: 100 }}
       className="flex items-center space-x-2 px-2 py-1 bg-white shadow-md rounded-md border border-[#dadada] dark:border-[#1E293B] dark:bg-[#1E293B] dark:text-white w-[50vw]"
     >
       <div className="bubble-menu space-x-0.5 w-full items-center flex overflow-hidden whitespace-nowrap  text-black dark:text-white">
         <AISuggestion editor={editor} />
 
         <Separator orientation="vertical" />
-        
+
         <ChangeNodeType editor={editor} />
 
         <Separator orientation="vertical" />

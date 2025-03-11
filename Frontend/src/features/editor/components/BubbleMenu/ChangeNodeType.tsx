@@ -17,7 +17,7 @@ const nodeOptions = [
 
 const ChangeNodeType: FC<ChangeNodeTypeProps> = ({ editor }) => {
   return (
-    <div className="relative flex-1  border">
+    <div className="relative flex-1">
       <select
         name="heading"
         onChange={(e) => {

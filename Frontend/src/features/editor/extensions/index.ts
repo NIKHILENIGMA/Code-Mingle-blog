@@ -8,7 +8,7 @@ import Highlight from "@tiptap/extension-highlight";
 import Link from "@tiptap/extension-link";
 import { lowLightConfig } from "../config/lowLightConfig";
 import { SlashExtension } from "./SlashExtension";
-import { TitleNode } from "../nodes/title/TitleNode";
+// import { TitleNode } from "../nodes/title/TitleNode";
 import { ImageNode } from "../nodes/media/ImageNode";
 
 const extensions = [
@@ -16,9 +16,11 @@ const extensions = [
     heading: {
       levels: [1, 2, 3],
     },
+    codeBlock: false,
     code: {
       HTMLAttributes: {
-        class: "rounded-md bg-gray-100 dark:bg-gray-800 dark:text-white p-2",
+        class:
+          "rounded-md bg-gray-100 dark:bg-gray-800 text-black dark:text-white p-2",
       },
     },
     bulletList: {
@@ -28,12 +30,14 @@ const extensions = [
     },
     orderedList: {
       HTMLAttributes: {
-        class: "list-decimal pl-4 marker:text-blue-500  dark:marker:text-blue-300",
+        class:
+          "list-decimal pl-4 marker:text-blue-500  dark:marker:text-blue-300",
       },
     },
     blockquote: {
       HTMLAttributes: {
-        class: "border-l-4 border-gray-300 pl-4 dark:border-gray-600 text-black dark:text-white",
+        class:
+          "border-l-4 border-gray-300 pl-4 dark:border-gray-600 text-black dark:text-white",
       },
     },
     horizontalRule: {
@@ -41,10 +45,8 @@ const extensions = [
         class: "border-t-2 border-gray-300 dark:border-gray-600 my-4",
       },
     },
-    dropcursor: {
-      class: "drop-cursor text-black dark:text-white",
-      width: 4,
-    },
+  }).extend({
+    inclusive: false, 
   }),
   SlashExtension,
   Placeholder.configure({
@@ -61,6 +63,9 @@ const extensions = [
   CodeBlockLowlight.configure({
     lowlight: lowLightConfig,
     defaultLanguage: "javascript",
+    HTMLAttributes: {
+      class: "rounded-md bg-gray-100 dark:bg-gray-800",
+    },
   }),
   GlobalDragHandle.configure({
     dragHandleWidth: 15,
@@ -96,7 +101,7 @@ const extensions = [
   }).extend({
     inclusive: false,
   }),
-  TitleNode,
+  // TitleNode,
 ];
 
 export default extensions;

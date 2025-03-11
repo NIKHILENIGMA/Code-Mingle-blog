@@ -17,7 +17,7 @@ const ToolbarButton: React.FC<ToolbarButtonProps> = ({
     <Button
       variant={"link"}
       onClick={onClick}
-      className={`p-2 flex-1 border text-gray-300 hover:text-white hover:bg-[#F1F5F9] dark:hover:bg-[#0E0A06] rounded-md transition ${
+      className={`p-2 flex-1 text-gray-300 hover:text-white hover:bg-[#F1F5F9] dark:hover:bg-[#0E0A06] rounded-md transition ${
         isActive ? "bg-orange-400 rounded-lg p-2 text-black" : ""
       }`}
     >

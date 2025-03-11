@@ -16,7 +16,7 @@ interface AISuggestionProps {
 
 const AISuggestion: FC<AISuggestionProps> = () => {
   return (
-    <div className="relative flex-1 border">
+    <div className="relative flex-1">
       <select
         // onChange={(e: ChangeEvent<HTMLSelectElement>) => (
         //   editor.chain().focus().setNodeMarkup("aiSuggestion", { type: e.target.value }).run()
