@@ -95,7 +95,7 @@ export const BASIC_COMMANDS = [
   {
     title: "Code Block",
     action: ({ editor }: { editor: Editor }) => {
-      editor.chain().focus().clearContent().setCodeBlock().run();
+      editor.chain().focus().clearContent().toggleCodeBlock().run();
     },
     icon: Code,
     group: "Code",
