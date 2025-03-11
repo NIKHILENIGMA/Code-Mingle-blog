@@ -2,14 +2,21 @@ import { Extension } from "@tiptap/core";
 import { EditorState, Plugin, PluginKey } from "@tiptap/pm/state";
 import { EditorView } from "@tiptap/pm/view";
 import { ReactRenderer } from "@tiptap/react";
-import SlashMenu from "../components/SlashMenu";
+import SlashMenu from "../components/SlashCommand/SlashMenu";
 
+/**
+ * A Tiptap extension that adds slash command functionality to the editor
+ */
 export const SlashExtension = Extension.create({
   name: "slash",
   addProseMirrorPlugins() {
     let MenuRenderer: ReactRenderer | null = null;
 
-    // Get the text after the slash
+    /**
+     * Gets the text after the slash character in the current selection
+     * @param state - The editor state
+     * @returns The text after the slash, or empty string if no match
+     */
     const getText = (state: EditorState) => {
       const { $from } = state.selection;
       const text = $from.parent.textBetween(
@@ -26,13 +33,19 @@ export const SlashExtension = Extension.create({
       return "";
     };
 
+    /**
+     * Handles the up arrow key press in the menu
+     */
     const handleArrowUp = () => {
       if (MenuRenderer) {
         MenuRenderer.updateProps({ direction: "up" });
       }
     };
 
-    // Open the menu
+    /**
+     * Opens the slash command menu
+     * @param view - The editor view
+     */
     const openMenu = (view: EditorView) => {
       if (MenuRenderer) return;
 
@@ -51,13 +64,18 @@ export const SlashExtension = Extension.create({
       MenuRenderer.updateProps({}); // Force re-render
     };
 
-    // Close the menu
+    /**
+     * Closes and destroys the slash command menu
+     */
     const closeMenu = () => {
       MenuRenderer?.destroy();
       MenuRenderer = null;
     };
 
-    // Update the menu position
+    /**
+     * Updates the position and query of the slash command menu
+     * @param view - The editor view
+     */
     const updateMenuPosition = (view: EditorView) => {
       // Ensure the menu is open
       if (!MenuRenderer) return;
@@ -83,6 +101,12 @@ export const SlashExtension = Extension.create({
       new Plugin({
         key: new PluginKey("slashCommands"),
         props: {
+          /**
+           * Handles keyboard events for the slash command menu
+           * @param view - The editor view
+           * @param event - The keyboard event
+           * @returns true if the event was handled, false otherwise
+           */
           handleKeyDown: (view, event) => {
             if (event.key === "/") {
               openMenu(view); // Delay menu opening
