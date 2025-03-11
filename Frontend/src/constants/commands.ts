@@ -1,23 +1,24 @@
 import { Editor } from "@tiptap/core";
 import {
-  ArrowLeftToLine,
-  ArrowRightToLine,
-  AudioLines,
+  // ArrowLeftToLine,
+  // ArrowRightToLine,
+  // AudioLines,
+  // Eraser,
   Columns2,
-  Eraser,
   Heading1,
   Heading2,
   Heading3,
   Image,
   List,
   ListOrdered,
-  ListTodo,
+  // ListTodo,
   Code,
-  Mic,
+  // Mic,
   MonitorPlay,
-  SwatchBook,
+  // SwatchBook,
   Table,
   Text,
+  TextQuote,
 } from "@/Utils/Icons";
 
 export interface CommandInterface {
@@ -38,15 +39,8 @@ export const BASIC_COMMANDS = [
   {
     title: "Paragraph",
     action: ({ editor }: { editor: Editor }) => {
-      const { from, to } = editor.state.selection;
-      if (from === to) return;
-
-      editor
-        .chain()
-        .focus()
-        .deleteRange({ from, to })
-        .setNode("paragraph")
-        .run();
+      // const { from, to } = editor.state.selection;
+      editor.chain().focus().setNode("paragraph").run();
     },
     icon: Text,
     group: "Basic",
@@ -56,12 +50,10 @@ export const BASIC_COMMANDS = [
   {
     title: "Heading 1",
     action: ({ editor }: { editor: Editor }) => {
-      const { from, to } = editor.state.selection;
-      if (from === to) return;
       editor
         .chain()
         .focus()
-        .deleteRange({ from, to })
+        .clearContent()
         .setHeading({ level: 1 })
         .run();
     },
@@ -73,12 +65,10 @@ export const BASIC_COMMANDS = [
   {
     title: "Heading 2",
     action: ({ editor }: { editor: Editor }) => {
-      const { from, to } = editor.state.selection;
-      if (from === to) return;
       editor
         .chain()
         .focus()
-        .deleteRange({ from, to })
+        .clearContent()
         .setHeading({ level: 2 })
         .run();
     },
@@ -90,12 +80,10 @@ export const BASIC_COMMANDS = [
   {
     title: "Heading 3",
     action: ({ editor }: { editor: Editor }) => {
-      const { from, to } = editor.state.selection;
-      if (from === to) return;
       editor
         .chain()
         .focus()
-        .deleteRange({ from, to })
+        .clearContent()
         .setHeading({ level: 3 })
         .run();
     },
@@ -107,26 +95,17 @@ export const BASIC_COMMANDS = [
   {
     title: "Code Block",
     action: ({ editor }: { editor: Editor }) => {
-      const { from, to } = editor.state.selection;
-      if (from === to) return;
-      editor.chain().focus().deleteRange({ from, to }).setCodeBlock().run();
+      editor.chain().focus().clearContent().setCodeBlock().run();
     },
     icon: Code,
-    group: "Basic",
+    group: "Code",
     description: "Add a code block",
     shortcut: "```",
   },
   {
     title: "Divider",
     action: ({ editor }: { editor: Editor }) => {
-      const { from, to } = editor.state.selection;
-      if (from === to) return;
-      editor
-        .chain()
-        .focus()
-        .deleteRange({ from, to })
-        .setHorizontalRule()
-        .run();
+      editor.chain().focus().clearContent().setHorizontalRule().run();
     },
     icon: Columns2,
     group: "Basic",
@@ -134,11 +113,19 @@ export const BASIC_COMMANDS = [
     shortcut: "---",
   },
   {
+    title: "Block Quote",
+    action: ({ editor }: { editor: Editor }) => {
+      editor.chain().focus().clearContent().setBlockquote().run();
+    },
+    icon: TextQuote,
+    group: "Quote",
+    description: "Add a block quote",
+    shortcut: "cntrl + shift + q",
+  },
+  {
     title: "Bullet List",
     action: ({ editor }: { editor: Editor }) => {
-      const { from, to } = editor.state.selection;
-      if (from === to) return;
-      editor.chain().focus().deleteRange({ from, to }).toggleBulletList().run();
+      editor.chain().focus().toggleBulletList().run();
     },
     icon: List,
     group: "List",
@@ -148,81 +135,77 @@ export const BASIC_COMMANDS = [
   {
     title: "Number List",
     action: ({ editor }: { editor: Editor }) => {
-      const { from, to } = editor.state.selection;
-      if (from === to) return;
-      editor
-        .chain()
-        .focus()
-        .deleteRange({ from, to })
-        .toggleOrderedList()
-        .run();
+      editor.chain().focus().toggleOrderedList().run();
     },
     icon: ListOrdered,
     group: "List",
     description: "Add an ordered list",
     shortcut: "cntrl + shift + 7",
   },
-  {
-    title: "Task List",
-    action: ({ editor }: { editor: Editor }) => {
-      const { from, to } = editor.state.selection;
-      if (from === to) return;
-      editor.chain().focus().deleteRange({ from, to }).toggleTaskList().run();
-    },
-    icon: ListTodo,
-    group: "List",
-    description: "Add a task list",
-    shortcut: "cntrl + shift + 9",
-  },
-  {
-    title: "Simplify text",
-    action: ({ editor }: { editor: Editor }) =>
-      editor.chain().focus().setHeading({ level: 1 }).run(),
-    icon: SwatchBook,
-    group: "Artificial Intelligence",
-    description: "Simplify the text",
-    shortcut: "#",
-  },
-  {
-    title: "Spelling & Grammar",
-    action: ({ editor }: { editor: Editor }) =>
-      editor.chain().focus().setHeading({ level: 2 }).run(),
-    icon: Eraser,
-    group: "Artificial Intelligence",
-    description: "Summarize the text",
-    shortcut: "##",
-  },
-  {
-    title: "Make longer",
-    action: ({ editor }: { editor: Editor }) =>
-      editor.chain().focus().setHeading({ level: 3 }).run(),
-    icon: ArrowRightToLine,
-    group: "Artificial Intelligence",
-    description: "Expand the text",
-    shortcut: "###",
-  },
-  {
-    title: "Make shorter",
-    action: ({ editor }: { editor: Editor }) =>
-      editor.chain().focus().setNode("paragraph").run(),
-    icon: ArrowLeftToLine,
-    group: "Artificial Intelligence",
-    description: "Make the text shorter",
-    shortcut: "cntrl + shift + p",
-  },
-  {
-    title: "Change tone",
-    action: ({ editor }: { editor: Editor }) =>
-      editor.chain().focus().setNode("paragraph").run(),
-    icon: Mic,
-    group: "Artificial Intelligence",
-    description: "Change the tone of the text",
-    shortcut: "cntrl + shift + p",
-  },
+  // {
+  //   title: "Task List",
+  //   action: ({ editor }: { editor: Editor }) => {
+  //     editor.chain().focus()
+  //   },
+  //   icon: ListTodo,
+  //   group: "List",
+  //   description: "Add a task list",
+  //   shortcut: "cntrl + shift + 9",
+  // },
+  // {
+  //   title: "Simplify text",
+  //   action: ({ editor }: { editor: Editor }) =>
+  //     editor.chain().focus().setHeading({ level: 1 }).run(),
+  //   icon: SwatchBook,
+  //   group: "Artificial Intelligence",
+  //   description: "Simplify the text",
+  //   shortcut: "#",
+  // },
+  // {
+  //   title: "Spelling & Grammar",
+  //   action: ({ editor }: { editor: Editor }) =>
+  //     editor.chain().focus().setHeading({ level: 2 }).run(),
+  //   icon: Eraser,
+  //   group: "Artificial Intelligence",
+  //   description: "Summarize the text",
+  //   shortcut: "##",
+  // },
+  // {
+  //   title: "Make longer",
+  //   action: ({ editor }: { editor: Editor }) =>
+  //     editor.chain().focus().setHeading({ level: 3 }).run(),
+  //   icon: ArrowRightToLine,
+  //   group: "Artificial Intelligence",
+  //   description: "Expand the text",
+  //   shortcut: "###",
+  // },
+  // {
+  //   title: "Make shorter",
+  //   action: ({ editor }: { editor: Editor }) =>
+  //     editor.chain().focus().setNode("paragraph").run(),
+  //   icon: ArrowLeftToLine,
+  //   group: "Artificial Intelligence",
+  //   description: "Make the text shorter",
+  //   shortcut: "cntrl + shift + p",
+  // },
+  // {
+  //   title: "Change tone",
+  //   action: ({ editor }: { editor: Editor }) =>
+  //     editor.chain().focus().setNode("paragraph").run(),
+  //   icon: Mic,
+  //   group: "Artificial Intelligence",
+  //   description: "Change the tone of the text",
+  //   shortcut: "cntrl + shift + p",
+  // },
   {
     title: "Image",
     action: ({ editor }: { editor: Editor }) =>
-      editor.chain().focus().setImage({ src: "" }).run(),
+      editor
+        .chain()
+        .focus()
+        .clearContent()
+        .setImage({ src: "" })
+        .run(),
     icon: Image,
     group: "Media",
     description: "Add an image",
@@ -231,21 +214,26 @@ export const BASIC_COMMANDS = [
   {
     title: "Youtube",
     action: ({ editor }: { editor: Editor }) =>
-      editor.chain().focus().setYoutubeVideo({ src: "" }).run(),
+      editor
+        .chain()
+        .focus()
+        .deleteNode("paragraph")
+        .setYoutubeVideo({ src: "" })
+        .run(),
     icon: MonitorPlay,
     group: "Media",
     description: "Add a youtube video link",
     shortcut: "%youtube",
   },
-  {
-    title: "Audio",
-    action: ({ editor }: { editor: Editor }) =>
-      editor.chain().focus().setHeading({ level: 3 }).run(),
-    icon: AudioLines,
-    group: "Media",
-    description: "Add an audio file",
-    shortcut: "%audio",
-  },
+  // {
+  //   title: "Audio",
+  //   action: ({ editor }: { editor: Editor }) =>
+  //     editor.chain().focus().setHeading({ level: 3 }).run(),
+  //   icon: AudioLines,
+  //   group: "Media",
+  //   description: "Add an audio file",
+  //   shortcut: "%audio",
+  // },
 ];
 
 /**
