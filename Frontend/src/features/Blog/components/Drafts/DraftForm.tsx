@@ -1,6 +1,6 @@
 import { FC, useEffect } from "react";
 import ShowBlogCoverImage from "@/features/Blog/components/BlogImages/ShowBlogCoverImage";
-import TiptapEditor from "@/features/Blog/components/Editor/TipTapEditor";
+import TiptapEditor from "@/features/editor/components/TiptapEditor/TipTapEditor";
 import CoverImagePopover from "@/features/Blog/components/BlogImages/CoverImagePopover";
 import { useImage } from "../../hooks/useImage";
 import DraftTitle from "./DraftTitle";
