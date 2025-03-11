@@ -1,7 +1,7 @@
 import React from "react";
 import { House } from "@/Utils/Icons";
 import { Textarea } from "@/components/ui/textarea";
-import TiptapEditor from "@/features/Blog/components/Editor/TipTapEditor";
+import TiptapEditor from "@/features/editor/components/TiptapEditor/TipTapEditor";
 import { Button } from "@/components";
 import { useNavigate } from "react-router-dom";
 import { ModeToggle } from "@/components/mode-toggle";
