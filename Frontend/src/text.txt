@@ -165,3 +165,357 @@ const {
       queryClient.invalidateQueries({ queryKey: ["drafts"] });
     },
   });
+
+
+//------------------- Slash Extension -----------------------------
+import { Extension } from "@tiptap/core";
+import { EditorState, Plugin, PluginKey } from "@tiptap/pm/state";
+import { EditorView } from "@tiptap/pm/view";
+import { ReactRenderer } from "@tiptap/react";
+import SlashMenu from "../components/SlashMenu";
+
+export const SlashExtension = Extension.create({
+  name: "slash",
+  addProseMirrorPlugins() {
+    let MenuRenderer: ReactRenderer | null = null;
+
+    /**
+     * Gets the text after the slash character in the current selection
+     * @param state - The editor state
+     * @returns The text after the slash, or empty string if no match
+     */
+    const getText = (state: EditorState) => {
+      const { $from } = state.selection;
+      const text = $from.parent.textBetween(
+        0,
+        $from.pos - $from.start(),
+        "",
+        "\0"
+      );
+
+      const match = text.match(/\/([a-z]*)$/i);
+      if (match) {
+        return match[1];
+      }
+      return "";
+    };
+
+    /**
+     * Handles the up arrow key press in the menu
+     */
+    const handleArrowUp = () => {
+      if (MenuRenderer) {
+        MenuRenderer.updateProps({ direction: "up" });
+      }
+    };
+
+    /**
+     * Opens the slash command menu
+     * @param view - The editor view
+     */
+    const openMenu = (view: EditorView) => {
+      if (MenuRenderer) return;
+
+      MenuRenderer = new ReactRenderer(SlashMenu, {
+        props: {
+          editor: this.editor,
+          onClose: closeMenu,
+        },
+        editor: this.editor,
+      });
+
+      updateMenuPosition(view);
+
+      // Ensure it attaches to the document
+      document.body.appendChild(MenuRenderer.element);
+      MenuRenderer.updateProps({}); // Force re-render
+    };
+
+    /**
+     * Closes and destroys the slash command menu
+     */
+    const closeMenu = () => {
+      MenuRenderer?.destroy();
+      MenuRenderer = null;
+    };
+
+    /**
+     * Updates the position and query of the slash command menu
+     * @param view - The editor view
+     */
+    const updateMenuPosition = (view: EditorView) => {
+      // Ensure the menu is open
+      if (!MenuRenderer) return;
+
+      // Get the text after the slash
+      const slashText = getText(view.state);
+
+      // Update the query prop
+      MenuRenderer.updateProps({ query: slashText });
+
+      // Get the position of the cursor
+      const { left, top } = view.coordsAtPos(view.state.selection.$from.pos);
+      Object.assign((MenuRenderer.element as HTMLElement).style, {
+        position: "absolute",
+        left: `${left}px`,
+        top: `${top + 30}px`,
+        background: "white",
+        zIndex: "1000",
+      });
+    };
+
+    return [
+      new Plugin({
+        key: new PluginKey("slashCommands"),
+        props: {
+          /**
+           * Handles keyboard events for the slash command menu
+           * @param view - The editor view
+           * @param event - The keyboard event
+           * @returns true if the event was handled, false otherwise
+           */
+          handleKeyDown: (view, event) => {
+            if (event.key === "/") {
+              openMenu(view); // Delay menu opening
+              return false; // Allow the `/` to be inserted
+            }
+            if (MenuRenderer) {
+              updateMenuPosition(view);
+            }
+            // Close the menu on enter
+            if (MenuRenderer && event.key === "Enter") {
+              closeMenu();
+              return true;
+            }
+            // Close the menu on backspace
+            if (event.key === "Backspace" && MenuRenderer) {
+              const text = getText(view.state);
+              if (text === "") {
+                closeMenu();
+              }
+            }
+
+            // Change the selection in the menu
+            if (MenuRenderer && event.key === "ArrowUp") {
+              handleArrowUp();
+              return true;
+            } else if (MenuRenderer && event.key === "ArrowDown") {
+              MenuRenderer.updateProps({ direction: "down" });
+              return true;
+            }
+
+            // Close the menu on escape
+            if (MenuRenderer && event.key === "Escape") {
+              closeMenu();
+              return true;
+            }
+
+            return false;
+          },
+        },
+      }),
+    ];
+  },
+});
+
+
+----------------------------------- Link Button ---------------------------------------------
+import { FC, MouseEvent, useEffect, useState } from "react";
+import { Button, Input, Label } from "@/components";
+import { Link } from "@/Utils/Icons";
+import { Editor } from "@tiptap/core";
+
+interface LinkButtonProps {
+  editor: Editor;
+}
+
+interface ErrorText {
+  anchorError: string;
+  urlError: string;
+}
+
+const getTheSelectedText = (editor: Editor): string => {
+  const { from, to } = editor.state.selection;
+  const text = editor.state.doc.textBetween(from, to);
+  return text;
+};
+
+const LinkButton: FC<LinkButtonProps> = ({ editor }) => {
+  const [url, setUrl] = useState<string>("");
+  const [anchorText, setAnchorText] = useState<string>(
+    getTheSelectedText(editor)
+  );
+  const [linkMenu, setLinkMenu] = useState<boolean>(false);
+  const [isActive, setIsActive] = useState(false);
+  const [error, setError] = useState<boolean>(false);
+  const [errorText, setErrorText] = useState<ErrorText>({
+    anchorError: "",
+    urlError: "",
+  });
+
+  const handleOpenLinkMenu = (e: MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    setLinkMenu(true);
+  };
+
+  const isHyperlinkValid = (url: string): boolean => {
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    setUrl(value);
+    setError(false);
+  };
+
+  const handleAchorTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setAnchorText(value);
+
+    if (value.trim() === "") {
+      setError(true);
+      setErrorText({
+        anchorError: "Anchor text cannot be empty",
+        urlError: "",
+      });
+    } else {
+      setError(false);
+      setErrorText({ anchorError: "", urlError: "" });
+    }
+  };
+
+  const handleInsertLink = () => {
+    // Check if the URL is valid
+    if (!isHyperlinkValid(url)) {
+      setError(true);
+      setErrorText({
+        anchorError: "",
+        urlError: "Invalid URL",
+      });
+      return;
+    }
+
+    // Check if the anchor text is empty
+    if (anchorText.trim() === "") {
+      setError(true);
+      setErrorText({
+        anchorError: "Anchor text cannot be empty",
+        urlError: "",
+      });
+      return;
+    }
+
+    editor
+      .chain()
+      .focus()
+      .deleteSelection()
+      .insertContent(`<a href="${url}">${anchorText}</a>`)
+      .run();
+
+    // Move cursor outside the link
+    editor.commands.insertContent(" ");
+
+    setLinkMenu(false);
+    setIsActive(false);
+    setUrl("");
+    setAnchorText("");
+  };
+
+  const handleUnLink = () => {
+    editor.chain().focus().unsetLink().run();
+    setLinkMenu(false);
+    setIsActive(false);
+    setUrl("");
+    setAnchorText("");
+  };
+
+  useEffect(() => {
+    editor.isActive("link");
+
+    return () => {
+      editor.off("selectionUpdate");
+    };
+  }, [editor]);
+
+  useEffect(() => {
+    setIsActive(editor.isActive("link"));
+  }, [editor]);
+
+  return (
+    <div className="relative flex-1 border">
+      <Button
+        variant={"link"}
+        onClick={handleOpenLinkMenu}
+        className={`p-2 text-gray-300 hover:text-white hover:bg-[#F1F5F9] dark:hover:bg-[#0E0A06] rounded-md transition ${
+          isActive ? "bg-orange-400 rounded-lg p-2 text-black" : ""
+        }`}
+      >
+        <Link />
+      </Button>
+      {linkMenu && (
+        <div className="absolute top-10 left-0 w-[20vw] bg-white dark:bg-slate-800 shadow-md rounded-lg border border-gray-200 space-y-2 z-30 p-5">
+          <div className="flex items-center justify-between relative">
+            <h2 className="text-lg font-bold text-slate-800 dark:text-white">
+              Add Hyperlink to text
+            </h2>
+            <Button
+              variant="default"
+              onClick={() => setLinkMenu(false)}
+              aria-label="Close link menu"
+              className="absolute -top-2 -right-2 h-6 w-6 flex justify-center items-center rounded-lg shadow-md"
+            >
+              &times;
+            </Button>
+          </div>
+
+          <div>
+            <Label htmlFor="anchor">Anchor</Label>
+            <Input
+              type="text"
+              id="anchor"
+              value={anchorText}
+              placeholder="Enter the URL link"
+              className="w-full p-2 border border-gray-200 dark:border-gray-700 rounded-md"
+              onChange={handleAchorTextChange}
+            />
+            {error && <p className="text-red-500">{errorText.anchorError}</p>}
+          </div>
+
+          <div>
+            <Label htmlFor="hyperlink">Hyperlink</Label>
+            <Input
+              type="text"
+              id="hyperlink"
+              value={url}
+              placeholder="Enter the URL link"
+              className="w-full p-2 border focus:ring-2 focus:ring-orange-500 border-gray-200 dark:border-gray-700 rounded-md"
+              onChange={handleInputChange}
+            />
+            {error && <p className="text-red-500">{errorText.urlError}</p>}
+          </div>
+          <div>
+            <Button variant={"default"} onClick={handleInsertLink}>
+              Apply
+            </Button>
+            <Button
+              disabled={!isActive}
+              variant={"link"}
+              onClick={handleUnLink}
+            >
+              Clear
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default LinkButton;
+
+
