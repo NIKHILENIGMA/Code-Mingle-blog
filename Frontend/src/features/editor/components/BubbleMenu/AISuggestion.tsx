@@ -1,34 +1,131 @@
-import { 
-  // ChangeEvent, 
-  FC } from "react";
+import {
+  // ChangeEvent,
+  FC,
+  useState,
+} from "react";
 import { Editor } from "@tiptap/core";
+import {
+  ArrowLeftToLine,
+  ArrowRightToLine,
+  Languages,
+  Mic,
+  SwatchBook,
+  Wand,
+} from "@/Utils/Icons";
 
-const options = [
-  { value: "simplify", label: "Simplify" },
-  { value: "tone-change", label: "Tone" },
-  { value: "language-translate", label: "Language" },
-  { value: "make-long", label: "Make Long" },
-  { value: "make-short", label: "Make Short" },
-];
 interface AISuggestionProps {
   editor: Editor;
 }
-
 const AISuggestion: FC<AISuggestionProps> = () => {
+  const [menu, setMenu] = useState<boolean>(false);
+
+  const handleShowMenu = () => {
+    console.log("Button clicked");
+    setMenu((prev) => !prev);
+  };
+
   return (
-    <div className="relative flex-1">
-      <select
-        // onChange={(e: ChangeEvent<HTMLSelectElement>) => (
-        //   editor.chain().focus().setNodeMarkup("aiSuggestion", { type: e.target.value }).run()
-        // )}
-        className="block min-w-[100px] appearance-none p-2 text-black bg-[#fff] hover:bg-slate-100 dark:bg-[#1E293B] dark:text-white rounded-md transition focus:ring-2 focus:ring-blue-500 focus:outline-none"
+    <div>
+      <button
+        onClick={handleShowMenu}
+        className="flex items-center justify-center w-full p-2 space-x-2"
       >
-        {options.map((opt, index) => (
-          <option key={`${opt.label}` + `${index}`} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
+        <Wand />
+        Ask AI
+      </button>
+
+      {menu ? (
+        <div className="absolute w-58 top-full mt-1 left-0 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
+          <ol className="py-2">
+            <li className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
+              <SwatchBook className="w-5 h-5 mr-3 text-gray-500 dark:text-gray-400" />
+              <span className="text-sm font-medium">Simplify</span>
+            </li>
+            <li className="relative flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors group">
+              <Mic className="w-5 h-5 mr-3 text-gray-500 dark:text-gray-400" />
+              <span className="text-sm font-medium">Tone</span>
+
+              <ol className="absolute left-full top-0 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 hidden group-hover:block">
+                <li className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
+                  <Mic className="w-5 h-5 mr-3 text-gray-500 dark:text-gray-400" />
+                  <span className="text-sm font-medium">Formal</span>
+                </li>
+                <li className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
+                  <Mic className="w-5 h-5 mr-3 text-gray-500 dark:text-gray-400" />
+                  <span className="text-sm font-medium">Informal</span>
+                </li>
+                <li className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
+                  <Mic className="w-5 h-5 mr-3 text-gray-500 dark:text-gray-400" />
+                  <span className="text-sm font-medium">Optimistic</span>
+                </li>
+                <li className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
+                  <Mic className="w-5 h-5 mr-3 text-gray-500 dark:text-gray-400" />
+                  <span className="text-sm font-medium">Friendly</span>
+                </li>
+                <li className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
+                  <Mic className="w-5 h-5 mr-3 text-gray-500 dark:text-gray-400" />
+                  <span className="text-sm font-medium">Assertive</span>
+                </li>
+                <li className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
+                  <Mic className="w-5 h-5 mr-3 text-gray-500 dark:text-gray-400" />
+                  <span className="text-sm font-medium">Curious</span>
+                </li>
+                <li className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
+                  <Mic className="w-5 h-5 mr-3 text-gray-500 dark:text-gray-400" />
+                  <span className="text-sm font-medium">Persuasive</span>
+                </li>
+              </ol>
+            </li>
+            <li className="relative flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
+              <Languages className="w-5 h-5 mr-3 text-gray-500 dark:text-gray-400" />
+              <span className="text-sm font-medium">Traslation</span>
+
+              <ol className="absolute left-full top-0 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 hidden group-hover:block">
+                <li className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
+                  <Mic className="w-5 h-5 mr-3 text-gray-500 dark:text-gray-400" />
+                  <span className="text-sm font-medium">Chinese</span>
+                </li>
+                <li className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
+                  <Mic className="w-5 h-5 mr-3 text-gray-500 dark:text-gray-400" />
+                  <span className="text-sm font-medium">English</span>
+                </li>
+                <li className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
+                  <Mic className="w-5 h-5 mr-3 text-gray-500 dark:text-gray-400" />
+                  <span className="text-sm font-medium">French</span>
+                </li>
+                <li className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
+                  <Mic className="w-5 h-5 mr-3 text-gray-500 dark:text-gray-400" />
+                  <span className="text-sm font-medium">German</span>
+                </li>
+                <li className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
+                  <Mic className="w-5 h-5 mr-3 text-gray-500 dark:text-gray-400" />
+                  <span className="text-sm font-medium">Greek</span>
+                </li>
+                <li className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
+                  <Mic className="w-5 h-5 mr-3 text-gray-500 dark:text-gray-400" />
+                  <span className="text-sm font-medium">Japanese</span>
+                </li>
+                <li className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
+                  <Mic className="w-5 h-5 mr-3 text-gray-500 dark:text-gray-400" />
+                  <span className="text-sm font-medium">Russian</span>
+                </li>
+                <li className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
+                  <Mic className="w-5 h-5 mr-3 text-gray-500 `dark:text-gray-400" />
+                  <span className="text-sm font-medium">Spanish</span>
+                </li>
+              </ol>
+            </li>
+            <li className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
+              <ArrowRightToLine className="w-5 h-5 mr-3 text-gray-500 dark:text-gray-400" />
+              <span className="text-sm font-medium">Make Long</span>
+            </li>
+            <li className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
+              <ArrowLeftToLine className="w-5 h-5 mr-3 text-gray-500 dark:text-gray-400" />
+              <span className="text-sm font-medium">Make Short</span>
+            </li>
+          </ol>
+        </div>
+      ) : null}
     </div>
   );
 };

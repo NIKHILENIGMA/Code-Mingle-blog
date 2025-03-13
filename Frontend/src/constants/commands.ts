@@ -50,10 +50,13 @@ export const BASIC_COMMANDS = [
   {
     title: "Heading 1",
     action: ({ editor }: { editor: Editor }) => {
+      const selection = editor.view.state.selection;
+      const from = selection.$from.posAtIndex(0);
+      const to = selection.$from.posAtIndex(1);
       editor
         .chain()
         .focus()
-        .clearContent()
+        .deleteRange({ from, to })
         .setHeading({ level: 1 })
         .run();
     },
@@ -65,10 +68,13 @@ export const BASIC_COMMANDS = [
   {
     title: "Heading 2",
     action: ({ editor }: { editor: Editor }) => {
+      const selection = editor.view.state.selection;
+      const from = selection.$from.posAtIndex(0);
+      const to = selection.$from.posAtIndex(1);
       editor
         .chain()
         .focus()
-        .clearContent()
+        .deleteRange({ from, to })
         .setHeading({ level: 2 })
         .run();
     },
@@ -80,10 +86,14 @@ export const BASIC_COMMANDS = [
   {
     title: "Heading 3",
     action: ({ editor }: { editor: Editor }) => {
+      const selection = editor.view.state.selection;
+      const from = selection.$from.posAtIndex(0);
+      const to = selection.$from.posAtIndex(1);
+
       editor
         .chain()
         .focus()
-        .clearContent()
+        .deleteRange({ from, to })
         .setHeading({ level: 3 })
         .run();
     },
@@ -95,7 +105,11 @@ export const BASIC_COMMANDS = [
   {
     title: "Code Block",
     action: ({ editor }: { editor: Editor }) => {
-      editor.chain().focus().clearContent().toggleCodeBlock().run();
+      const selection = editor.view.state.selection;
+      const from = selection.$from.posAtIndex(0);
+      const to = selection.$from.posAtIndex(1);
+
+      editor.chain().focus().deleteRange({ from, to }).toggleCodeBlock().run();
     },
     icon: Code,
     group: "Code",
@@ -105,7 +119,16 @@ export const BASIC_COMMANDS = [
   {
     title: "Divider",
     action: ({ editor }: { editor: Editor }) => {
-      editor.chain().focus().clearContent().setHorizontalRule().run();
+      const selection = editor.view.state.selection;
+      const from = selection.$from.posAtIndex(0);
+      const to = selection.$from.posAtIndex(1);
+
+      editor
+        .chain()
+        .focus()
+        .deleteRange({ from, to })
+        .setHorizontalRule()
+        .run();
     },
     icon: Columns2,
     group: "Basic",
@@ -115,7 +138,11 @@ export const BASIC_COMMANDS = [
   {
     title: "Block Quote",
     action: ({ editor }: { editor: Editor }) => {
-      editor.chain().focus().clearContent().setBlockquote().run();
+      const selection = editor.view.state.selection;
+      const from = selection.$from.posAtIndex(0);
+      const to = selection.$from.posAtIndex(1);
+
+      editor.chain().focus().deleteRange({ from, to }).setBlockquote().run();
     },
     icon: TextQuote,
     group: "Quote",
@@ -125,7 +152,11 @@ export const BASIC_COMMANDS = [
   {
     title: "Bullet List",
     action: ({ editor }: { editor: Editor }) => {
-      editor.chain().focus().toggleBulletList().run();
+      const selection = editor.view.state.selection;
+      const from = selection.$from.posAtIndex(0);
+      const to = selection.$from.posAtIndex(1);
+
+      editor.chain().focus().deleteRange({ from, to }).toggleBulletList().run();
     },
     icon: List,
     group: "List",
@@ -135,7 +166,16 @@ export const BASIC_COMMANDS = [
   {
     title: "Number List",
     action: ({ editor }: { editor: Editor }) => {
-      editor.chain().focus().toggleOrderedList().run();
+      const selection = editor.view.state.selection;
+      const from = selection.$from.posAtIndex(0);
+      const to = selection.$from.posAtIndex(1);
+
+      editor
+        .chain()
+        .focus()
+        .deleteRange({ from, to })
+        .toggleOrderedList()
+        .run();
     },
     icon: ListOrdered,
     group: "List",
@@ -199,13 +239,18 @@ export const BASIC_COMMANDS = [
   // },
   {
     title: "Image",
-    action: ({ editor }: { editor: Editor }) =>
+    action: ({ editor }: { editor: Editor }) => {
+      const selection = editor.view.state.selection;
+      const from = selection.$from.posAtIndex(0);
+      const to = selection.$from.posAtIndex(1);
+
       editor
         .chain()
         .focus()
-        .clearContent()
+        .deleteRange({ from, to })
         .setImage({ src: "" })
-        .run(),
+        .run();
+    },
     icon: Image,
     group: "Media",
     description: "Add an image",
@@ -213,13 +258,18 @@ export const BASIC_COMMANDS = [
   },
   {
     title: "Youtube",
-    action: ({ editor }: { editor: Editor }) =>
+    action: ({ editor }: { editor: Editor }) => {
+      const selection = editor.view.state.selection;
+      const from = selection.$from.posAtIndex(0);
+      const to = selection.$from.posAtIndex(1);
+
       editor
         .chain()
         .focus()
-        .deleteNode("paragraph")
+        .deleteRange({ from, to })
         .setYoutubeVideo({ src: "" })
-        .run(),
+        .run();
+    },
     icon: MonitorPlay,
     group: "Media",
     description: "Add a youtube video link",
