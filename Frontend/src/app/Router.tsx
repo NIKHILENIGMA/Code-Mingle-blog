@@ -7,7 +7,7 @@ import { AllPostsPage, CreatePostPage, ReadPostPage } from "@/pages";
 import DraftLayout from "@/features/Blog/Layout/DraftLayout";
 // import AuthProvider from "@/features/auth/components/AuthProvider";
 import PreviewPostPage from "@/pages/Blog/PreviewPostPage";
-import PrivateRoute from "@/components/PrivateRoute";
+// import PrivateRoute from "@/components/PrivateRoute";
 import ProfileSettings from "@/features/Profile/pages/ProfileSetting";
 import PersonalSettings from "@/features/Profile/pages/PersonalSettings";
 import ProfileSecurity from "@/features/Profile/pages/ProfileSecurity";
@@ -39,9 +39,9 @@ const router = createBrowserRouter([
       {
         path: "/profile/me",
         element: (
-          <PrivateRoute>
+          // <PrivateRoute>
             <UserDashboard />
-          </PrivateRoute>
+          // </PrivateRoute>
         ),
         children: [],
       },
@@ -49,27 +49,27 @@ const router = createBrowserRouter([
         path: "/profile/settings",
         element: (
           // <PrivateRoute>
-            <ProfileSettings />
+          <ProfileSettings />
           // </PrivateRoute>
         ),
         children: [
           {
             path: "general-details",
-            element: <GeneralDetails />
+            element: <GeneralDetails />,
           },
           {
             path: "personal-settings",
-            element: <PersonalSettings />
+            element: <PersonalSettings />,
           },
           {
             path: "security",
-            element: <ProfileSecurity />
+            element: <ProfileSecurity />,
           },
           {
             path: "account",
-            element: <AccountSettings />
+            element: <AccountSettings />,
           },
-        ]
+        ],
       },
     ],
   },
@@ -77,10 +77,10 @@ const router = createBrowserRouter([
   {
     path: "/draft",
     element: (
-      <PrivateRoute>
-        {" "}
-        <DraftLayout />{" "}
-      </PrivateRoute>
+      // <PrivateRoute>
+
+      <DraftLayout />
+      // </PrivateRoute>
     ),
     children: [
       {
