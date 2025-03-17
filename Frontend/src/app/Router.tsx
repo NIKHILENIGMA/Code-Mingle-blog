@@ -3,17 +3,19 @@ import HomePage from "../pages/Public/HomePage";
 import React from "react";
 import AboutPage from "../pages/Public/AboutPage";
 import Main from "@/Layout/Main";
-import { AllPostsPage, CreatePostPage, ReadPostPage } from "@/pages";
-import DraftLayout from "@/features/Blog/Layout/DraftLayout";
-// import AuthProvider from "@/features/auth/components/AuthProvider";
+import DraftLayout from "@/features/drafts/Layout/DraftLayout";
 import PreviewPostPage from "@/pages/Blog/PreviewPostPage";
-// import PrivateRoute from "@/components/PrivateRoute";
+// import AuthProvider from "@/features/auth/components/AuthProvider";
+import PrivateRoute from "@/components/PrivateRoute";
 import ProfileSettings from "@/features/Profile/pages/ProfileSetting";
 import PersonalSettings from "@/features/Profile/pages/PersonalSettings";
 import ProfileSecurity from "@/features/Profile/pages/ProfileSecurity";
 import AccountSettings from "@/features/Profile/pages/AccountSettings";
 import GeneralDetails from "@/features/Profile/pages/GeneralDetails";
 import UserDashboard from "@/features/Profile/pages/UserDashboard";
+import DraftPage from "@/features/drafts/pages/DraftPage";
+import ReadPostPage from "@/features/Blog/pages/ReadPostPage";
+import AllPostsPage from "@/features/Blog/pages/AllPostsPage";
 
 const router = createBrowserRouter([
   {
@@ -33,14 +35,14 @@ const router = createBrowserRouter([
         element: <AllPostsPage />,
       },
       {
-        path: "/posts/:postId",
+        path: "/posts/123",
         element: <ReadPostPage />,
       },
       {
         path: "/profile/me",
         element: (
           // <PrivateRoute>
-            <UserDashboard />
+          <UserDashboard />
           // </PrivateRoute>
         ),
         children: [],
@@ -77,21 +79,20 @@ const router = createBrowserRouter([
   {
     path: "/draft",
     element: (
-      // <PrivateRoute>
-
-      <DraftLayout />
-      // </PrivateRoute>
+      <PrivateRoute>
+        <DraftLayout />
+      </PrivateRoute>
     ),
     children: [
       {
         path: ":draftId",
-        element: <CreatePostPage />,
-      },
-      {
-        path: ":draftId/preview",
-        element: <PreviewPostPage />,
+        element: <DraftPage />,
       },
     ],
+  },
+  {
+    path: "/preview/:draftId",
+    element: <PreviewPostPage />,
   },
   {
     path: "/learn",
