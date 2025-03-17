@@ -2,6 +2,7 @@ import { Router } from 'express'
 import { isAuthenticated, validateBody, validateParams, validateQuery } from '../../../../middleware'
 import {
     archivePublishedPost,
+    checkIsSlugAvailable,
     deletePublishedPost,
     fetchPublishedPost,
     fetchPublishedPosts,
@@ -30,7 +31,7 @@ router.use(isAuthenticated)
 /**
  * ! Route to publish a post
  * @method POST
- * @route /api/v1/post/new
+ * @route /api/v1/published/new
  * @access Private
  */
 
@@ -39,7 +40,7 @@ router.route('/new').post(validateBody(PublishBodySchema), publishPost)
 /**
  * ! Route to update a published post
  * @method PATCH
- * @route /api/v1/post/:id
+ * @route /api/v1/published/:id
  * @access Private
  *
  */
@@ -48,15 +49,23 @@ router.route('/:id').patch(validateParams(PublishParamsSchema), validateBody(Upd
 /**
  * ! Route to delete a published post
  * @method DELETE
- * @route /api/v1/post/:id
+ * @route /api/v1/published/:id
  * @access Private
  */
 router.route('/:id').delete(validateParams(PublishParamsSchema), deletePublishedPost)
 
 /**
+ * ! Route to check if a slug is available
+ * @method POST
+ * @route /api/v1/published/:id
+ * @access Private
+ */
+router.route('/:id').post(checkIsSlugAvailable)
+
+/**
  * ! Route to change the published post to an archived post
  * @method POST
- * @route /api/v1/post/:id
+ * @route /api/v1/published/:id
  * @access Private
  */
 router.route('/:id').post(validateParams(PublishParamsSchema), archivePublishedPost)
@@ -64,7 +73,7 @@ router.route('/:id').post(validateParams(PublishParamsSchema), archivePublishedP
 /**
  * ! Route to get all user published posts
  * @method GET
- * @route /api/v1/post/
+ * @route /api/v1/published/
  * @access Public
  */
 
@@ -73,7 +82,7 @@ router.route('/').get(validateQuery(PublishedQueryParameterSchema), validateBody
 /**
  * ! Route to get a published post
  * @method GET
- * @route /api/v1/post/:id
+ * @route /api/v1/published/:id
  * @access Public
  *
  */

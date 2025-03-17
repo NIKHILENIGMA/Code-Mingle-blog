@@ -11,7 +11,7 @@ import { PublishPostBody, PublishPostPayload, UpdatePublishedPost, PublishWhere,
 // Create an instance of the PublishService class
 const publishService = new PublishService()
 // Destructure the responseMessage object
-const { INTERNAL_SERVICE, SUCCESS, UNAUTHORIZED, METHOD_FAILED } = responseMessage
+const { INTERNAL_SERVICE, SUCCESS, UNAUTHORIZED, METHOD_FAILED, BAD_REQUEST } = responseMessage
 
 /**
  *! Handles user publishing a post
@@ -36,6 +36,14 @@ export const publishPost = AsyncHandler(async (req: ProtectedRequest, res: Respo
     // Get the post content from the request body
     const publishContent = req.body as PublishPostBody
 
+    const thumbnail = req.file as Express.Multer.File
+
+    if (!thumbnail) {
+        return ApiError(new Error(BAD_REQUEST('thumbnail image needed').message), req, next, BAD_REQUEST().code)
+    }
+
+    om
+
     // Create the payload to be saved
     const payload: PublishPostPayload = {
         ...publishContent,
@@ -51,6 +59,27 @@ export const publishPost = AsyncHandler(async (req: ProtectedRequest, res: Respo
         return ApiResponse(req, res, SUCCESS().code, SUCCESS('Post published successfully').message)
     } catch (error) {
         return ApiError(error instanceof Error ? error : new Error(INTERNAL_SERVICE('save draft').message), req, next, INTERNAL_SERVICE().code)
+    }
+})
+
+export const checkIsSlugAvailable = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
+    const { slug } = req.body as { slug: string }
+
+    if (!slug) {
+        return ApiError(new Error(BAD_REQUEST('slug needed to check').message), req, next, BAD_REQUEST().code)
+        
+    }
+
+    try {
+        const isAvailable = await publishService.isSlugAvailable(req, next, slug)
+        return ApiResponse(req, res, SUCCESS().code, SUCCESS('Slug is available').message, { isAvailable })
+    } catch (error) {
+        return ApiError(
+            error instanceof Error ? error : new Error(INTERNAL_SERVICE('check slug availability').message),
+            req,
+            next,
+            INTERNAL_SERVICE().code
+        )
     }
 })
 

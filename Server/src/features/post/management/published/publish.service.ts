@@ -37,6 +37,20 @@ export default class PublishService {
         }
     }
 
+    public async isSlugAvailable(req: Request, next: NextFunction, slug: string): Promise<boolean | void> {
+        try {
+            const post = await prisma.post.findFirst({
+                where: {
+                    slug
+                }
+            })
+
+            return post === null
+        } catch (error) {
+            return ApiError(error instanceof Error ? error : new Error(INTERNAL_SERVICE('save draft').message), req, next, INTERNAL_SERVICE().code)
+        }
+    }
+
     /**
      * Update a published post.
      *

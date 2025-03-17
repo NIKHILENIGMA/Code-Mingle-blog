@@ -2,9 +2,8 @@ import { DRAFT_STATUS } from '../../../../constant'
 
 // types.ts
 export interface PublishPostBody {
-    title: string
-    thumbnail: string
-    slug: string
+    slug: string,
+    // category: string
 }
 
 export interface PublishPostPayload extends PublishPostBody {

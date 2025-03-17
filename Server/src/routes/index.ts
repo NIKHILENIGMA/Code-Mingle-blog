@@ -104,7 +104,7 @@ router.use('/drafts', draftRoutes)
 /**
  * @name Publish Routes
  * @description This route is used to publish and unpublish posts
- * @route /api/v1/posts/published
+ * @route /api/v1/published
  * @access Private
  */
 router.use('/published', publishRoutes)
