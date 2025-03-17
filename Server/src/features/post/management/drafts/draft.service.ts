@@ -44,8 +44,8 @@ class DraftService {
         /// Generate payload for update
         const payload: DraftUpdatePayload = {
             title: options.draftContent.title,
-            content: options.draftContent.content,
-            image: options.draftContent.image
+            content: options.draftContent.content
+            // image: options.draftContent.image
         }
 
         try {
@@ -149,6 +149,48 @@ class DraftService {
             )
         }
     }
-}
 
+    public async updateDraftCoverImage(req: Request, next: NextFunction, where: { image: string }, draftId: string): Promise<string | void> {
+        try {
+            const draft = await this.DraftRepository.findDraftById({ id: draftId })
+
+            if (!draft) {
+                return ApiError(new Error(NOT_FOUND('draft').message), req, next, NOT_FOUND().code)
+            }
+
+            await this.DraftRepository.update({ id: draftId }, where)
+
+            return 'Draft cover image updated successfully'
+        } catch (error) {
+            return ApiError(
+                error instanceof Error ? error : new Error(METHOD_FAILED('update draft cover image').message),
+                req,
+                next,
+                METHOD_FAILED().code
+            )
+        }
+    }
+
+
+    public async removeDraftCoverImage(req: Request, next: NextFunction, draftId: string): Promise<string | void> {
+        try {
+            const draft = await this.DraftRepository.findDraftById({ id: draftId })
+
+            if (!draft) {
+                return ApiError(new Error(NOT_FOUND('draft').message), req, next, NOT_FOUND().code)
+            }
+
+            await this.DraftRepository.update({ id: draftId }, { image: '' })
+
+            return 'Draft cover image removed successfully'
+        } catch (error) {
+            return ApiError(
+                error instanceof Error ? error : new Error(METHOD_FAILED('remove draft cover image').message),
+                req,
+                next,
+                METHOD_FAILED().code
+            )
+        }
+    }
+}
 export default DraftService

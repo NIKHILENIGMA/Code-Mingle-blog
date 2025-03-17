@@ -1,7 +1,8 @@
 import express from 'express'
 import { validateParams, isAuthenticated, validateBody } from '../../../../middleware'
-import { createDraft, getDraft, getUserDrafts, removeDraft, saveDraft } from './draft.controller'
+import { createDraft, getDraft, getUserDrafts, removeDraft, removeDraftCoverImage, saveDraft, uploadDraftCoverImage } from './draft.controller'
 import { DraftParamsSchema, UpdateDraftBodySchema } from './draft.schema'
+import { upload } from '../../../../middleware/multer.middleware'
 
 const router = express.Router({ mergeParams: true })
 
@@ -53,5 +54,21 @@ router.route('/:id').get(validateParams(DraftParamsSchema), getDraft)
  * @access Private
  */
 router.route('/').get(getUserDrafts)
+
+/**
+ * !Routes for uploading a draft cover image.
+ * @method POST
+ * @route /api/v1/drafts/upload/cover-image
+ * @access Private
+ */
+router.route('/:id/cover-image/upload/').post(upload.single('draftCoverImg'), uploadDraftCoverImage)
+
+/**
+ * !Routes for removing a draft cover image.
+ * @method DELETE
+ * @route /api/v1/drafts/:id/remove/cover-image
+ * @access Private
+ */
+router.route('/:id/cover-image/remove/').delete(removeDraftCoverImage)
 
 export default router

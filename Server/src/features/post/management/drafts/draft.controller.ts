@@ -9,6 +9,8 @@ import responseMessage from '../../../../constant/responseMessage'
 import DraftService from './draft.service'
 import { GenerateDraft, DraftContent, DraftWhere, DraftSelectFields, DraftWhereStatus } from '../../../../types/draft'
 import { DRAFT_STATUS } from '../../../../constant'
+import { uploadService } from '../../../common/upload.service'
+import { CloundinaryOption } from '../../../../types/types'
 
 const draftService = new DraftService()
 
@@ -28,7 +30,7 @@ export const createDraft = AsyncHandler(async (req: ProtectedRequest, res: Respo
     if (!userId) {
         return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
     }
-    
+
     try {
         // Get user
 
@@ -67,7 +69,7 @@ export const saveDraft = AsyncHandler(async (req: ProtectedRequest, res: Respons
     }
 
     /// Get draft content
-    const draftContent: DraftContent = (req.body as DraftContent)
+    const draftContent: DraftContent = req.body as DraftContent
     if (!draftContent) {
         return ApiError(new Error(MISSING_BODY.message), req, next, MISSING_BODY.code)
     }
@@ -232,5 +234,78 @@ export const listDraft = AsyncHandler(async (req: Request, res: Response, next: 
         return ApiResponse(req, res, SUCCESS().code, SUCCESS('All Drafts fetched successfully').message, getAllDrafts)
     } catch (error) {
         return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('list draft').message), req, next, METHOD_FAILED('list draft').code)
+    }
+})
+
+export const uploadDraftCoverImage = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
+    // Get the draft id from the request object
+    const draftId = req.params.id
+    // Get the user id from the request object
+    const draftCoverImagePath = (req.file as Express.Multer.File)?.path || ''
+    // Get the avatar URL from the request body
+    const { unsplashUrl } = req.body as { unsplashUrl: string }
+
+    // Where clause for the user id
+    const userId = (req.user as User)?.id
+    if (!userId) {
+        return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
+    }
+
+    if (!unsplashUrl && !draftCoverImagePath) {
+        return ApiError(new Error(BAD_REQUEST('No cover image provided').message), req, next, BAD_REQUEST().code)
+    }
+
+    // Cloudinary options for uploading the avatar
+    const cloudinaryOption: CloundinaryOption = {
+        folder: 'posts',
+        public_name: `cover_image-${draftId}`,
+        quality: 50,
+        resource: 'image',
+        altName: 'draft cover image'
+    }
+
+    //  Where clause for the user id
+    const where = { id: userId }
+
+    //  Upload the avatar
+    try {
+        if (unsplashUrl) {
+            await draftService.updateDraftCoverImage(req, next, { image: unsplashUrl }, draftId)
+            return ApiResponse(req, res, SUCCESS().code, SUCCESS('Draft Cover image uploaded successfully').message, { image: unsplashUrl })
+        } else {
+            const draftCoverImageURL = await uploadService.uploadFile(req, next, where, draftCoverImagePath, cloudinaryOption)
+            if (!draftCoverImageURL) {
+                return ApiError(new Error(METHOD_FAILED('upload avatar').message), req, next, METHOD_FAILED().code)
+            }
+
+            await draftService.updateDraftCoverImage(req, next, { image: draftCoverImageURL }, draftId)
+            return ApiResponse(req, res, SUCCESS().code, SUCCESS('Draft Cover image uploaded successfully').message, { image: draftCoverImageURL })
+        }
+    } catch (error) {
+        return ApiError(new Error(INTERNAL_SERVICE((error as Error)?.message).message), req, next, INTERNAL_SERVICE().code)
+    }
+})
+
+export const removeDraftCoverImage = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
+    // Get the draft id from the request object
+    const draftId = req.params.id
+    // Get the user id from the request object
+    const userId = (req.user as User)?.id
+    if (!userId) {
+        return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
+    }
+
+    const public_id = `posts/cover_image-${draftId}-${userId}`
+    //  Remove the draft cover image
+    try {
+        // Remove the draft cover image from Cloudinary
+        await uploadService.removeImage(req, next, public_id)
+
+        // Remove the draft cover image from the database
+        await draftService.removeDraftCoverImage(req, next, draftId)
+
+        return ApiResponse(req, res, SUCCESS().code, SUCCESS('Draft Cover image removed successfully').message)
+    } catch (error) {
+        return ApiError(new Error(INTERNAL_SERVICE((error as Error)?.message).message), req, next, INTERNAL_SERVICE().code)
     }
 })
