@@ -1,6 +1,6 @@
 import { FC } from "react";
-import DraftActions from "@/features/Blog/components/Drafts/DraftActions";
-import DraftForm from "@/features/Blog/components/Drafts/DraftForm";
+import DraftActions from "@/features/drafts/components/Drafts/DraftActions";
+import DraftForm from "@/features/drafts/components/Drafts/DraftForm";
 
 const CreatePostPage: FC = () => {
   return (

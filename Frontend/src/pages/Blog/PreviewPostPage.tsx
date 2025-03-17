@@ -1,8 +1,8 @@
 import { FC, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/app/store/store";
-import PreviewMockup from "@/features/Blog/components/Preview/PreviewMockup";
-import PreviewToggleDevice from "@/features/Blog/components/Preview/PreviewToggleDevice";
+import PreviewMockup from "@/features/drafts/components/Preview/PreviewMockup";
+import PreviewToggleDevice from "@/features/drafts/components/Preview/PreviewToggleDevice";
 import { Draft } from "@/Types/draft";
 
 const PreviewPostPage: FC = () => {

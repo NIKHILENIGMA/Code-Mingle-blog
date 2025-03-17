@@ -16,6 +16,11 @@ const extensions = [
     heading: {
       levels: [1, 2, 3],
     },
+    bold: {
+      HTMLAttributes: {
+        class: "dark:text-white",
+      },
+    },
     codeBlock: false,
     code: {
       HTMLAttributes: {

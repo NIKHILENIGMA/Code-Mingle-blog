@@ -1,23 +1,44 @@
-import { Img } from "@/components";
-import React from "react";
-import { Link } from "react-router-dom";
+import { FC } from "react";
+import { useNavigate } from "react-router-dom";
 
-const NotFoundPage: React.FC = () => {
+const NotFoundPage: FC = () => {
+  const navigate = useNavigate();
   return (
-    <div className="relative flex flex-col items-center justify-center w-full h-screen space-y-3">
-      <Img
-        src={
-          "https://img.freepik.com/free-vector/glitch-error-404-page-background_23-2148090410.jpg?t=st=1736104469~exp=1736108069~hmac=bac858bcd71f0ff712c67a8136ebfa91cd02cdb6cddf43c8dff68b20fd0ac0f1&w=740"
-        }
-        cn="w-[80%] h-[80%] object-cover"
-        alt="404"
+    <div className="flex items-center justify-center min-h-screen bg-white px-4">
+      <div className="flex flex-col items-center space-y-6 text-center">
+        {/* Error Code */}
+        <h1 className="text-7xl font-bold text-black">404</h1>
+
+        {/* Error Message */}
+        <h2 className="text-2xl font-semibold text-black">PAGE NOT FOUND</h2>
+
+        {/* Additional Info */}
+        <p className="text-gray-500">
+          Your search has ventured beyond the known universe
+        </p>
+
+        {/* Back to Home Button */}
+        <button
+          onClick={() => navigate("/")}
+          className="mt-4 px-6 py-3 bg-purple-600 text-white rounded-md shadow hover:bg-purple-700 transition"
+        >
+          Back to Home
+        </button>
+      </div>
+
+      {/* Left Illustration */}
+      <img
+        src="/not-found-standing-girl.svg"
+        alt="Left Illustration"
+        className="hidden md:block w-44 h-auto absolute left-[27%] bottom-220"
       />
-      <p className="absolute bottom-10">
-        Go to{" "}
-        <Link to="/" className="text-blue-400 underline">
-          Go back to Home{" "}
-        </Link>
-      </p>
+
+      {/* Right Illustration */}
+      <img
+        src="/not-found-sitting-boy.svg"
+        alt="Right Illustration"
+        className="hidden md:block w-44 h-auto absolute right-[20%] bottom-[30%]"
+      />
     </div>
   );
 };

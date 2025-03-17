@@ -23,9 +23,5 @@ export const NOT_AUTHENTICATED_OPTIONS: NotAuthenticatedOptionsType[] = [
     to: "/login",
     variant: "default",
   },
-  {
-    name: "Register", 
-    to: "/signup",
-    variant: "secondary",
-  },
+
 ];

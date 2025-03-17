@@ -1,72 +1,84 @@
-import { FC } from "react";
-import { useNavigate } from "react-router-dom";
+import { createElement, FC } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/app/store/store";
-import { Pencil } from "@/Utils/Icons";
-import SearchBar from "@/features/Blog/components/Drafts/SearchBar";
-import { useCreateDraft } from "@/features/Blog/hooks/useCreateDraft";
-import Logo from "@/components/Logo";
-import HeaderNavigationLinks from "@/components/Header/HeaderNavigationLinks";
+import { DraftingCompass, Notebook, Pencil } from "@/Utils/Icons";
+import SearchBar from "@/features/drafts/components/Drafts/SearchBar";
+import { NavLink } from "react-router-dom";
+import { NavItems } from "@/constants/constants";
 import Authenticated from "@/components/Header/Authenticated";
 import NotAuthenticated from "@/components/Header/NotAuthenticated";
 import { ModeToggle } from "../mode-toggle";
-import HeaderMobileView from "./HeaderMobileView";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 
 const Header: FC = () => {
-  const navigate = useNavigate();
-  const { createDraftMutation } = useCreateDraft();
+  // const navigate = useNavigate();
+  // const { createDraftMutation } = useCreateDraft();
   const authenticate = useSelector(
     (state: RootState) => state.auth?.accessToken
   );
 
-  const handleNewDraftNavigate = async (): Promise<void> => {
-    const draftId = await createDraftMutation.mutateAsync();
-    if (!draftId) {
-      navigate("/");
-    } else {
-      navigate(`/draft/${draftId}`);
-    }
-  };
-
   return (
-    <header className="fixed top-0 z-20 w-full h-16 p-4  bg-transparent shadow-none backdrop-blur-sm">
-      <nav className="flex items-center justify-between w-full h-full">
-        {/* Logo */}
-        <Logo />
-        {/* Navigation Links */}
-        <HeaderNavigationLinks />
-        {/* Toggle dark mode */}
-        <ModeToggle />
-        {/* Search Bar */}
-        <div className="items-center justify-around px-4 py-2 space-x-4 lg:flex">
-          <span className="px-2 py-2 bg-orange-500 rounded-full cursor-pointer">
-            <Pencil
-              size={20}
-              color="white"
-              className=""
-              onClick={handleNewDraftNavigate}
-            />
-          </span>
-          <SearchBar />
-        </div>
-        {/* User Auth */}
-        <div className="items-center justify-around hidden space-x-4 lg:flex">
-          {
-            // User Auth
-            authenticate ? (
-              <Authenticated />
-            ) : (
-              <NotAuthenticated />
-            )
-          }
-        </div>
+    <header className="fixed top-0 left-0 w-full bg-white shadow-sm z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          <div className="text-xl font-bold">NODEDRAFTS</div>
+          <nav className="hidden md:flex space-x-8">
+            {NavItems.map((navOpt, index) => (
+              <NavLink
+                key={index}
+                to={navOpt.path}
+                className={({ isActive }: { isActive: boolean }): string =>
+                  `${
+                    isActive
+                      ? "text-sky-500"
+                      : "text-gray-700 dark:text-gray-300"
+                  } flex items-center space-x-2 font-serif font-medium hover:text-sky-700`
+                }
+              >
+                <span>{createElement(navOpt.icon, { size: "18" })}</span>{" "}
+                <span className="text-sm">{navOpt.name}</span>
+              </NavLink>
+            ))}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className=" border-none flex space-x-1 bg-white shadow-none text-black hover:text-purple-600">
+                  <Pencil size={18} /> <span>Write</span>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-48 relative">
+                <DropdownMenuLabel>My Drafts</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  <DropdownMenuItem className="cursor-pointer">
+                    <Notebook /> New Draft
+                  </DropdownMenuItem>
 
-        {/* /// Mobile menu */}
-        <HeaderMobileView
-          isAuthenticated={authenticate ?? ""}
-          onChange={handleNewDraftNavigate}
-        />
-      </nav>
+                  <DropdownMenuItem className="cursor-pointer">
+                    <DraftingCompass /> Edit Draft
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </nav>
+          <div className="flex items-center space-x-4">
+            <ModeToggle />
+            <div className="flex items-center space-x-4 pr-4">
+              <SearchBar size={18} />
+              <div className="hidden space-x-4 lg:flex">
+                {authenticate ? <Authenticated /> : <NotAuthenticated />}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </header>
   );
 };

@@ -3,7 +3,7 @@ import { cards } from "@/constants/cardsContent";
 import { useParams } from "react-router-dom";
 import { Bookmark, Heart } from "@/Utils/Icons";
 // import CommentButton from "@/features/Blog/components/Comments/CommentButton";
-import SharePostLink from "@/features/Blog/components/Drafts/SharePostLink";
+import SharePostLink from "@/features/Blog/components/Comments/SharePostLink";
 import ReactHtmlParser from "react-html-parser";
 import { Button } from "@/components";
 

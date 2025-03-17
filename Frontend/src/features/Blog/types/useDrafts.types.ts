@@ -1,4 +1,4 @@
-import { Draft } from "@/Types/draft";
+import { Draft } from "@/features/drafts/types";
 
 export interface useDraftsProps {
   isOpen: boolean;

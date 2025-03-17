@@ -32,12 +32,15 @@ const TiptapEditor: FC<TiptapEditorProps> = ({
       },
     },
   });
+  
   useEffect(() => {
-    // Set initial content if it changes after the editor is mounted and content is not the same
-    if (editor && initialContent !== editor.getHTML()) {
-      editor.commands.setContent(initialContent);
+    if (editor && initialContent && editor.getHTML() !== initialContent) {
+      queueMicrotask(() => {
+        editor.commands.setContent(initialContent, false);
+      });
     }
   }, [initialContent, editor]);
+  
 
   useEffect(() => {
     // Cleanup the editor
@@ -47,7 +50,7 @@ const TiptapEditor: FC<TiptapEditorProps> = ({
   }, [editor]);
 
   return (
-    <div className="relative w-full min-h-full space-y-2 g editor-wrapper ">
+    <div className="relative w-full min-h-screen space-y-2 g editor-wrapper">
       {editor && <CustomBubbleMenu editor={editor} />}
 
       {/* <Title /> */}
@@ -56,8 +59,8 @@ const TiptapEditor: FC<TiptapEditorProps> = ({
         className="min-h-[20vw] rounded-lg py-2 w-full flex justify-start pl-2 items-start "
       />
 
-      <hr />
-      <div>{editor && <div>{editor.getHTML()}</div>}</div>
+      {/* <hr />
+      <div>{editor && <div>{editor.getHTML()}</div>}</div> */}
     </div>
   );
 };

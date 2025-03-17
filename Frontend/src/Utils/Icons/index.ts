@@ -1,6 +1,7 @@
 import {
   Upload,
   ImageIcon,
+  ImagePlus,
   Text,
   Heading1,
   Heading2,
@@ -17,6 +18,7 @@ import {
   Bold,
   Italic,
   Underline,
+  Notebook,
   Strikethrough,
   TypeOutline, // text
   Code, // code
@@ -73,19 +75,25 @@ import {
   CloudAlert,
   AudioLines,
   ShieldAlert,
+  DraftingCompass,
   GripVertical,
   Save,
+  BookCheck,
 } from "lucide-react";
 
 export {
+  BookCheck,
+  ImagePlus,
   GripVertical,
   ShieldAlert,
+  DraftingCompass,
   AudioLines,
   Save,
   Users,
   CloudAlert,
   LoaderCircle,
   UserCheck,
+  Notebook,
   CircleCheckBig,
   MonitorPlay,
   Trash2,

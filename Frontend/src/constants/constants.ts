@@ -8,7 +8,7 @@ import {
 export const AUTHENTICATION_URL = "/v1/users/authentication";
 export const PROFILE_URL = "/v1/users/profile";
 export const USER_URL = "/v1/user";
-export const POST_URL = "/v1/post";
+export const POST_URL = "/v1/posts";
 export const DRAFT_URL = "/v1/drafts";
 export const COMMENT_URL = "/v1/comment";
 export const LIKE_URL = "/v1/like";
@@ -24,7 +24,7 @@ export const OPEN_AI_URL = "/v1/openai";
 
 export const NavItems = [
   { name: "Home", path: "/", icon: House },
-  { name: "Blogs", path: "/posts", icon: Rss },
+  { name: "Stories", path: "/posts", icon: Rss },
   { name: "Editor", path: "/learn", icon: ClipboardType },
 ];
 

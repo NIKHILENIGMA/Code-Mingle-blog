@@ -7,14 +7,14 @@ interface FileUploaderProps {
   btnName: string;
   uploadFileName: string;
   uploadURL: string;
-  className?: string;
+  cn?: string;
 }
 
 const FileUploader: FC<FileUploaderProps> = ({
   btnName,
   uploadFileName,
   uploadURL,
-  className = "",
+  cn = "",
 }) => {
   const {
     file,
@@ -27,7 +27,7 @@ const FileUploader: FC<FileUploaderProps> = ({
   } = useFileUpload({ fileName: uploadFileName, url: uploadURL });
 
   return (
-    <div className={`w-full h-full ${className}`}>
+    <div className={`w-full h-full ${cn}`}>
       <div className="w-full h-full">
         {file ? (
           <div>
