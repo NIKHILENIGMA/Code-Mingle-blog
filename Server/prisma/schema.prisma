@@ -159,11 +159,12 @@ model Like {
 }
 
 model Category {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique
-  posts     Post[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           Int      @id @default(autoincrement())
+  name         String   @unique
+  description  String?
+  posts        Post[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   @@map("categories")
 }
