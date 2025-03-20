@@ -2,17 +2,57 @@ import { ApiError } from '../../../utils/ApiError'
 import { NextFunction, Request } from 'express'
 import { responseMessage } from '../../../constant'
 import prisma from '../../../config/prisma.config'
-import { CategoryDTO, CategoryWhere, UpdateCategory } from './category.types'
+import { CategoryDTO, CategoryWhere } from './category.types'
 
 const { METHOD_FAILED, NOT_FOUND } = responseMessage
 
 export default class CategoryService {
     constructor() {}
-    public async createCategory(req: Request, next: NextFunction, name: string): Promise<void> {
+
+    public async categoryExist(req: Request, next: NextFunction, { name }: { name: string }): Promise<boolean | void> {
+        try {
+            const category = await prisma.category.findFirst({
+                where: {
+                    name
+                }
+            })
+
+            return category ? true : false
+        } catch (error) {
+            return ApiError(
+                error instanceof Error ? error : new Error(METHOD_FAILED('fetch published post').message),
+                req,
+                next,
+                METHOD_FAILED().code
+            )
+        }
+    }
+
+    public async checkCategoryById(req: Request, next: NextFunction, { id }: { id: number }): Promise<boolean | void> {
+        try {
+            const category = await prisma.category.findFirst({
+                where: {
+                    id
+                }
+            })
+
+            return category ? true : false
+        } catch (error) {
+            return ApiError(
+                error instanceof Error ? error : new Error(METHOD_FAILED('fetch published post').message),
+                req,
+                next,
+                METHOD_FAILED().code
+            )
+        }
+    }
+
+    public async createCategory(req: Request, next: NextFunction, { name, description }: { name: string; description: string }): Promise<void> {
         try {
             await prisma.category.create({
                 data: {
-                    name
+                    name,
+                    description
                 }
             })
         } catch (error) {
@@ -25,16 +65,13 @@ export default class CategoryService {
         }
     }
 
-    public async updateCategory(req: Request, next: NextFunction, where: CategoryWhere, payload: UpdateCategory): Promise<void> {
+    public async updateCategory(
+        req: Request,
+        next: NextFunction,
+        where: { id: number },
+        payload: { name: string; description?: string }
+    ): Promise<void> {
         try {
-            const category = await prisma.category.findFirst({
-                where
-            })
-
-            if (!category) {
-                return ApiError(new Error(NOT_FOUND('category').message), req, next, NOT_FOUND().code)
-            }
-
             await prisma.category.update({
                 where,
                 data: payload
