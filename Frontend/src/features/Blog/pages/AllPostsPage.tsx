@@ -1,5 +1,7 @@
 import { FC } from "react";
 import FilterSidebar from "../components/BlogImages/FilterSidebar";
+// import { getAllPostsService } from "@/services/api/postApiServices";
+// import { useQuery } from "@tanstack/react-query";
 const posts = [
   {
     id: 1,
@@ -103,6 +105,21 @@ const posts = [
 ];
 
 const AllPostsPage: FC = () => {
+  // const {
+  //   data: posts,
+  //   isLoading,
+  //   error,
+  // } = useQuery({
+  //   queryKey: ["posts"],
+  //   queryFn: getAllPostsService,
+  //   refetchOnWindowFocus: false,
+  //   gcTime: 1000 * 60 * 60 * 24, // 24 hours
+  //   staleTime: 1000 * 60 * 60 * 24, // 24 hours
+  // });
+
+  // if (isLoading) return <div>Loading...</div>;
+  // if (error) return <div>Error: {error.message}</div>;
+
   return (
     <div className="p-4 md:p-8 max-w-7xl mx-auto my-16">
       {/* Header */}
@@ -125,7 +142,7 @@ const AllPostsPage: FC = () => {
 
         {/* Posts List */}
         <div className="w-full md:w-3/4 space-y-6">
-          {posts.map((post) => (
+          {posts.map((post: any) => (
             <div
               key={post.id}
               className="flex flex-col md:flex-row bg-white rounded-lg p-4 md:p-6 space-y-4 md:space-y-0 md:space-x-6 transition hover:shadow-md"

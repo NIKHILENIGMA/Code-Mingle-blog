@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { isAuthenticated, validateBody, validateParams, validateQuery } from '../../../../middleware'
+import { isAuthenticated, validateBody, validateParams } from '../../../../middleware'
 import {
     archivePublishedPost,
     checkIsSlugAvailable,
@@ -9,13 +9,7 @@ import {
     publishPost,
     updatePublishedPost
 } from './publish.controller'
-import {
-    ListPublishedPostsBodySchema,
-    PublishBodySchema,
-    PublishedQueryParameterSchema,
-    PublishParamsSchema,
-    UpdatePublishedPostSchema
-} from './publish.schema'
+import { PublishBodySchema, PublishParamsSchema, UpdatePublishedPostSchema } from './publish.schema'
 
 const router = Router()
 
@@ -23,7 +17,7 @@ const router = Router()
 // -----------------------------------------------------------------------------------------------------------
 // -----------------------------------------------------------------------------------------------------------
 
-router.use(isAuthenticated)
+// router.use(isAuthenticated)
 
 // -----------------------------------------------------------------------------------------------------------
 // -----------------------------------------------------------------------------------------------------------
@@ -35,7 +29,7 @@ router.use(isAuthenticated)
  * @access Private
  */
 
-router.route('/new').post(validateBody(PublishBodySchema), publishPost)
+router.route('/new').post(isAuthenticated, validateBody(PublishBodySchema), publishPost)
 
 /**
  * ! Route to update a published post
@@ -44,7 +38,7 @@ router.route('/new').post(validateBody(PublishBodySchema), publishPost)
  * @access Private
  *
  */
-router.route('/:id').patch(validateParams(PublishParamsSchema), validateBody(UpdatePublishedPostSchema), updatePublishedPost)
+router.route('/:id').patch(isAuthenticated, validateParams(PublishParamsSchema), validateBody(UpdatePublishedPostSchema), updatePublishedPost)
 
 /**
  * ! Route to delete a published post
@@ -52,7 +46,7 @@ router.route('/:id').patch(validateParams(PublishParamsSchema), validateBody(Upd
  * @route /api/v1/published/:id
  * @access Private
  */
-router.route('/:id').delete(validateParams(PublishParamsSchema), deletePublishedPost)
+router.route('/:id').delete(isAuthenticated, validateParams(PublishParamsSchema), deletePublishedPost)
 
 /**
  * ! Route to check if a slug is available
@@ -77,7 +71,8 @@ router.route('/:id').post(validateParams(PublishParamsSchema), archivePublishedP
  * @access Public
  */
 
-router.route('/').get(validateQuery(PublishedQueryParameterSchema), validateBody(ListPublishedPostsBodySchema), fetchPublishedPosts)
+router.route('/').get(fetchPublishedPosts)
+
 
 /**
  * ! Route to get a published post

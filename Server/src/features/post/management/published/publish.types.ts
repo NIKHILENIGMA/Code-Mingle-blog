@@ -24,7 +24,7 @@ export interface PublishWhere {
 }
 
 export interface PublishedWhere {
-    authorId: string
+    // authorId: string
     status: DRAFT_STATUS
 }
 

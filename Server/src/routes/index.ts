@@ -13,6 +13,7 @@ import publishRoutes from '../features/post/management/published/publish.routes'
 import reportsRoutes from '../features/post/management/report/report.routes'
 import newLetterRoutes from '../features/mail/newletter/newletter.routes'
 import aiRoutes from '../features/artficialIntelligence/ai.routes'
+import categoryRoutes from '../features/admin/category/category.routes'
 
 
 // Create a new router 
@@ -159,8 +160,37 @@ router.use('/admin/users', reportsRoutes)
  * @access Private
  */
 router.use('/admin/posts', reportsRoutes)
+ 
+/**
+ * @name Admin Routes
+ * @description This route is used to get reports
+ * @route /api/v1/admin
+ * @access Private
+ */
+router.use('/admin/categories', categoryRoutes)
+
+/**
+ * @name Admin Routes
+ * @description This route is used to get reports
+ * @route /api/v1/admin
+ * @access Private
+ */
 router.use('/admin/seo', reportsRoutes)
+
+/**
+ * @name Admin Routes
+ * @description This route is used to get reports
+ * @route /api/v1/admin
+ * @access Private
+ */
 router.use('/admin/settings', reportsRoutes)
+
+/**
+ * @name Admin Routes
+ * @description This route is used to get reports
+ * @route /api/v1/admin
+ * @access Private
+ */
 router.use('/admin/tags', reportsRoutes)
 
 // router.use('/media', uploadRoutes)

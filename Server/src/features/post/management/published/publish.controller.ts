@@ -36,13 +36,12 @@ export const publishPost = AsyncHandler(async (req: ProtectedRequest, res: Respo
     // Get the post content from the request body
     const publishContent = req.body as PublishPostBody
 
+    // Get the thumbnail image from the request file
     const thumbnail = req.file as Express.Multer.File
 
     if (!thumbnail) {
         return ApiError(new Error(BAD_REQUEST('thumbnail image needed').message), req, next, BAD_REQUEST().code)
     }
-
-    om
 
     // Create the payload to be saved
     const payload: PublishPostPayload = {
@@ -62,6 +61,19 @@ export const publishPost = AsyncHandler(async (req: ProtectedRequest, res: Respo
     }
 })
 
+/**
+ * ! Handles user checking if a slug is available
+ * 
+ * This function is an asynchronous request handler that is responsible for handling a user checking if a slug is available.
+ * It expects a request body containing the slug to check.
+ * 
+ * @param {Request} req - The request object containing the slug to check.
+ * @param {Response} res - The response object used to send the response back to the client.
+ * @param {NextFunction} next - The next middleware function in the stack.
+ * @returns {Promise<void>} A promise that resolves to void.
+ * 
+ *  @throws {Error} Will throw an error if there is an issue checking the slug.
+ */
 export const checkIsSlugAvailable = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
     const { slug } = req.body as { slug: string }
 
@@ -288,10 +300,10 @@ export const unarchivePublishedPost = AsyncHandler(async (req: ProtectedRequest,
  */
 export const fetchPublishedPosts = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
     // Get the user id from the request object
-    const userId = (req.user as User)?.id
-    if (!userId) {
-        return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
-    }
+    // const userId = (req.user as User)?.id
+    // if (!userId) {
+    //     return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
+    // }
 
     // Get the limit and page query parameters
     const { limit, page } = req.query as { limit: string; page: string }
@@ -307,7 +319,7 @@ export const fetchPublishedPosts = AsyncHandler(async (req: ProtectedRequest, re
 
     // Create the payload to find the posts
     const payload: PublishedWhere = {
-        authorId: userId,
+        // authorId: userId,
         status
     }
     try {

@@ -9,6 +9,7 @@ export const AUTHENTICATION_URL = "/v1/users/authentication";
 export const PROFILE_URL = "/v1/users/profile";
 export const USER_URL = "/v1/user";
 export const POST_URL = "/v1/posts";
+export const PUBLISH_URL = "/v1/published";
 export const DRAFT_URL = "/v1/drafts";
 export const COMMENT_URL = "/v1/comment";
 export const LIKE_URL = "/v1/like";
