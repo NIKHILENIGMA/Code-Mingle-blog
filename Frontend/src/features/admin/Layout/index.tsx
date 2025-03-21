@@ -1,6 +1,7 @@
 import { FC } from "react";
 import { Outlet } from "react-router-dom";
 import AdminSidebar from "../components/AdminSidebar";
+import { Toaster } from "@/components/ui/sonner";
 
 const AdminPanelLayout: FC = () => {
   return (
@@ -8,6 +9,7 @@ const AdminPanelLayout: FC = () => {
       <AdminSidebar />
       <div className="flex-1 p-5">
         <Outlet />
+        <Toaster />
       </div>
     </div>
   );
