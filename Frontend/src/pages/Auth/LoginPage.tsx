@@ -43,7 +43,6 @@ function LoginPage(): JSX.Element {
             <Link to="/forgot-password" className="font-normal text-violet-600">Reset it here</Link>
           </p>
         </div>
-
         {/* Submit button */}
         <div>
           <Button disabled={isSubmitting} type="submit">
