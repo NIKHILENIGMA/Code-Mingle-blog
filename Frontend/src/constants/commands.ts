@@ -1,9 +1,5 @@
 import { Editor } from "@tiptap/core";
 import {
-  // ArrowLeftToLine,
-  // ArrowRightToLine,
-  // AudioLines,
-  // Eraser,
   Columns2,
   Heading1,
   Heading2,
@@ -11,11 +7,8 @@ import {
   Image,
   List,
   ListOrdered,
-  // ListTodo,
   Code,
-  // Mic,
   MonitorPlay,
-  // SwatchBook,
   Table,
   Text,
   TextQuote,
