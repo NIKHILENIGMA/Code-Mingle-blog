@@ -2,18 +2,18 @@ import { FC } from "react";
 
 const ProductSection: FC = () => {
   return (
-    <section className="bg-gray-100 py-16">
+    <section className="py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
           {/* Text Content */}
           <div>
-            <p className="text-sm text-purple-600 uppercase tracking-wider mb-2">
+            <p className="text-sm text-primary uppercase tracking-wider mb-2">
               Explore Our Product
             </p>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-gray-900 mb-4 leading-tight">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold mb-4 leading-tight">
               Boost your productivity. <br /> Start using our app today
             </h2>
-            <p className="text-gray-600 text-base md:text-lg mb-6">
+            <p className="text-muted-foreground text-base md:text-lg mb-6">
               A platform designed for developers to express ideas, share
               insights and collaborate. Connect with a global community that
               values your expertise.

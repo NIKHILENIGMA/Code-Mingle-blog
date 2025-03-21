@@ -3,15 +3,15 @@ import { Button } from "@/components";
 
 const HeroSection: FC = () => {
   return (
-    <section className="pt-24 pb-16 bg-gradient-to-b from-white to-gray-100 dark:bg-gradient-to-b dark:from-gray-900 dark:to-gray-800">
+    <section className="pt-24 pb-16 ">
       <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-        <p className="text-sm text-blue-600 uppercase mb-2 tracking-wider">
+        <p className="text-sm text-primary uppercase mb-2 tracking-wider">
           Platform
         </p>
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-gray-900 dark:text-white mb-4">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold mb-4">
           Empowering Developers to share their journey
         </h1>
-        <p className="text-gray-600 dark:text-gray-400 text-base md:text-lg">
+        <p className="text-muted-foreground text-base md:text-lg">
           A platform designed for developers to express ideas, share insights
           and collaborate. Connect with a global community that values your
           expertise.

@@ -1,6 +1,5 @@
 import React from "react";
 import { House } from "@/Utils/Icons";
-import { Textarea } from "@/components/ui/textarea";
 import TiptapEditor from "@/features/editor/components/TiptapEditor/TipTapEditor";
 import { Button } from "@/components";
 import { useNavigate } from "react-router-dom";
@@ -39,15 +38,17 @@ const LearnEditorPage: React.FC = () => {
       </div>
       <div className="flex flex-col min-h-full w-[80vw] px-52  mx-auto space-y-3  rounded-lg ">
         <div className="flex flex-col justify-start w-full mb-4 space-y-4 ">
-          <Textarea
+          <textarea
             placeholder="Article Title...."
-            className="text-3xl font-bold border-none shadow-none outline-none resize-none focus:border-white focus:ring-0 focus:outline-none focus:ring-offset-white"
-            rows={1}
+            className="text-4xl font-bold border-none shadow-none outline-none resize-none px-2 focus:border-white focus:ring-0 focus:outline-none focus:ring-offset-white dark:bg-[#030712]"
+            rows={2}
             maxLength={90}
             onInput={(e) => {
               const target = e.target as HTMLTextAreaElement;
               target.style.height = "auto";
-              target.style.height = `${target.scrollHeight}px`;
+              target.style.height = `${target.scrollHeight}px + 10px`;
+              target.style.scrollbarWidth = "none";
+              target.style.overflow = "hidden";
             }}
             onChange={(e) => handleChange(e)}
           />

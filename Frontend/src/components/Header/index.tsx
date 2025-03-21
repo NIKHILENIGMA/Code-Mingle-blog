@@ -26,7 +26,7 @@ const Header: FC = () => {
   );
 
   return (
-    <header className="fixed top-0 left-0 w-full bg-white shadow-sm z-50">
+    <header className="fixed top-0 left-0 w-full shadow-sm z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="text-xl font-bold">NODEDRAFTS</div>
@@ -38,9 +38,9 @@ const Header: FC = () => {
                 className={({ isActive }: { isActive: boolean }): string =>
                   `${
                     isActive
-                      ? "text-sky-500"
-                      : "text-gray-700 dark:text-gray-300"
-                  } flex items-center space-x-2 font-serif font-medium hover:text-sky-700`
+                      ? "text-purple-600 dark:text-purple-400"
+                      : ""
+                  } flex items-center space-x-2 font-serif font-medium`
                 }
               >
                 <span>{createElement(navOpt.icon, { size: "18" })}</span>{" "}
@@ -49,7 +49,7 @@ const Header: FC = () => {
             ))}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className=" border-none flex space-x-1 bg-white shadow-none text-black hover:text-purple-600">
+                <button className=" border-none flex space-x-2 shadow-none items-center ">
                   <Pencil size={18} /> <span>Write</span>
                 </button>
               </DropdownMenuTrigger>

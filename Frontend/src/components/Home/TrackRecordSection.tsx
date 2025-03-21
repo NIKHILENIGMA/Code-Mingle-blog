@@ -2,40 +2,40 @@ import { FC } from "react";
 
 const TrackRecordSection: FC = () => {
   return (
-    <section className="py-16 bg-gray-50">
+    <section className="py-16 ">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row items-center gap-10">
         {/* Left Content */}
         <div className="w-full lg:w-1/2">
           <p className="text-sm text-purple-600 uppercase tracking-wider mb-2">
             Track Record
           </p>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-4">
+          <h2 className="text-3xl sm:text-4xl font-extrabold mb-4">
             Trusted by thousands of writers worldwide
           </h2>
-          <p className="text-gray-600 mb-8">
+          <p className="dark:text-gray-400 mb-8">
             Our platform is trusted by thousands of aspiring writers around the
             world for better performance and better productivity.
           </p>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 border-t border-gray-200 pt-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 border-t  pt-6">
             <div>
-              <p className="text-2xl font-bold text-gray-900">9,000+</p>
-              <p className="text-gray-600">Current creators on the platform</p>
+              <p className="text-2xl font-bold">9,000+</p>
+              <p className="dark:text-gray-400">Current creators on the platform</p>
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-900">2%</p>
-              <p className="text-gray-600">
+              <p className="text-2xl font-bold">2%</p>
+              <p className="dark:text-gray-400">
                 Very Minimal and affordable flat platform fee
               </p>
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-900">99.9%</p>
-              <p className="text-gray-600">Uptime Guarantee</p>
+              <p className="text-2xl font-bold">99.9%</p>
+              <p className="dark:text-gray-400">Uptime Guarantee</p>
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-900">$90M</p>
-              <p className="text-gray-600">Paid out to our Creators</p>
+              <p className="text-2xl font-bold">$90M</p>
+              <p className="dark:text-gray-400">Paid out to our Creators</p>
             </div>
           </div>
 
