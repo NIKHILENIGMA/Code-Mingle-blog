@@ -3,6 +3,7 @@ import TiptapEditor from "@/features/editor/components/TiptapEditor/TipTapEditor
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/app/store/store";
 import { updateSelectedDraft } from "@/features/drafts/slices/draftSlice";
+import DraftTitle from "./DraftTitle";
 
 const DraftForm: FC = () => {
   const selectedDraft = useSelector(
@@ -19,6 +20,13 @@ const DraftForm: FC = () => {
   return (
     <div className="p-4 md:p-8 max-w-4xl mx-auto">
       {/* <hr className="my-2" /> */}
+      <DraftTitle
+        name="title"
+        title={selectedDraft?.title || ""}
+        onTitleChange={(newTitle: string) => {
+          dispatch(updateSelectedDraft({ ...selectedDraft, title: newTitle }));
+        }}
+      />
       <div className="flex flex-col h-full w-[57vw] p-2 mx-auto space-y-3 rounded-lg mb-16">
         <TiptapEditor
           key={selectedDraft?.id}
@@ -26,9 +34,7 @@ const DraftForm: FC = () => {
           onContentChange={handleEditorChange}
         />
       </div>
-      <div className="flex justify-center my-10 h-[34vh]">
-
-      </div>
+      <div className="flex justify-center my-10 h-[34vh]"></div>
     </div>
   );
 };

@@ -15,7 +15,6 @@ const DraftActions: FC = () => {
   );
   const { saveDraftMutation } = useAutoSaveDraft();
 
-  //todo Complete the save function to save the draft
   const handleSave = async () => {
     if (!selectedDraft) return;
 
@@ -32,14 +31,14 @@ const DraftActions: FC = () => {
         <Button
           variant="secondary"
           onClick={handleSave}
-          className="flex items-center gap-1 border border-purple-600 text-purple-600 px-4 py-2 rounded-md hover:bg-purple-50 transition"
+          className=""
         >
           <Save size={16} /> Save
         </Button>
         <Button
           variant="secondary"
           onClick={handlePreview}
-          className="flex items-center gap-1 border border-purple-600 text-purple-600 px-4 py-2 rounded-md hover:bg-purple-50 transition"
+          className=""
         >
           <ScanEye /> Preview
         </Button>

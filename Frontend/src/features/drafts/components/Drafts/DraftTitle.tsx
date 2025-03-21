@@ -1,5 +1,4 @@
 import { FC } from "react";
-import { Textarea } from "@/components/ui/textarea";
 
 interface DraftTitleProps {
   name: string;
@@ -17,7 +16,7 @@ const DraftTitle: FC<DraftTitleProps> = ({
   onTitleChange,
 }) => {
   return (
-    <Textarea
+    <textarea
       name={name}
       rows={rows ? rows : 1}
       maxLength={column ? column : 90}
@@ -29,7 +28,8 @@ const DraftTitle: FC<DraftTitleProps> = ({
         target.style.height = `${target.scrollHeight}px`;
       }}
       onChange={(e) => onTitleChange(e.target.value)}
-      className="text-3xl font-bold border-none shadow-none outline-none resize-none focus:border-white focus:ring-0 focus:outline-none focus:ring-offset-white"
+      className="bg-background resize-none text-3xl p-2 w-full font-bold outline-none border-b-2 border-primary-100 "
+      
     />
   );
 };
