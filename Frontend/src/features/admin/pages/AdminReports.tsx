@@ -1,3 +1,4 @@
+import { Button } from "@/components";
 import { FC, useReducer, useState } from "react";
 
 interface Report {
@@ -70,23 +71,20 @@ const AdminReports: FC = () => {
   const totalPages = Math.ceil(reports.length / reportsPerPage);
 
   return (
-    <div className="p-5 text-gray-800 max-w-screen-lg mx-auto">
+    <div className="p-5  max-w-screen-lg mx-auto">
       <h1 className="text-2xl font-bold text-center">Reports</h1>
       <div className="mt-5 grid grid-cols-1 md:grid-cols-2 gap-4">
         {paginatedReports.map((report) => (
-          <div
-            key={report.id}
-            className="bg-white shadow-lg rounded-lg p-6 border border-gray-200"
-          >
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">
+          <div key={report.id} className="shadow bg-card rounded-lg p-6 border">
+            <h2 className="text-xl font-semibold mb-4">
               {report.type === "post" ? "Reported Post" : "Reported User"}
             </h2>
-            <div className="text-gray-600 space-y-2">
+            <div className="space-y-2">
               {report.title && (
-                <p>
-                  <span className="font-medium">Post Title:</span>{" "}
-                  {report.title}
-                </p>
+                <div className="flex space-x-2">
+                  <span className="font-medium">Post Title:</span>
+                  <p className="text-muted">{report.title}</p>
+                </div>
               )}
               <p>
                 <span className="font-medium">Reason:</span> {report.reason}
@@ -100,28 +98,27 @@ const AdminReports: FC = () => {
               </p>
             </div>
             <div className="mt-6 flex justify-between">
-              <button
+              <Button
                 onClick={() => handleRemove(report.id)}
-                className="px-5 py-2 bg-red-600 text-white font-medium rounded-lg shadow hover:bg-red-700 transition"
+                className="bg-destructive"
               >
                 {report.type === "post" ? "Remove Post" : "Ban User"}
-              </button>
-              <button className="px-5 py-2 bg-gray-600 text-white font-medium rounded-lg shadow hover:bg-gray-700 transition">
-                Ignore Report
-              </button>
+              </Button>
+              <Button className="bg-secondary">Ignore Report</Button>
             </div>
           </div>
         ))}
       </div>
+
       <div className="mt-6 flex justify-center space-x-2">
-        <button
+        <Button
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
           disabled={currentPage === 1}
           className="px-4 py-2 bg-gray-300 text-gray-700 font-medium rounded-lg shadow hover:bg-gray-400 transition disabled:opacity-50"
         >
           Previous
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={() =>
             setCurrentPage((prev) => Math.min(prev + 1, totalPages))
           }
@@ -129,7 +126,7 @@ const AdminReports: FC = () => {
           className="px-4 py-2 bg-gray-300 text-gray-700 font-medium rounded-lg shadow hover:bg-gray-400 transition disabled:opacity-50"
         >
           Next
-        </button>
+        </Button>
       </div>
     </div>
   );
