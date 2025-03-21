@@ -16,6 +16,14 @@ import UserDashboard from "@/features/Profile/pages/UserDashboard";
 import DraftPage from "@/features/drafts/pages/DraftPage";
 import ReadPostPage from "@/features/Blog/pages/ReadPostPage";
 import AllPostsPage from "@/features/Blog/pages/AllPostsPage";
+import AdminPanelLayout from "@/features/admin/Layout";
+import {
+  AdminCategory,
+  AdminDashboard,
+  AdminPosts,
+  AdminUsers,
+  AdminReports,
+} from "@/features/admin";
 
 const router = createBrowserRouter([
   {
@@ -142,6 +150,32 @@ const router = createBrowserRouter([
         element: <SignupPage />,
       };
     },
+  },
+  {
+    path: "/admin",
+    element: <AdminPanelLayout />,
+    children: [
+      {
+        path: "dashboard",
+        element: <AdminDashboard />,
+      },
+      {
+        path: "posts",
+        element: <AdminPosts />,
+      },
+      {
+        path: "users",
+        element: <AdminUsers />,
+      },
+      {
+        path: "categories",
+        element: <AdminCategory />,
+      },
+      {
+        path: "reports",
+        element: <AdminReports />,
+      },
+    ],
   },
 
   {
