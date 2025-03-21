@@ -1,10 +1,46 @@
 import { FC } from "react";
 import { User } from "@/Types/user";
 import DashboardAvatarChange from "./DashboardAvatarChange";
+import {
+  FaFacebook,
+  FaInstagram,
+  FaLinkedin,
+  FaSquareXTwitter,
+  FaReddit,
+} from "react-icons/fa6";
+import { TbWorld } from "react-icons/tb";
+import { Link } from "react-router-dom";
 
 interface ProfileAvatarProps {
   user: User | null;
 }
+
+const socialLinks = [
+  {
+    link: "https://www.facebook.com/",
+    icon: FaFacebook,
+  },
+  {
+    link: "https://www.twitter.com/",
+    icon: FaSquareXTwitter,
+  },
+  {
+    link: "https://www.instagram.com/",
+    icon: FaInstagram,
+  },
+  {
+    link: "https://www.linkedin.com/",
+    icon: FaLinkedin,
+  },
+  {
+    link: "https://www.reddit.com/",
+    icon: FaReddit,
+  },
+  {
+    link: "https://nikhilharmalkar.me/",
+    icon: TbWorld,
+  },
+];
 
 const DashboardAvatar: FC<ProfileAvatarProps> = ({ user }) => {
   return (
@@ -23,7 +59,10 @@ const DashboardAvatar: FC<ProfileAvatarProps> = ({ user }) => {
         />
       )}
 
-      <DashboardAvatarChange avatar={user?.avatarImg ?? ""} alt={user?.firstName ?? "User"} />
+      <DashboardAvatarChange
+        avatar={user?.avatarImg ?? ""}
+        alt={user?.firstName ?? "User"}
+      />
       <h1 className="text-2xl font-bold mt-2">{`${user?.firstName} ${user?.lastName}`}</h1>
       <p className="text-gray-300">
         Web Developer | UI/UX Enthusiast | Blogger
@@ -45,44 +84,11 @@ const DashboardAvatar: FC<ProfileAvatarProps> = ({ user }) => {
 
       {/* Social Media Links  */}
       <div className="flex justify-center gap-4 mt-5">
-        <a
-          href="https://www.facebook.com/"
-          target="_blank"
-          className="text-sky-500"
-        >
-          Facebook
-        </a>
-        <a href="https://x.com/" target="_blank" className="text-sky-500">
-          Twitter
-        </a>
-        <a
-          href="https://www.instagram.com/"
-          target="_blank"
-          className="text-sky-500"
-        >
-          Instagram
-        </a>
-        <a
-          href="https://www.linkedin.com/"
-          target="_blank"
-          className="text-sky-500"
-        >
-          LinkedIn
-        </a>
-        <a
-          href="https://www.reddit.com/"
-          target="_blank"
-          className="text-sky-500"
-        >
-          Reddit
-        </a>
-        <a
-          href="https://nikhilharmalkar.me/"
-          target="_blank"
-          className="text-sky-500"
-        >
-          Portfolio
-        </a>
+        {socialLinks.map((link, index) => (
+          <Link to={link?.link} target="_blank" key={link.link + index}>
+            <link.icon size={20} />
+          </Link>
+        ))}
       </div>
     </div>
   );

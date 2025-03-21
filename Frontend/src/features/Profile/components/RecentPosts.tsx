@@ -1,4 +1,5 @@
 import { FC } from "react";
+import ReactHtmlParser from "react-html-parser";
 
 interface POST {
   id: string;
@@ -24,7 +25,7 @@ const RecentPosts: FC<RecentPostsProps> = ({ posts }) => {
             posts.map((post) => (
               <div
                 key={post.id}
-                className="flex gap-4 bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition"
+                className="flex gap-4 bg-card p-4 rounded-lg shadow-md hover:shadow-lg transition border-primary-500 border"
               >
                 <img
                   src={`${post.image}` || "https://via.placeholder.com/150"}
@@ -33,8 +34,12 @@ const RecentPosts: FC<RecentPostsProps> = ({ posts }) => {
                 />
                 <div>
                   <h3 className="text-lg font-semibold">{post.title}</h3>
-                  <p className="text-gray-600 text-sm">{post.content}</p>
-                  <div className="flex justify-between text-gray-500 text-xs mt-2">
+                  <p className="text-muted-foreground text-xs">
+                    {ReactHtmlParser(
+                      post.content?.toString()?.substring(0, 430) + "..."
+                    )}
+                  </p>
+                  <div className="flex justify-between text-muted-foreground text-xs mt-2">
                     <span>👍 {post.likes} Likes</span>
                     <span>💬 {post.comments} Comments</span>
                     <span>📅 {post.createdAt}</span>

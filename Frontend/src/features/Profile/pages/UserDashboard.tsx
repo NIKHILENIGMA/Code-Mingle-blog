@@ -13,7 +13,7 @@ const UserDashboard: FC = () => {
       {isPending ? (
         <Loader />
       ) : (
-        <div className="bg-gray-100 min-h-screen w-full">
+        <div className="bg-background min-h-screen w-full">
           {/* Profile Header */}
           <DashboardHeader  user={user}/>
 
