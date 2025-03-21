@@ -7,7 +7,7 @@ import {
 import { EllipsisVertical, Trash2, ScanEye } from "@/Utils/Icons";
 import { Button } from "@/components";
 import { useDeleteDraft } from "../../hooks/useDeleteDraft";
-import { Draft } from "@/Types/draft";
+import { Draft } from "../../types";
 import { useNavigate } from "react-router-dom";
 
 const SideBarDraftDropDownActions: FC<{ draft: Draft }> = ({ draft }) => {

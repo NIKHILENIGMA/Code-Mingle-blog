@@ -5,16 +5,17 @@ import SideBarNewDraftButton from "./SideBarNewDraftButton";
 import SideBarDraftList from "./SideBarDraftList";
 import { ArrowLeftToLine } from "@/Utils/Icons";
 import { Separator } from "@/components/ui/separator";
+import { useNavigate } from "react-router-dom";
 
 const Sidebar: FC = () => {
   const { drafts, isError, isLoading } = useDrafts();
+  const navigate = useNavigate();
 
   return (
-    <div className="w-[18rem] min-h-screen bg-white p-4 flex flex-col justify-between border-r border-gray-200">
+    <div className="w-[18rem] min-h-screen p-4 flex flex-col justify-between border-r border-primary-100">
       {/* Header */}
       <div className="space-y-4">
         <h1 className="text-xl font-bold mb-4">NODEDRAFTS</h1>
-
         {/* Search Bar */}
         {/* <Input
           type="text"
@@ -38,7 +39,10 @@ const Sidebar: FC = () => {
       </div>
 
       {/* Back to Home Button */}
-      <button className="flex items-center justify-center gap-2 mt-4 border border-purple-600 text-purple-600 py-2 rounded-md hover:bg-purple-50 transition">
+      <button
+        className="flex items-center justify-center gap-2 mt-4 border border-purple-600 text-purple-600 py-2 rounded-md hover:bg-purple-50 transition"
+        onClick={() => navigate("/")}
+      >
         <ArrowLeftToLine size={17} />
         Back to home
       </button>
