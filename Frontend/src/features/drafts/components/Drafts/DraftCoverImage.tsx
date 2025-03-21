@@ -14,7 +14,9 @@ import { updateSelectedDraft } from "@/features/drafts/slices/draftSlice";
 import { RootState } from "@/app/store/store";
 import UnsplashImage from "./UnsplashImage";
 import UploadImage from "./UploadImage";
-import { Separator } from '@/components/ui/separator';
+import { Separator } from "@/components/ui/separator";
+import { toast } from "sonner";
+import { SiUnsplash } from "react-icons/si";
 
 type Navigation = "upload" | "unslash";
 
@@ -28,11 +30,6 @@ const DraftCoverImage: FC<DraftCoverImageProps> = ({ id }) => {
     (state: RootState) => state?.draft?.selectedDraft
   );
 
-  // Handle navigation between upload and unsplash
-  const handleNavigation = (path: Navigation) => {
-    setNavigate(path);
-  };
-
   // Remove cover image from the server
   const handleRemoveCoverImage = async (e: MouseEvent<HTMLButtonElement>) => {
     // Remove cover image from the server
@@ -41,6 +38,7 @@ const DraftCoverImage: FC<DraftCoverImageProps> = ({ id }) => {
     await removeDraftCoverImageService(id);
     // Update the selected draft state
     dispatch(updateSelectedDraft({ image: "" }));
+    toast.success("Cover image removed successfully", { duration: 3000 });
   };
 
   return (
@@ -78,19 +76,15 @@ const DraftCoverImage: FC<DraftCoverImageProps> = ({ id }) => {
 
             <div className=" w-full p-4 rounded-lg min-h-full space-y-2">
               <div className="flex space-x-3 w-full p-1">
-                <Button onClick={() => handleNavigation("upload")}>
+                <Button onClick={() => setNavigate("upload")}>
                   <Upload />
                   Upload
                 </Button>
                 <Button
                   className="overflow-hidden"
-                  onClick={() => handleNavigation("unslash")}
+                  onClick={() => setNavigate("unslash")}
                 >
-                  <img
-                    src="unsplash.svg"
-                    alt="unsplash-icon"
-                    className="w-10 h-10 object-cover"
-                  />
+                  <SiUnsplash />
                   Unsplash
                 </Button>
               </div>
