@@ -14,7 +14,6 @@ import { updateSelectedDraft } from "@/features/drafts/slices/draftSlice";
 import { RootState } from "@/app/store/store";
 import UnsplashImage from "./UnsplashImage";
 import UploadImage from "./UploadImage";
-import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { SiUnsplash } from "react-icons/si";
 
@@ -53,11 +52,11 @@ const DraftCoverImage: FC<DraftCoverImageProps> = ({ id }) => {
           <Button
             variant={"destructive"}
             onClick={handleRemoveCoverImage}
-            className="absolute top-2 right-2 bg-white text-red-500 border border-red-500 rounded-full p-2 "
+            className="absolute top-2 right-2 rounded-full p-2 px-2 bg-transparent hover:bg-transparent"
           >
             <Trash2 color="red" />
           </Button>
-          <Separator />
+          {/* <Separator /> */}
         </div>
       ) : (
         <Dialog>
