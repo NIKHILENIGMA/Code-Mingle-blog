@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useEffect, useRef } from "react";
 
 interface DraftTitleProps {
   name: string;
@@ -15,21 +15,25 @@ const DraftTitle: FC<DraftTitleProps> = ({
   title,
   onTitleChange,
 }) => {
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto"; // Reset height to recalculate
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  }, [title]); // Runs when the title changes
   return (
     <textarea
+      ref={textareaRef}
       name={name}
-      rows={rows ? rows : 1}
-      maxLength={column ? column : 90}
+      rows={rows}
+      maxLength={column}
       value={title}
       placeholder="Article Title...."
-      onInput={(e) => {
-        const target = e.target as HTMLTextAreaElement;
-        target.style.height = "auto";
-        target.style.height = `${target.scrollHeight}px`;
-      }}
       onChange={(e) => onTitleChange(e.target.value)}
-      className="bg-background resize-none text-3xl p-2 w-full font-bold outline-none border-b-2 border-primary-100 "
-      
+      className="bg-background resize-none text-3xl p-2 w-full font-bold outline-none hide-scrollbar"
+      style={{ overflow: "hidden" }} // Prevents scrollbar flickering
     />
   );
 };
