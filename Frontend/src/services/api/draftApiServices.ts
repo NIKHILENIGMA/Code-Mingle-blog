@@ -213,3 +213,18 @@ export const removeDraftThumbnailService = async (id: string): Promise<void> => 
     throw new Error("Failed to remove draft thumbnail.");
   }
 }
+
+
+export const previewDraftService = async (id: string) => {
+  try {
+    const response = await apiInstance.get(`${DRAFT_URL}/${id}/preview`);
+
+    if (!response.data) {
+      throw new Error(`Failed to preview draft: ${response.data}`);
+    }
+
+    return response.data.data;
+  } catch (error) {
+    throw new Error(`${(error as AxiosError)?.message}`);
+  }
+}
