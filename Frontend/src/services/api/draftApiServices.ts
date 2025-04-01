@@ -17,9 +17,7 @@ interface PostContent {
  * @throws {Error} if draft generation fails.
  */
 
-export const createDraftService = async (): Promise<
-  ApiResponse<{ draft: Draft }>
-> => {
+export const createDraftService = async () => {
   try {
     // The response is an ApiResponse containing the created draft
     const response = await apiInstance.post(`${DRAFT_URL}/new`);
@@ -27,7 +25,7 @@ export const createDraftService = async (): Promise<
       throw new Error(`Draft generation failed: ${response.data}`);
     }
 
-    return response.data;
+    return response.data?.data;
   } catch (error) {
     console.error(error);
     throw new Error("Draft generation failed");
@@ -106,11 +104,9 @@ export const deleteDraftService = async (id: string): Promise<void> => {
  * @throws {Error} if retrieval of all drafts fails.
  */
 
-export const allDraftsService = async (): Promise<
-  ApiResponse<{ drafts: Draft[] }>
-> => {
+export const allDraftsService = async () => {
   try {
-    const response = await apiInstance.get<ApiResponse<{ drafts: Draft[] }>>(
+    const response = await apiInstance.get(
       `${DRAFT_URL}/`
     );
     return response.data;
@@ -192,3 +188,28 @@ export const removeDraftCoverImageService = async (
     throw new Error("Failed to remove draft cover image.");
   }
 };
+
+// {{BASE_URL}}/drafts/b8ccdc53-a416-483d-8eaf-990d2f465de2/thumbnail/upload/
+export const uploadDraftThumbnailService = async (id: string, file: FormData) => { 
+  try {
+    const response = await apiInstance.post(`${DRAFT_URL}/${id}/thumbnail/upload`, file);
+
+    if (!response.data) {
+      throw new Error(`Failed to upload draft thumbnail: ${response.data}`);
+    }
+
+    return response.data.data;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to upload draft thumbnail.");
+  }
+}
+
+export const removeDraftThumbnailService = async (id: string): Promise<void> => {
+  try {
+    await apiInstance.delete(`${DRAFT_URL}/${id}/thumbnail/remove`);
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to remove draft thumbnail.");
+  }
+}
