@@ -10,26 +10,33 @@ import { DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { Trash2 } from "lucide-react";
 
 interface DeleteDialogProps {
-  id: number;
+  id: string | number;
   title: string;
+  btnText?: string;
   description: string;
-  onDelete: (id: number) => void;
+  variant?: "ghost" | "secondary";
+  onDelete: (id: string | number) => void;
 }
 
-// 
+//
 // This action cannot be undone. This will permanently delete the category.
 const DeleteDialog: FC<DeleteDialogProps> = ({
   id,
   title,
   description,
+  btnText = "Delete",
+  variant = "ghost",
   onDelete,
 }) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <button className="px-3 py-2 border rounded-md hover:text-primary hover:border-primary/65">
-          <Trash2 size={16} className="" />
-        </button>
+        <Button
+          variant={variant}
+          className="px-3 py-2 border rounded-md hover:text-primary hover:border-primary/65"
+        >
+          <Trash2 size={16} className="" /> {btnText}
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
