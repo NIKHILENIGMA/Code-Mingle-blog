@@ -6,16 +6,18 @@ import {
 } from "@radix-ui/react-popover";
 import { EllipsisVertical, Trash2, ScanEye } from "@/Utils/Icons";
 import { Button } from "@/components";
-import { useDeleteDraft } from "../../hooks/useDeleteDraft";
 import { Draft } from "../../types";
 import { useNavigate } from "react-router-dom";
+import { useDraftMutations } from "../../hooks/useDraftMutations";
+import { toast } from "sonner";
 
 const SideBarDraftDropDownActions: FC<{ draft: Draft }> = ({ draft }) => {
-  const { deleteDraftMutation } = useDeleteDraft();
   const navigation = useNavigate();
-
+  const { deleteDraftMutation } = useDraftMutations();
+  
   const handleDelete = () => {
-    deleteDraftMutation.mutate(draft);
+    deleteDraftMutation.mutate(draft?.id);
+    toast.success("Draft deleted successfully", { duration: 3000 });
   };
 
   const handlePreview = (id: string) => {
