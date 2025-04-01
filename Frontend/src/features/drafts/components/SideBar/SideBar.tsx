@@ -1,14 +1,16 @@
-// src/components/Sidebar.tsx
 import { FC } from "react";
-import { useDrafts } from "../../hooks/useDrafts";
+import { useDraftQuery } from "@/features/drafts/hooks/useDraftQuery";
 import SideBarNewDraftButton from "./SideBarNewDraftButton";
 import SideBarDraftList from "./SideBarDraftList";
 import { ArrowLeftToLine } from "@/Utils/Icons";
 import { Separator } from "@/components/ui/separator";
 import { useNavigate } from "react-router-dom";
+import { Button, Input } from "@/components";
 
 const Sidebar: FC = () => {
-  const { drafts, isError, isLoading } = useDrafts();
+  const { getDraftsQuery } = useDraftQuery();
+  const { data: drafts, isLoading, isError } = getDraftsQuery;
+  
   const navigate = useNavigate();
 
   return (
@@ -17,21 +19,20 @@ const Sidebar: FC = () => {
       <div className="space-y-4">
         <h1 className="text-xl font-bold mb-4">NODEDRAFTS</h1>
         {/* Search Bar */}
-        {/* <Input
-          type="text"
-          placeholder="Search Drafts"
-          className="w-full px-3 py-2 mb-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-        /> */}
 
         {/* New Draft Button */}
         <SideBarNewDraftButton />
-
         {/* Divider */}
         <Separator />
+        <Input
+          type="text"
+          placeholder="Search Drafts"
+          className="w-full px-3 py-2 mb-4 border rounded-md"
+        />
 
         {/* Draft Items */}
         <SideBarDraftList
-          drafts={drafts || null}
+          drafts={drafts?.data || null}
           isLoading={isLoading}
           isError={isError}
           filter={"search"}
@@ -39,13 +40,10 @@ const Sidebar: FC = () => {
       </div>
 
       {/* Back to Home Button */}
-      <button
-        className="flex items-center justify-center gap-2 mt-4 border border-purple-600 text-purple-600 py-2 rounded-md hover:bg-purple-50 transition"
-        onClick={() => navigate("/")}
-      >
+      <Button variant={"outline"} onClick={() => navigate("/")}>
         <ArrowLeftToLine size={17} />
         Back to home
-      </button>
+      </Button>
     </div>
   );
 };
