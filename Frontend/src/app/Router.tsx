@@ -4,7 +4,7 @@ import React from "react";
 import AboutPage from "../pages/Public/AboutPage";
 import Main from "@/Layout/Main";
 import DraftLayout from "@/features/drafts/Layout/DraftLayout";
-import PreviewPostPage from "@/pages/Blog/PreviewPostPage";
+import PreviewPostPage from "@/features/drafts/pages/PreviewPostPage";
 // import AuthProvider from "@/features/auth/components/AuthProvider";
 import PrivateRoute from "@/components/PrivateRoute";
 import ProfileSettings from "@/features/Profile/pages/ProfileSetting";
