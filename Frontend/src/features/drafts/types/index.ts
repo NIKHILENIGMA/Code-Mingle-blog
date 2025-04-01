@@ -5,7 +5,7 @@ export interface Draft  {
     image?: string,
     tags?: string[],
     category?: string,
-    thambnail?: string,
+    thumbnailImage?: string,
     isPublished?: boolean,
     publishedAt?: string,
     updatedAt?: string,
