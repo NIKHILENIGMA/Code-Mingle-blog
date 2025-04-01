@@ -24,12 +24,12 @@ const Authenticated: FC = () => {
           <Avatar>
             <AvatarImage
               src={user?.avatarImg || "/no-avatar-user.png"}
-              className="border-[3px] border-white rounded-full object-cover"
+              className="border-[0.2rem] border-primary/70 rounded-full object-cover"
             />
             <AvatarFallback>
               <AvatarImage
                 src="/no-avatar-user.png"
-                className="border-[3px] border-white rounded-full object-cover"
+                className="border border-primary/70 rounded-full object-cover"
               />
             </AvatarFallback>
           </Avatar>
