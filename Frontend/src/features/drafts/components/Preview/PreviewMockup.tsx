@@ -1,14 +1,34 @@
-import { Draft } from "@/Types/draft";
-import { draftHtml } from "@/Utils/DraftHTML";
 import { FC } from "react";
+import Loader from "@/components/Loader/Loader";
+import RenderDraftPreview from "./RenderDraftPreview";
+
+interface PreviewDraft {
+  preview: {
+    id: string;
+    title: string;
+    slug: string | null;
+    content: string;
+    image: string;
+    readTime: null;
+    category: null;
+    author: {
+      id: string;
+      username: string;
+      avatarImg: string;
+    };
+    createdAt: string;
+    updatedAt: string;
+  };
+}
 
 interface PreviewMockupProps {
-  selectedDraft: Draft;
-  type: "laptop" | "mobile";
+  selectedDraft: PreviewDraft;
   mockupImage?: string;
   altName?: string;
   mockPlacement?: string;
   placement?: string;
+  isLoading?: boolean;
+  isError?: boolean;
 }
 
 const PreviewMockup: FC<PreviewMockupProps> = ({
@@ -17,11 +37,8 @@ const PreviewMockup: FC<PreviewMockupProps> = ({
   altName,
   mockPlacement,
   placement,
-  type
-  
+  isLoading,
 }) => {
-  const renderHTML = draftHtml(selectedDraft?.title || "", selectedDraft?.content || "");
-
   return (
     <div className={"relative flex items-center w-3/4 h-full overflow-hidden"}>
       <img
@@ -29,13 +46,11 @@ const PreviewMockup: FC<PreviewMockupProps> = ({
         alt={altName}
         className={`${mockPlacement} w-full overflow-hidden object-cover `}
       />
-      <div className={`${placement} absolute`}>
-        <iframe
-          srcDoc={renderHTML}
-          title={`Draft Preview -${type}`}
-          className="w-full h-full overflow-hidden"
-        />
-      </div>
+      {isLoading ? (
+        <Loader />
+      ) : (
+        <RenderDraftPreview styles={placement ?? ""} draft={selectedDraft?.preview} />
+      )}
     </div>
   );
 };
