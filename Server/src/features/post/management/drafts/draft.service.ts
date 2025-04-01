@@ -238,5 +238,24 @@ class DraftService {
             )
         }
     }
+
+    public async previewDraftService(req: Request, next: NextFunction, where: DraftWhere) {
+        try {
+            const preview = await this.DraftRepository.draftPreviewById(where)
+
+            if (!preview) {
+                return ApiError(new Error(NOT_FOUND('draft').message), req, next, NOT_FOUND().code)
+            }
+
+            return preview
+        } catch (error) {
+            return ApiError(
+                error instanceof Error ? error : new Error(METHOD_FAILED('preview draft service').message),
+                req,
+                next,
+                METHOD_FAILED().code
+            )
+        }
+    }
 }
 export default DraftService

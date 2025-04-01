@@ -373,3 +373,23 @@ export const removeDraftThumbnail = AsyncHandler(async (req: ProtectedRequest, r
         return ApiError(new Error(INTERNAL_SERVICE((error as Error)?.message).message), req, next, INTERNAL_SERVICE().code)
     }
 })
+
+export const draftPreview = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
+    const draftId = req.params.id
+    if (!draftId) {
+        return ApiError(new Error(MISSING_ID('draft').message), req, next, MISSING_ID().code)
+    }
+
+    const userId = (req.user as User)?.id
+    if (!userId) {
+        return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
+    }
+
+    try {
+        const preview = await draftService.previewDraftService(req, next, { id: draftId, authorId: userId })
+
+        return ApiResponse(req, res, SUCCESS().code, SUCCESS('Draft fetched successfully').message, { preview })
+    } catch (error) {
+        return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('get draft').message), req, next, METHOD_FAILED().code)
+    }
+})

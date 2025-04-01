@@ -60,6 +60,38 @@ export class PrismaDraftRepository implements IDraftRepository {
         return draft
     }
 
+    public async draftPreviewById(where: DraftWhere) {
+        try {
+            const draftPreview = await prisma.post.findUnique({
+                where: where,
+                select: {
+                    id: true,
+                    title: true,
+                    slug: true,
+                    content: true,
+                    image: true,
+                    readTime: true,
+                    category: true,
+                    author: {
+                        select: {
+                            id: true,
+                            username: true,
+                            avatarImg: true,
+                        }
+                    },
+                    createdAt: true,
+                    updatedAt: true,
+                }
+            })
+
+            return draftPreview
+            
+        } catch (error) {
+            throw new Error(`Failed to find draft by id ${(error as Error).message}`)
+        }
+    }
+
+
     public async findDraftBySlug(where: DraftWhereSlug): Promise<Post | null> {
         try {
             const draft = await prisma.post.findUnique({

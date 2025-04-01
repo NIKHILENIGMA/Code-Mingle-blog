@@ -12,4 +12,5 @@ export interface IDraftRepository  {
     findDraftById(where: Record<string, string | number>): Promise<Post | null>
     findDraftBySlug(where: Record<string, string | number>): Promise<Post | null>
     findDraftsByAuthorId(where: Record<string, string | number>, orderBy?: Record<string, string>): Promise<Post[] | null>
+    draftPreviewById(where: Record<string, string | number>): Promise<Partial<Post> | null>
 }

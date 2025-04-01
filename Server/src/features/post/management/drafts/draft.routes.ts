@@ -2,6 +2,7 @@ import express from 'express'
 import { validateParams, isAuthenticated, validateBody } from '../../../../middleware'
 import {
     createDraft,
+    draftPreview,
     getDraft,
     getUserDrafts,
     removeDraft,
@@ -96,5 +97,13 @@ router.route('/:id/thumbnail/upload').post(upload.single('thumnailImage'), uploa
  * @access Private
  */
 router.route('/:id/thumbnail/remove').delete(removeDraftThumbnail)
+
+/**
+ * !Routes for getting a draft preview.
+ * @method GET
+ * @route /api/v1/drafts/:id/preview
+ * @access Private
+ */
+router.route('/:id/preview').get(validateParams(DraftParamsSchema), draftPreview)
 
 export default router
