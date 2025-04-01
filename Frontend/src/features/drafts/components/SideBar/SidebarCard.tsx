@@ -20,7 +20,7 @@ const SidebarCard: FC<DraftSideBarCardProps> = ({ draft }) => {
   return (
     <div
       key={draft.id}
-      className="space-y-2 flex p-1 border border-muted-foreground rounded-md"
+      className="space-y-2 flex p-1 border border-primary/70 rounded-md bg-card hover:bg-card/20"
     >
       <NavLink
         to={`/draft/${draft.id}`}
