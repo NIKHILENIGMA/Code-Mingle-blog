@@ -20,19 +20,19 @@ const SidebarCard: FC<DraftSideBarCardProps> = ({ draft }) => {
   return (
     <div
       key={draft.id}
-      className="space-y-2 flex p-1 border border-gray-600 rounded-md"
+      className="space-y-2 flex p-1 border border-muted-foreground rounded-md"
     >
       <NavLink
         to={`/draft/${draft.id}`}
         onClick={() => handleSelectDraft(draft)}
         className={({ isActive }: { isActive: boolean }): string =>
           `${
-            isActive ? "text-purple-600 border-purple-600" : "text-gray-800/60"
-          } flex items-center truncate w-full`
+            isActive ? "text-primary" : "text-muted-foreground/80"
+          } flex items-center truncate w-full px-2`
         }
       >
         <FileText size={24} className="px-1" />
-        {draft?.title ? truncate(draft?.title, 30) : "Untitled"}
+        {draft?.title ? truncate(draft?.title, 20) : "Untitled"}
       </NavLink>
       <SideBarDraftDropDownActions draft={draft} />
     </div>
