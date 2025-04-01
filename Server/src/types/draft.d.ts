@@ -41,6 +41,7 @@ export type DraftSelectFields = {
     id: boolean;
     title: boolean;
     content: boolean;
+    thumbnailImage?: boolean;
     image?: boolean;
     createdAt?: boolean;
 }
