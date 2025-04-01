@@ -2,12 +2,10 @@ import { Draft } from "@/features/drafts/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface InitialStateProps {
-  saveDraft: 'idle' | 'saving' | 'saved' | 'error';
   selectedDraft: Draft | null;
 }
 
 const initialState: InitialStateProps = {
-  saveDraft: 'idle',
   selectedDraft: null,
 };
 
@@ -30,12 +28,8 @@ const draftSlice = createSlice({
         };
       }
     },
-
-    setSaveDraft: (state, action: PayloadAction<{ saveDraft: 'idle' | 'saving' | 'saved' | 'error' }>) => {
-      state.saveDraft = action.payload.saveDraft;
-    },
   },
 });
 
-export const { setSelectedDraft, setSaveDraft, updateSelectedDraft } = draftSlice.actions;
+export const { setSelectedDraft, updateSelectedDraft } = draftSlice.actions;
 export default draftSlice.reducer;
