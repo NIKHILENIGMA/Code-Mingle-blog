@@ -171,6 +171,7 @@ export const getDraft = AsyncHandler(async (req: ProtectedRequest, res: Response
         id: true,
         title: true,
         content: true,
+        thumbnailImage: true,
         image: true,
         createdAt: true
     }
@@ -305,6 +306,69 @@ export const removeDraftCoverImage = AsyncHandler(async (req: ProtectedRequest, 
         await draftService.removeDraftCoverImage(req, next, draftId)
 
         return ApiResponse(req, res, SUCCESS().code, SUCCESS('Draft Cover image removed successfully').message)
+    } catch (error) {
+        return ApiError(new Error(INTERNAL_SERVICE((error as Error)?.message).message), req, next, INTERNAL_SERVICE().code)
+    }
+})
+
+export const uploadThumbnail = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
+    const thumbnailImage = req.file as Express.Multer.File
+    if (!thumbnailImage) {
+        return ApiError(new Error(BAD_REQUEST('No thumbnail provided').message), req, next, BAD_REQUEST().code)
+    }
+
+    const userId = (req.user as User)?.id
+    if (!userId) {
+        return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
+    }
+
+    const draftId = req.params.id
+    if (!draftId) {
+        return ApiError(new Error(MISSING_ID('draft').message), req, next, MISSING_ID().code)
+    }
+
+    try {
+        const cloudinaryOption: CloundinaryOption = {
+            folder: 'thumbnails',
+            public_name: `thumbnail-${draftId}`,
+            quality: 50,
+            resource: 'image',
+            altName: `thumbnail-${userId}`
+        }
+
+        const where = { id: userId }
+        const uploadThumbnail = await uploadService.uploadFile(req, next, where, thumbnailImage.path, cloudinaryOption)
+
+        if (!uploadThumbnail) {
+            return ApiError(new Error(METHOD_FAILED('upload thumbnail').message), req, next, METHOD_FAILED().code)
+        }
+
+        await draftService.updateDraftThumbnail(req, next, { thumbnailImage: uploadThumbnail }, draftId)
+
+        return ApiResponse(req, res, SUCCESS().code, SUCCESS('Thumbnail uploaded successfully').message, { thumbnail: uploadThumbnail })
+    } catch (error) {
+        return ApiError(new Error(INTERNAL_SERVICE((error as Error)?.message).message), req, next, INTERNAL_SERVICE().code)
+    }
+})
+
+export const removeDraftThumbnail = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
+    const draftId = req.params.id
+    if (!draftId) {
+        return ApiError(new Error(MISSING_ID('draft').message), req, next, MISSING_ID().code)
+    }
+
+    const userId = (req.user as User)?.id
+    if (!userId) {
+        return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
+    }
+
+    try {
+        const public_id = `thumbnails/thumbnail-${draftId}-${userId}`
+        await uploadService.removeImage(req, next, public_id)
+
+        await draftService.removeDraftThumbnail(req, next, draftId)
+
+        return ApiResponse(req, res, SUCCESS().code, SUCCESS('Thumbnail removed successfully').message)
     } catch (error) {
         return ApiError(new Error(INTERNAL_SERVICE((error as Error)?.message).message), req, next, INTERNAL_SERVICE().code)
     }

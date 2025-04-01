@@ -171,7 +171,6 @@ class DraftService {
         }
     }
 
-
     public async removeDraftCoverImage(req: Request, next: NextFunction, draftId: string): Promise<string | void> {
         try {
             const draft = await this.DraftRepository.findDraftById({ id: draftId })
@@ -186,6 +185,53 @@ class DraftService {
         } catch (error) {
             return ApiError(
                 error instanceof Error ? error : new Error(METHOD_FAILED('remove draft cover image').message),
+                req,
+                next,
+                METHOD_FAILED().code
+            )
+        }
+    }
+
+    public async updateDraftThumbnail(req: Request, next: NextFunction, image: { thumbnailImage: string }, draftId: string): Promise<string | void> {
+        try {
+            const draft = await this.DraftRepository.findDraftById({ id: draftId })
+
+            if (!draft) {
+                return ApiError(new Error(NOT_FOUND('draft').message), req, next, NOT_FOUND().code)
+            }
+
+            await this.DraftRepository.update(
+                { id: draftId },
+                {
+                    thumbnailImage: image.thumbnailImage
+                }
+            )
+
+            return 'Draft thumbnail updated successfully'
+        } catch (error) {
+            return ApiError(
+                error instanceof Error ? error : new Error(METHOD_FAILED('update draft thumbnail').message),
+                req,
+                next,
+                METHOD_FAILED().code
+            )
+        }
+    }
+
+    public async removeDraftThumbnail(req: Request, next: NextFunction, draftId: string): Promise<string | void> {
+        try {
+            const draft = await this.DraftRepository.findDraftById({ id: draftId })
+
+            if (!draft) {
+                return ApiError(new Error(NOT_FOUND('draft').message), req, next, NOT_FOUND().code)
+            }
+
+            await this.DraftRepository.update({ id: draftId }, { thumbnailImage: '' })
+
+            return 'Draft thumbnail removed successfully'
+        } catch (error) {
+            return ApiError(
+                error instanceof Error ? error : new Error(METHOD_FAILED('remove draft thumbnail').message),
                 req,
                 next,
                 METHOD_FAILED().code

@@ -1,6 +1,16 @@
 import express from 'express'
 import { validateParams, isAuthenticated, validateBody } from '../../../../middleware'
-import { createDraft, getDraft, getUserDrafts, removeDraft, removeDraftCoverImage, saveDraft, uploadDraftCoverImage } from './draft.controller'
+import {
+    createDraft,
+    getDraft,
+    getUserDrafts,
+    removeDraft,
+    removeDraftCoverImage,
+    removeDraftThumbnail,
+    saveDraft,
+    uploadDraftCoverImage,
+    uploadThumbnail
+} from './draft.controller'
 import { DraftParamsSchema, UpdateDraftBodySchema } from './draft.schema'
 import { upload } from '../../../../middleware/multer.middleware'
 
@@ -70,5 +80,21 @@ router.route('/:id/cover-image/upload/').post(upload.single('draftCoverImg'), up
  * @access Private
  */
 router.route('/:id/cover-image/remove/').delete(removeDraftCoverImage)
+
+/**
+ * !Routes for uploading a draft thumbnail.
+ * @method POST
+ * @route /api/v1/drafts/:id/thumbnail/upload
+ * @access Private
+ */
+router.route('/:id/thumbnail/upload').post(upload.single('thumnailImage'), uploadThumbnail)
+
+/**
+ * !Routes for removing a draft thumbnail.
+ * @method DELETE
+ * @route /api/v1/drafts/:id/thumbnail/remove
+ * @access Private
+ */
+router.route('/:id/thumbnail/remove').delete(removeDraftThumbnail)
 
 export default router
