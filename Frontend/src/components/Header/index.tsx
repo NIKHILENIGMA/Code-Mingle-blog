@@ -20,7 +20,6 @@ import {
 
 const Header: FC = () => {
   // const navigate = useNavigate();
-  // const { createDraftMutation } = useCreateDraft();
   const authenticate = useSelector(
     (state: RootState) => state.auth?.accessToken
   );
