@@ -1,24 +1,50 @@
 import { FC } from "react";
 import { Button } from "@/components";
 import { FilePlus2, ShieldAlert } from "@/Utils/Icons";
-import { useCreateDraft } from "../../hooks/useCreateDraft";
-// import Logo from "@/components/Logo";
 import SpinLoader from "@/components/Loader/SpinLoader";
+import { useDraftMutations } from "../../hooks/useDraftMutations";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { useDispatch } from "react-redux";
+import { setSelectedDraft } from "../../slices/draftSlice";
 
 const SideBarNewDraftButton: FC = () => {
-  const { createDraftMutation } = useCreateDraft();
+  const { createDraftMutation } = useDraftMutations();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleNewDraft = async () => {
-    await createDraftMutation.mutateAsync();
+    try {
+      const response = await createDraftMutation.mutateAsync();
+      if (response?.draftId) {
+        navigate(`/draft/${response.draftId}`);
+        dispatch(
+          setSelectedDraft({
+            selectedDraft: {
+              id: response.draftId,
+              title: "",
+              content: "",
+              image: "",
+            },
+          })
+        );
+        toast.success("New Draft created successfully");
+      } else {
+        toast.error("Failed to create draft: Missing draftId");
+      }
+    } catch (error) {
+      console.error("Error creating draft:", error);
+      toast.error("Failed to create draft");
+    }
   };
 
   return (
     <div className="w-full rounded-xl">
       <Button
-        variant="default"
+        variant={"ghost"}
         size={"sm"}
         onClick={handleNewDraft}
-        className="w-full flex items-center justify-start gap-2 bg-purple-600 text-white py-3 rounded-md hover:bg-purple-700 transition pl-4"
+        className="w-full flex items-center justify-start space-x-2"
       >
         {createDraftMutation.isPending ? (
           <>
