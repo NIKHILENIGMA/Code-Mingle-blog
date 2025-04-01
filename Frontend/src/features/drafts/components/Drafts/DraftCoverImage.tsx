@@ -16,6 +16,7 @@ import UnsplashImage from "./UnsplashImage";
 import UploadImage from "./UploadImage";
 import { toast } from "sonner";
 import { SiUnsplash } from "react-icons/si";
+import Loader from "@/components/Loader/Loader";
 
 type Navigation = "upload" | "unslash";
 
@@ -28,7 +29,7 @@ const DraftCoverImage: FC<DraftCoverImageProps> = ({ id }) => {
   const draftState = useSelector(
     (state: RootState) => state?.draft?.selectedDraft
   );
-
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   // Remove cover image from the server
   const handleRemoveCoverImage = async (e: MouseEvent<HTMLButtonElement>) => {
     // Remove cover image from the server
@@ -90,7 +91,11 @@ const DraftCoverImage: FC<DraftCoverImageProps> = ({ id }) => {
 
               <div className="w-full p-2">
                 {navigate === "upload" ? (
-                  <UploadImage id={id} />
+                  isLoading ? (
+                    <Loader />
+                  ) : (
+                    <UploadImage id={id} onLoading={setIsLoading} />
+                  )
                 ) : (
                   <UnsplashImage id={id} />
                 )}
