@@ -4,7 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { z } from "zod";
-import { setCredientials, setUser } from "../authSlice";
+import { setCredentials, setUser } from "../authSlice";
 import { useLocation, useNavigate } from "react-router-dom";
 import { LoginSchema } from "@/features/auth/schema/schema";
 import { useUser } from "@/features/Profile/hooks/useUser";
@@ -46,7 +46,7 @@ export const useLoginForm = () => {
 
         // Set the access token and persist true
         dispatch(
-          setCredientials({
+          setCredentials({
             isAuthenticated: true,
             persist: true,
             accessToken: response?.data?.token,
