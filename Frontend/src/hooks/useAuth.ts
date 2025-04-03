@@ -7,7 +7,7 @@ import {
   removeAccessToken,
   setAccessToken,
 } from "@/Utils/tokenManagement";
-import { setCredientials, setUser, setLogout } from "@/features/auth/authSlice";
+import { setCredentials, setUser, setLogout } from "@/features/auth/authSlice";
 import { useRefreshToken } from "@/features/auth/hooks/useRefreshToken";
 import { useUser } from "@/features/Profile/hooks/useUser";
 import { useEffect, useState } from "react";
@@ -20,7 +20,7 @@ export const useAuth = () => {
   } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch();
   const storedToken: string | null = getAccessToken("__acc");
-  const { refreshToken } = useRefreshToken(); // Ensure this is memoized inside the hook
+  const { refreshToken } = useRefreshToken(); 
   const { currentUser } = useUser();
 
   // Local flag to prevent multiple API calls
@@ -37,7 +37,7 @@ export const useAuth = () => {
       // If token from local storage is valid, update the Redux state
       if (storedToken && checkTokenValidity(storedToken)) {
         dispatch(
-          setCredientials({
+          setCredentials({
             accessToken: storedToken,
             persist: true,
             isAuthenticated: true,
@@ -58,7 +58,7 @@ export const useAuth = () => {
               // Update local storage and Redux state with the new token
               setAccessToken(newAccessToken);
               dispatch(
-                setCredientials({
+                setCredentials({
                   accessToken: newAccessToken,
                   persist: true,
                   isAuthenticated: true,
@@ -88,6 +88,7 @@ export const useAuth = () => {
     };
 
     tokenState();
+  // amazonq-ignore-next-line
   }, [reduxAccessToken, storedToken, dispatch, refreshToken, currentUser]);
 
   return {
