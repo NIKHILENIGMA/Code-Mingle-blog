@@ -1,7 +1,7 @@
 import axios, { AxiosError } from "axios";
 import { store } from "@/app/store/store";
 import { refreshTokenService } from "./authApiServices";
-import { setCredientials, setLogout } from "@/features/auth/authSlice";
+import { setCredentials, setLogout } from "@/features/auth/authSlice";
 import { removeAccessToken, setAccessToken } from "@/Utils/tokenManagement";
 
 const API_URL = "/api";
@@ -55,7 +55,7 @@ apiInstance.interceptors.response.use(
           setAccessToken(newAccessToken?.data.token);
 
           store.dispatch(
-            setCredientials({
+            setCredentials({
               isAuthenticated: true,
               persist: true,
               accessToken: newAccessToken.data.token,
