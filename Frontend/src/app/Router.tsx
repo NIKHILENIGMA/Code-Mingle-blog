@@ -5,7 +5,6 @@ import AboutPage from "../pages/Public/AboutPage";
 import Main from "@/Layout/Main";
 import DraftLayout from "@/features/drafts/Layout/DraftLayout";
 import PreviewPostPage from "@/features/drafts/pages/PreviewPostPage";
-// import AuthProvider from "@/features/auth/components/AuthProvider";
 import PrivateRoute from "@/components/PrivateRoute";
 import ProfileSettings from "@/features/Profile/pages/ProfileSetting";
 import PersonalSettings from "@/features/Profile/pages/PersonalSettings";
@@ -24,6 +23,7 @@ import {
   AdminUsers,
   AdminReports,
 } from "@/features/admin";
+import PreviewPage from "@/features/drafts/pages/PreviewPage";
 
 const router = createBrowserRouter([
   {
@@ -43,15 +43,15 @@ const router = createBrowserRouter([
         element: <AllPostsPage />,
       },
       {
-        path: "/posts/123",
+        path: "/posts/:id",
         element: <ReadPostPage />,
       },
       {
         path: "/profile/me",
         element: (
-          // <PrivateRoute>
-          <UserDashboard />
-          // </PrivateRoute>
+          <PrivateRoute>
+            <UserDashboard />
+          </PrivateRoute>
         ),
         children: [],
       },
@@ -83,7 +83,7 @@ const router = createBrowserRouter([
       },
     ],
   },
-
+  
   {
     path: "/draft",
     element: (
@@ -101,6 +101,10 @@ const router = createBrowserRouter([
   {
     path: "/preview/:draftId",
     element: <PreviewPostPage />,
+  },
+  {
+    path: "/posts/preview/:id",
+    element: <PreviewPage />,
   },
   {
     path: "/learn",
