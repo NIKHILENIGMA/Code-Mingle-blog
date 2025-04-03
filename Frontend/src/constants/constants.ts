@@ -33,3 +33,105 @@ export const NavItems = [
 
 export const DRAFT_STALE_TIME = import.meta.env.VITE_DRAFT_STALE_TIME || 1000 * 60 * 60 * 24;
 export const DRAFT_GC_TIME = import.meta.env.VITE_DRAFT_GARBAGE_COLLECTION_TIME || 1000 * 60 * 60 * 24 * 7;
+
+export const dummyPosts = [
+  {
+    id: 1,
+    image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
+    title: "How to use Engine Optimization to drive sales to further levels",
+    date: "Mar 14, 2025",
+    description:
+      "A platform designed for developers to express ideas, share insights and collaborate. Connect with a global community that values your expertise.",
+    author: "Nickenigma",
+    role: "Founder / CEO",
+    category: "Technology",
+  },
+  {
+    id: 2,
+    image: "https://images.unsplash.com/photo-1557682224-5b8590cd9ec5",
+    title: "How to use Engine Optimization to drive sales to further levels",
+    date: "Mar 14, 2025",
+    description:
+      "A platform designed for developers to express ideas, share insights and collaborate. Connect with a global community that values your expertise.",
+    author: "Nickenigma",
+    role: "Founder / CEO",
+    category: "Technology",
+  },
+  {
+    id: 3,
+    image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853",
+    title: "How to use Engine Optimization to drive sales to further levels",
+    date: "Mar 14, 2025",
+    description:
+      "A platform designed for developers to express ideas, share insights and collaborate. Connect with a global community that values your expertise.",
+    author: "Nickenigma",
+    role: "Founder / CEO",
+    category: "Technology",
+  },
+  {
+    id: 4,
+    image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
+    title: "How to use Engine Optimization to drive sales to further levels",
+    date: "Mar 14, 2025",
+    description:
+      "A platform designed for developers to express ideas, share insights and collaborate. Connect with a global community that values your expertise.",
+    author: "Nickenigma",
+    role: "Founder / CEO",
+    category: "Technology",
+  },
+  {
+    id: 5,
+    image: "https://images.unsplash.com/photo-1557682224-5b8590cd9ec5",
+    title: "How to use Engine Optimization to drive sales to further levels",
+    date: "Mar 14, 2025",
+    description:
+      "A platform designed for developers to express ideas, share insights and collaborate. Connect with a global community that values your expertise.",
+    author: "Nickenigma",
+    role: "Founder / CEO",
+    category: "Technology",
+  },
+  {
+    id: 6,
+    image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853",
+    title: "How to use Engine Optimization to drive sales to further levels",
+    date: "Mar 14, 2025",
+    description:
+      "A platform designed for developers to express ideas, share insights and collaborate. Connect with a global community that values your expertise.",
+    author: "Nickenigma",
+    role: "Founder / CEO",
+    category: "Technology",
+  },
+  {
+    id: 7,
+    image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
+    title: "How to use Engine Optimization to drive sales to further levels",
+    date: "Mar 14, 2025",
+    description:
+      "A platform designed for developers to express ideas, share insights and collaborate. Connect with a global community that values your expertise.",
+    author: "Nickenigma",
+    role: "Founder / CEO",
+    category: "Technology",
+  },
+  {
+    id: 8,
+    image: "https://images.unsplash.com/photo-1557682224-5b8590cd9ec5",
+    title: "How to use Engine Optimization to drive sales to further levels",
+    date: "Mar 14, 2025",
+    description:
+      "A platform designed for developers to express ideas, share insights and collaborate. Connect with a global community that values your expertise.",
+    author: "Nickenigma",
+    role: "Founder / CEO",
+    category: "Technology",
+  },
+  {
+    id: 9,
+    image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853",
+    title: "How to use Engine Optimization to drive sales to further levels",
+    date: "Mar 14, 2025",
+    description:
+      "A platform designed for developers to express ideas, share insights and collaborate. Connect with a global community that values your expertise.",
+    author: "Nickenigma",
+    role: "Founder / CEO",
+    category: "Technology",
+  },
+];
