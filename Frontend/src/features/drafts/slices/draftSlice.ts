@@ -1,12 +1,14 @@
-import { Draft } from "@/features/drafts/types";
+import { Draft, PreviewDraft } from "@/features/drafts/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface InitialStateProps {
   selectedDraft: Draft | null;
+  previewDraft: PreviewDraft | null;
 }
 
 const initialState: InitialStateProps = {
   selectedDraft: null,
+  previewDraft: null,
 };
 
 const draftSlice = createSlice({
@@ -28,6 +30,7 @@ const draftSlice = createSlice({
         };
       }
     },
+
   },
 });
 
