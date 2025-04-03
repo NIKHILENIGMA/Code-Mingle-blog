@@ -1,110 +1,23 @@
 import { FC } from "react";
 import FilterSidebar from "../components/BlogImages/FilterSidebar";
+import { useNavigate } from "react-router-dom";
+import { dummyPosts } from "@/constants/constants";
 // import { getAllPostsService } from "@/services/api/postApiServices";
 // import { useQuery } from "@tanstack/react-query";
-const posts = [
-  {
-    id: 1,
-    image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
-    title: "How to use Engine Optimization to drive sales to further levels",
-    date: "Mar 14, 2025",
-    description:
-      "A platform designed for developers to express ideas, share insights and collaborate. Connect with a global community that values your expertise.",
-    author: "Nickenigma",
-    role: "Founder / CEO",
-    category: "Technology",
-  },
-  {
-    id: 2,
-    image: "https://images.unsplash.com/photo-1557682224-5b8590cd9ec5",
-    title: "How to use Engine Optimization to drive sales to further levels",
-    date: "Mar 14, 2025",
-    description:
-      "A platform designed for developers to express ideas, share insights and collaborate. Connect with a global community that values your expertise.",
-    author: "Nickenigma",
-    role: "Founder / CEO",
-    category: "Technology",
-  },
-  {
-    id: 3,
-    image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853",
-    title: "How to use Engine Optimization to drive sales to further levels",
-    date: "Mar 14, 2025",
-    description:
-      "A platform designed for developers to express ideas, share insights and collaborate. Connect with a global community that values your expertise.",
-    author: "Nickenigma",
-    role: "Founder / CEO",
-    category: "Technology",
-  },
-  {
-    id: 4,
-    image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
-    title: "How to use Engine Optimization to drive sales to further levels",
-    date: "Mar 14, 2025",
-    description:
-      "A platform designed for developers to express ideas, share insights and collaborate. Connect with a global community that values your expertise.",
-    author: "Nickenigma",
-    role: "Founder / CEO",
-    category: "Technology",
-  },
-  {
-    id: 5,
-    image: "https://images.unsplash.com/photo-1557682224-5b8590cd9ec5",
-    title: "How to use Engine Optimization to drive sales to further levels",
-    date: "Mar 14, 2025",
-    description:
-      "A platform designed for developers to express ideas, share insights and collaborate. Connect with a global community that values your expertise.",
-    author: "Nickenigma",
-    role: "Founder / CEO",
-    category: "Technology",
-  },
-  {
-    id: 6,
-    image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853",
-    title: "How to use Engine Optimization to drive sales to further levels",
-    date: "Mar 14, 2025",
-    description:
-      "A platform designed for developers to express ideas, share insights and collaborate. Connect with a global community that values your expertise.",
-    author: "Nickenigma",
-    role: "Founder / CEO",
-    category: "Technology",
-  },
-  {
-    id: 7,
-    image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
-    title: "How to use Engine Optimization to drive sales to further levels",
-    date: "Mar 14, 2025",
-    description:
-      "A platform designed for developers to express ideas, share insights and collaborate. Connect with a global community that values your expertise.",
-    author: "Nickenigma",
-    role: "Founder / CEO",
-    category: "Technology",
-  },
-  {
-    id: 8,
-    image: "https://images.unsplash.com/photo-1557682224-5b8590cd9ec5",
-    title: "How to use Engine Optimization to drive sales to further levels",
-    date: "Mar 14, 2025",
-    description:
-      "A platform designed for developers to express ideas, share insights and collaborate. Connect with a global community that values your expertise.",
-    author: "Nickenigma",
-    role: "Founder / CEO",
-    category: "Technology",
-  },
-  {
-    id: 9,
-    image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853",
-    title: "How to use Engine Optimization to drive sales to further levels",
-    date: "Mar 14, 2025",
-    description:
-      "A platform designed for developers to express ideas, share insights and collaborate. Connect with a global community that values your expertise.",
-    author: "Nickenigma",
-    role: "Founder / CEO",
-    category: "Technology",
-  },
-];
+
+interface PostInterface {
+  id: number;
+  image: string;
+  title: string;
+  date: string;
+  description: string;
+  author: string;
+  role: string;
+  category: string;
+}
 
 const AllPostsPage: FC = () => {
+  const navigate = useNavigate();
   // const {
   //   data: posts,
   //   isLoading,
@@ -119,6 +32,10 @@ const AllPostsPage: FC = () => {
 
   // if (isLoading) return <div>Loading...</div>;
   // if (error) return <div>Error: {error.message}</div>;
+
+  const handleReadPost = (id: string) => {
+    navigate(`/posts/${id}`);
+  };
 
   return (
     <div className="p-4 md:p-8 max-w-7xl mx-auto my-16">
@@ -142,10 +59,11 @@ const AllPostsPage: FC = () => {
 
         {/* Posts List */}
         <div className="w-full md:w-3/4 space-y-6">
-          {posts.map((post: any) => (
+          {dummyPosts?.map((post: PostInterface) => (
             <div
               key={post.id}
-              className="flex flex-col md:flex-row bg-white rounded-lg p-4 md:p-6 space-y-4 md:space-y-0 md:space-x-6 transition hover:shadow-md"
+              className="flex flex-col md:flex-row bg-white rounded-lg p-4 md:p-6 space-y-4 md:space-y-0 md:space-x-6 transition hover:shadow-md cursor-pointer"
+              onClick={() => handleReadPost(post.id.toString())}
             >
               {/* Post Image */}
               <div className="w-full md:w-1/3">
@@ -160,7 +78,7 @@ const AllPostsPage: FC = () => {
               <div className="flex flex-col justify-between w-full">
                 {/* Post Header */}
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-800 hover:underline cursor-pointer">
+                  <h2 className="text-xl font-sexmibold text-gray-800 hover:underline cursor-pointer">
                     {post.title}
                   </h2>
 
