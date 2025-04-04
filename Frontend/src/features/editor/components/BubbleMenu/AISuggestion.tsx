@@ -12,16 +12,118 @@ import {
   SwatchBook,
   Wand,
 } from "@/Utils/Icons";
+import {
+  BsEmojiGrin,
+  BsEmojiLaughing,
+  BsEmojiSmile,
+  BsEmojiSmileUpsideDown,
+  BsEmojiSunglasses,
+  BsEmojiSurprise,
+  BsEmojiWink,
+} from "react-icons/bs";
 
 interface AISuggestionProps {
   editor: Editor;
 }
+
+const aiOptions = [
+  {
+    icon: <SwatchBook className="w-5 h-5 mr-3" />,
+    label: "Simplify",
+  },
+  {
+    icon: <Mic className="w-5 h-5 mr-3" />,
+    label: "Tone",
+    subOptions: [
+      {
+        icon: <BsEmojiSmile className="w-5 h-5 mr-3" />,
+        label: "Formal",
+      },
+      {
+        icon: <BsEmojiSmileUpsideDown className="w-5 h-5 mr-3" />,
+        label: "Informal",
+      },
+      {
+        icon: <BsEmojiGrin className="w-5 h-5 mr-3" />,
+        label: "Optimistic",
+      },
+      {
+        icon: <BsEmojiSunglasses className="w-5 h-5 mr-3" />,
+        label: "Friendly",
+      },
+      {
+        icon: <BsEmojiLaughing className="w-5 h-5 mr-3" />,
+        label: "Assertive",
+      },
+      {
+        icon: <BsEmojiSurprise className="w-5 h-5 mr-3" />,
+        label: "Curious",
+      },
+      {
+        icon: <BsEmojiWink className="w-5 h-5 mr-3" />,
+        label: "Persuasive",
+      },
+    ],
+  },
+  {
+    icon: <Languages className="w-5 h-5 mr-3" />,
+    label: "Translation",
+    subOptions: [
+      {
+        icon: <Languages className="w-5 h-5 mr-3" />,
+        label: "Chinese",
+      },
+      {
+        icon: <Languages className="w-5 h-5 mr-3" />,
+        label: "English",
+      },
+      {
+        icon: <Languages className="w-5 h-5 mr-3" />,
+        label: "French",
+      },
+      {
+        icon: <Languages className="w-5 h-5 mr-3" />,
+        label: "German",
+      },
+      {
+        icon: <Languages className="w-5 h-5 mr-3" />,
+        label: "Greek",
+      },
+      {
+        icon: <Languages className="w-5 h-5 mr-3" />,
+        label: "Japanese",
+      },
+      {
+        icon: <Languages className="w-5 h-5 mr-3" />,
+        label: "Russian",
+      },
+      {
+        icon: <Languages className="w-5 h-5 mr-3" />,
+        label: "Spanish",
+      },
+    ],
+  },
+  {
+    icon: <ArrowRightToLine className="w-5 h-5 mr-3" />,
+    label: "Make Long",
+  },
+  {
+    icon: <ArrowLeftToLine className="w-5 h-5 mr-3" />,
+    label: "Make Short",
+  },
+];
+
 const AISuggestion: FC<AISuggestionProps> = () => {
   const [menu, setMenu] = useState<boolean>(false);
 
   const handleShowMenu = () => {
     console.log("Button clicked");
     setMenu((prev) => !prev);
+  };
+
+  const handleOptionSelect = (option: { label: string; type?: string }) => {
+    console.log("Option selected:", option);
+    setMenu(false); // Close the menu after selecting an option
   };
 
   return (
@@ -35,95 +137,45 @@ const AISuggestion: FC<AISuggestionProps> = () => {
       </button>
 
       {menu ? (
-        <div className="absolute w-58 top-full mt-1 left-0 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
-          <ol className="py-2">
-            <li className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
-              <SwatchBook className="w-5 h-5 mr-3 text-gray-500 dark:text-gray-400" />
-              <span className="text-sm font-medium">Simplify</span>
-            </li>
-            <li className="relative flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors group">
-              <Mic className="w-5 h-5 mr-3 text-gray-500 dark:text-gray-400" />
-              <span className="text-sm font-medium">Tone</span>
+        <div className="absolute w-58 top-full mt-1 left-0 rounded-lg shadow-lg border border-primary/70 bg-background">
+          <ul className="py-2">
+            {aiOptions.map((option, index) => (
+              <li
+                key={index + option.label}
+                className="relative group cursor-pointer"
+              >
+                <div
+                  className="flex items-center px-4 py-2 hover:bg-primary/10 hover:text-primary transition-colors"
+                  onClick={() => handleOptionSelect(option)}
+                >
+                  {option.icon}
+                  <span className="text-sm font-medium">{option.label}</span>
+                </div>
 
-              <ol className="absolute left-full top-0 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 hidden group-hover:block">
-                <li className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
-                  <Mic className="w-5 h-5 mr-3 text-gray-500 dark:text-gray-400" />
-                  <span className="text-sm font-medium">Formal</span>
-                </li>
-                <li className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
-                  <Mic className="w-5 h-5 mr-3 text-gray-500 dark:text-gray-400" />
-                  <span className="text-sm font-medium">Informal</span>
-                </li>
-                <li className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
-                  <Mic className="w-5 h-5 mr-3 text-gray-500 dark:text-gray-400" />
-                  <span className="text-sm font-medium">Optimistic</span>
-                </li>
-                <li className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
-                  <Mic className="w-5 h-5 mr-3 text-gray-500 dark:text-gray-400" />
-                  <span className="text-sm font-medium">Friendly</span>
-                </li>
-                <li className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
-                  <Mic className="w-5 h-5 mr-3 text-gray-500 dark:text-gray-400" />
-                  <span className="text-sm font-medium">Assertive</span>
-                </li>
-                <li className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
-                  <Mic className="w-5 h-5 mr-3 text-gray-500 dark:text-gray-400" />
-                  <span className="text-sm font-medium">Curious</span>
-                </li>
-                <li className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
-                  <Mic className="w-5 h-5 mr-3 text-gray-500 dark:text-gray-400" />
-                  <span className="text-sm font-medium">Persuasive</span>
-                </li>
-              </ol>
-            </li>
-            <li className="relative flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
-              <Languages className="w-5 h-5 mr-3 text-gray-500 dark:text-gray-400" />
-              <span className="text-sm font-medium">Traslation</span>
-
-              <ol className="absolute left-full top-0 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 hidden group-hover:block">
-                <li className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
-                  <Mic className="w-5 h-5 mr-3 text-gray-500 dark:text-gray-400" />
-                  <span className="text-sm font-medium">Chinese</span>
-                </li>
-                <li className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
-                  <Mic className="w-5 h-5 mr-3 text-gray-500 dark:text-gray-400" />
-                  <span className="text-sm font-medium">English</span>
-                </li>
-                <li className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
-                  <Mic className="w-5 h-5 mr-3 text-gray-500 dark:text-gray-400" />
-                  <span className="text-sm font-medium">French</span>
-                </li>
-                <li className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
-                  <Mic className="w-5 h-5 mr-3 text-gray-500 dark:text-gray-400" />
-                  <span className="text-sm font-medium">German</span>
-                </li>
-                <li className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
-                  <Mic className="w-5 h-5 mr-3 text-gray-500 dark:text-gray-400" />
-                  <span className="text-sm font-medium">Greek</span>
-                </li>
-                <li className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
-                  <Mic className="w-5 h-5 mr-3 text-gray-500 dark:text-gray-400" />
-                  <span className="text-sm font-medium">Japanese</span>
-                </li>
-                <li className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
-                  <Mic className="w-5 h-5 mr-3 text-gray-500 dark:text-gray-400" />
-                  <span className="text-sm font-medium">Russian</span>
-                </li>
-                <li className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
-                  <Mic className="w-5 h-5 mr-3 text-gray-500 `dark:text-gray-400" />
-                  <span className="text-sm font-medium">Spanish</span>
-                </li>
-              </ol>
-            </li>
-            <li className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
-              <ArrowRightToLine className="w-5 h-5 mr-3 text-gray-500 dark:text-gray-400" />
-              <span className="text-sm font-medium">Make Long</span>
-            </li>
-            <li className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
-              <ArrowLeftToLine className="w-5 h-5 mr-3 text-gray-500 dark:text-gray-400" />
-              <span className="text-sm font-medium">Make Short</span>
-            </li>
-          </ol>
+                {option?.subOptions && option.subOptions?.length > 0 && (
+                  <ul className="absolute left-full top-0 w-64 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 bg-background hidden group-hover:block z-10">
+                    {option.subOptions.map((subOption, subIndex) => (
+                      <li
+                        key={subIndex + subOption.label}
+                        className="flex items-center px-4 py-2 hover:bg-primary/10 hover:text-primary cursor-pointer transition-colors"
+                        onClick={() =>
+                          handleOptionSelect({
+                            type: option.label,
+                            label: subOption.label,
+                          })
+                        }
+                      >
+                        {subOption.icon}
+                        <span className="text-sm font-medium">
+                          {subOption.label}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            ))}
+          </ul>
         </div>
       ) : null}
     </div>
