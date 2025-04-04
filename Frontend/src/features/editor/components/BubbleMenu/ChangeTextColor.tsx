@@ -16,32 +16,32 @@ const options = [
   { value: "#000000", label: "Black" },
 ];
 
-interface HighlightTextProps {
+interface ChangeTextColorProps {
   editor: Editor | null;
 }
 
-const HighlightText: FC<HighlightTextProps> = ({ editor }) => {
+const ChangeTextColor: FC<ChangeTextColorProps> = ({ editor }) => {
   const [open, setOpen] = useState<boolean>(false);
 
   const handleSelect = (color: string) => {
-    editor?.chain().focus().toggleMark("highlight", { color }).run();
+    editor?.chain().focus()?.setColor(color).run();
     setOpen(false);
   };
 
   return (
     <div
-      className=" bg-card  rounded-md"
+      className="bg-card rounded-md "
       onMouseDown={(e) => e.preventDefault()} // prevents BubbleMenu from closing
     >
       <Button
         onClick={() => setOpen((prev) => !prev)}
-        className="flex items-center gap-1 px-3 py-1 bg-card rounded-md text-sm"
+        className="flex items-center gap-1 px-3 py-1 rounded-md bg-card  text-sm"
       >
-        Highlight <ChevronDown className="w-4 h-4" />
+        Color <ChevronDown className="w-4 h-4" />
       </Button>
 
       {open && (
-        <div className="absolute top-full md:-right-[30%] lg:-right-[70%] mt-2 w-36 border border-primary/70 rounded-md shadow-md bg-card z-20">
+        <div className="absolute top-full lg:-right-[92%] mt-2 w-36 bg-popover border border-border rounded-md shadow-md z-20">
           {options.map((option) => (
             <div
               key={option.value}
@@ -49,7 +49,7 @@ const HighlightText: FC<HighlightTextProps> = ({ editor }) => {
             >
               <button
                 onClick={() => handleSelect(option.value)}
-                className="text-start h-full flex items-center gap-2 px-3 py-1 w-full rounded-sm transition-colors"
+                className="text-start h-full flex items-center gap-2 px-3 py-1 w-full hover:bg-primary/10 rounded-sm hover:text-primary transition-colors hover:border-primary"
               >
                 <span
                   className="border-2 rounded-md p-3 w-4 h-4 flex items-center justify-center"
@@ -69,4 +69,4 @@ const HighlightText: FC<HighlightTextProps> = ({ editor }) => {
   );
 };
 
-export default HighlightText;
+export default ChangeTextColor;
