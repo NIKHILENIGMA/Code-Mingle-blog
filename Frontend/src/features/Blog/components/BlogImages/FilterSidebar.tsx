@@ -8,7 +8,7 @@ const FilterSidebar = () => {
   const [isPriceOpen, setIsPriceOpen] = useState(false);
 
   return (
-    <aside className="w-full md:w-1/4 max-h-[60vh] overflow-y-auto bg-white border rounded-lg p-4 shadow-sm hide-scrollbar">
+    <aside className="w-full md:w-1/4 max-h-[60vh] overflow-y-auto bg-background border rounded-lg p-4 shadow-sm hide-scrollbar">
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold text-purple-600">Filters</h2>
