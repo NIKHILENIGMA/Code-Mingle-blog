@@ -3,7 +3,7 @@ import { House } from "@/Utils/Icons";
 import TiptapEditor from "@/features/editor/components/TiptapEditor/TipTapEditor";
 import { Button } from "@/components";
 import { useNavigate } from "react-router-dom";
-import { ModeToggle } from "@/components/mode-toggle";
+import { ModeToggle } from "@/components/DarkMode/mode-toggle";
 
 interface LearnEditorPageProps {
   title: string;
