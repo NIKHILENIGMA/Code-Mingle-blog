@@ -10,8 +10,13 @@ import { lowLightConfig } from "../config/lowLightConfig";
 import { SlashExtension } from "./SlashExtension";
 // import { TitleNode } from "../nodes/title/TitleNode";
 import { ImageNode } from "../nodes/media/ImageNode";
-import TextStyle from '@tiptap/extension-text-style'
-import { Color } from '@tiptap/extension-color'
+import TextStyle from "@tiptap/extension-text-style";
+import { Color } from "@tiptap/extension-color";
+import { SimplifyExtension } from "./AI/SimplifyExtension";
+import { TranslateTextExtension } from "./AI/TranslateTextExtension";
+import { MakeShortTextExtension } from "./AI/MakeShortTextExtension";
+import { MakeLongTextExtension } from "./AI/MakeLongTextExtension";
+import { ChangeToneExtension } from "./AI/ChangeToneExtension";
 
 const extensions = [
   StarterKit.configure({
@@ -53,11 +58,11 @@ const extensions = [
       },
     },
   }).extend({
-    inclusive: false, 
+    inclusive: false,
   }),
   TextStyle,
   Color.configure({
-    types: ['textStyle', 'heading', 'paragraph'],
+    types: ["textStyle", "heading", "paragraph"],
   }),
   SlashExtension,
   Placeholder.configure({
@@ -112,7 +117,11 @@ const extensions = [
   }).extend({
     inclusive: false,
   }),
-  // TitleNode,
+  SimplifyExtension,
+  TranslateTextExtension,
+  MakeLongTextExtension,
+  MakeShortTextExtension,
+  ChangeToneExtension,
 ];
 
 export default extensions;

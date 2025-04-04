@@ -33,12 +33,13 @@ export const ChangeToneExtension = Extension.create({
             const changedTone = async () => {
                 try {
                 const response = await changeTone(selectedText, toneType);
-    
+                  
+                const changeToneText = response?.data;
                 editor
                     .chain()
                     .focus()
                     .deleteRange({ from, to })
-                    .insertContentAt(from, response)
+                    .insertContentAt(from, changeToneText)
                     .run();
                 } catch (error) {
                 console.error(error);
