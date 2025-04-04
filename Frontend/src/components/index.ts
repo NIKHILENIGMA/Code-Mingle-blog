@@ -2,7 +2,6 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Avatar } from "./ui/avatar";
-import HeroBackground from "./HeroBackground";
 import {
   Dialog,
   DialogContent,
@@ -12,7 +11,7 @@ import {
   DialogClose,
 } from "./ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import Img from "./Img";
+import Img from "./common/Img";
 
 export {
   Button,
@@ -29,5 +28,4 @@ export {
   Popover,
   PopoverContent,
   PopoverTrigger,
-  HeroBackground
 };
