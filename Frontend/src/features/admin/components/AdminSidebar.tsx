@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { FiMenu } from "react-icons/fi";
-import { ModeToggle } from "./../../../components/mode-toggle";
+import { ModeToggle } from "../../../components/DarkMode/mode-toggle";
 
 const links = [
   {

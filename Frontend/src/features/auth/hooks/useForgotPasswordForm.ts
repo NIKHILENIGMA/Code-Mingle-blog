@@ -36,8 +36,6 @@ export const useForgotPasswordForm = () => {
       const response = (await forgotPasswordMutation({
         email: data.email,
       })) as ForgotPasswordResponse;
-      console.log(data);
-
       reset();
       return response.token;
     } catch (error) {

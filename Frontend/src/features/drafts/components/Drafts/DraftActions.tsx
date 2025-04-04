@@ -1,7 +1,7 @@
 import { FC } from "react";
 import { Button } from "@/components";
 import PublishButton from "./PublishButton";
-import { ModeToggle } from "@/components/mode-toggle";
+import { ModeToggle } from "@/components/DarkMode/mode-toggle";
 import { ScanEye, Save } from "@/Utils/Icons";
 import { useDraftActions } from "../../hooks/useDraftActions";
 

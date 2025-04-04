@@ -10,7 +10,7 @@ import { Draft } from "../../types";
 import { useNavigate } from "react-router-dom";
 import { useDraftMutations } from "../../hooks/useDraftMutations";
 import { toast } from "sonner";
-import DeleteDialog from "@/components/DeleteDialog";
+import DeleteDialog from "@/components/common/DeleteDialog";
 
 const SideBarDraftDropDownActions: FC<{ draft: Draft }> = ({ draft }) => {
   const navigation = useNavigate();

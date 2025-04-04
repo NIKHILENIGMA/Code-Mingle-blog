@@ -3,7 +3,7 @@ import { Category } from "../types";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { useCategoryMutations } from "@/features/admin/hooks/useCategoryMutation";
-import DeleteDialog from "@/components/DeleteDialog";
+import DeleteDialog from "@/components/common/DeleteDialog";
 import UpdateCategory from "./UpdateCategory";
 
 interface CategoryTableProps {
