@@ -7,7 +7,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { NavItems } from "@/constants/constants";
 import Authenticated from "@/components/Header/Authenticated";
 import NotAuthenticated from "@/components/Header/NotAuthenticated";
-import { ModeToggle } from "../mode-toggle";
+import { ModeToggle } from "../DarkMode/mode-toggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
