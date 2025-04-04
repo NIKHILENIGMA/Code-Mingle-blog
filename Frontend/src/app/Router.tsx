@@ -5,7 +5,7 @@ import AboutPage from "../pages/Public/AboutPage";
 import Main from "@/Layout/Main";
 import DraftLayout from "@/features/drafts/Layout/DraftLayout";
 import PreviewPostPage from "@/features/drafts/pages/PreviewPostPage";
-import PrivateRoute from "@/components/PrivateRoute";
+import PrivateRoute from "@/components/common/PrivateRoute";
 import ProfileSettings from "@/features/Profile/pages/ProfileSetting";
 import PersonalSettings from "@/features/Profile/pages/PersonalSettings";
 import ProfileSecurity from "@/features/Profile/pages/ProfileSecurity";
