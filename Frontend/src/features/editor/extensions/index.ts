@@ -10,6 +10,8 @@ import { lowLightConfig } from "../config/lowLightConfig";
 import { SlashExtension } from "./SlashExtension";
 // import { TitleNode } from "../nodes/title/TitleNode";
 import { ImageNode } from "../nodes/media/ImageNode";
+import TextStyle from '@tiptap/extension-text-style'
+import { Color } from '@tiptap/extension-color'
 
 const extensions = [
   StarterKit.configure({
@@ -52,6 +54,10 @@ const extensions = [
     },
   }).extend({
     inclusive: false, 
+  }),
+  TextStyle,
+  Color.configure({
+    types: ['textStyle', 'heading', 'paragraph'],
   }),
   SlashExtension,
   Placeholder.configure({
