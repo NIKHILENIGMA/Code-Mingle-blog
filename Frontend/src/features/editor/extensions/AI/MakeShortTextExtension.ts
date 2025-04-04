@@ -1,3 +1,4 @@
+import { makeTextShort } from "@/services/openAI";
 import { Editor, Extension } from "@tiptap/core";
 
 declare module "@tiptap/core" {
@@ -21,12 +22,15 @@ export const MakeShortTextExtension = Extension.create({
           if (!selectedText.trim()) return false;
           const shortenedText = async () => {
             try {
-              const response = selectedText.slice(0, 100);
+              const response = await makeTextShort(selectedText);
+              if (!response) return false;
+
+              const contractText = response?.data?.choices[0]?.message?.content;
               editor
                 .chain()
                 .focus()
                 .deleteRange({ from, to })
-                .insertContentAt(from, response)
+                .insertContentAt(from, contractText)
                 .run();
             } catch (error) {
               console.error(error);
