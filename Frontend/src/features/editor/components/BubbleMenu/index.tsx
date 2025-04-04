@@ -11,9 +11,10 @@ import {
 import ToolbarButton from "./ToolbarButton";
 import { Separator } from "@/components/ui/separator";
 import ChangeNodeType from "./ChangeNodeType";
-import HighlightOption from "./HighlightText";
+import HighlightText from "./HighlightText";
 import LinkButton from "./LinkButton";
 import AISuggestion from "./AISuggestion";
+import ChangeTextColor from "./ChangeTextColor";
 
 interface CustomeBubbleMenuProps {
   editor: Editor;
@@ -27,9 +28,9 @@ const CustomBubbleMenu: FC<CustomeBubbleMenuProps> = ({ editor }) => {
       pluginKey="bubbleMenu"
       editor={editor}
       tippyOptions={{ duration: 100 }}
-      className="flex items-center space-x-2 px-2 py-1 bg-white shadow-md rounded-md border border-[#dadada] dark:border-[#1E293B] dark:bg-[#1E293B] dark:text-white w-[50vw]"
+      className="flex items-center space-x-2 px-2 py-1 bg-card shadow-md rounded-md border border-secondary w-[50vw]"
     >
-      <div className="bubble-menu space-x-0.5 w-full items-center flex overflow-hidden whitespace-nowrap  text-black dark:text-white">
+      <div className="bubble-menu space-x-0.5 w-full items-center flex overflow-hidden whitespace-nowrap  text-muted-foreground">
         <AISuggestion editor={editor} />
 
         <Separator orientation="vertical" />
@@ -39,21 +40,21 @@ const CustomBubbleMenu: FC<CustomeBubbleMenuProps> = ({ editor }) => {
         <Separator orientation="vertical" />
         {/* Bold the selected text */}
         <ToolbarButton
-          icon={<Bold className="text-black dark:text-white" />}
+          icon={<Bold className="" />}
           isActive={editor.isActive("bold")}
           onClick={() => editor.chain().focus().toggleBold().run()}
         />
 
         {/* Italic the selected text */}
         <ToolbarButton
-          icon={<Italic className="text-black dark:text-white" />}
+          icon={<Italic className="" />}
           isActive={editor.isActive("italic")}
           onClick={() => editor.chain().focus().toggleItalic().run()}
         />
 
         {/* Underline the selected text */}
         <ToolbarButton
-          icon={<UnderLineIcon className="text-black dark:text-white" />}
+          icon={<UnderLineIcon className="" />}
           isActive={editor.isActive("underline")}
           onClick={() => {
             if (!editor) return null;
@@ -63,21 +64,21 @@ const CustomBubbleMenu: FC<CustomeBubbleMenuProps> = ({ editor }) => {
 
         {/* Strike the selected text */}
         <ToolbarButton
-          icon={<Strikethrough className="text-black dark:text-white" />}
+          icon={<Strikethrough className="" />}
           isActive={editor.isActive("strike")}
           onClick={() => editor.chain().focus().toggleStrike().run()}
         />
 
         {/* Add code to the text */}
         <ToolbarButton
-          icon={<CodeXml className="text-black dark:text-white" />}
+          icon={<CodeXml className="" />}
           isActive={editor.isActive("code")}
           onClick={() => editor.chain().focus().toggleCode().run()}
         />
 
         {/* Add code block to the text */}
         <ToolbarButton
-          icon={<SquareChartGantt className="text-black dark:text-white" />}
+          icon={<SquareChartGantt className="" />}
           isActive={editor.isActive("codeBlock")}
           onClick={() => editor.chain().focus().toggleCodeBlock().run()}
         />
@@ -88,9 +89,11 @@ const CustomBubbleMenu: FC<CustomeBubbleMenuProps> = ({ editor }) => {
 
         <Separator orientation="vertical" />
 
-        <HighlightOption editor={editor} />
+        <HighlightText editor={editor} />
 
         <Separator orientation="vertical" />
+        
+        <ChangeTextColor editor={editor} />
         {/* Change the text color */}
       </div>
     </BubbleMenu>
