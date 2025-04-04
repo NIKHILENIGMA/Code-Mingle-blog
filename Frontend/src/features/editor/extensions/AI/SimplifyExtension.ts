@@ -25,7 +25,7 @@ export const SimplifyExtension = Extension.create({
 
           // Get the selected text from the editor
           const selectedText = editor.state.doc.textBetween(from, to, " ");
-
+          
           // If there is no selected text, return
           if (!selectedText.trim()) return false;
 
@@ -33,13 +33,15 @@ export const SimplifyExtension = Extension.create({
           const simplify = async () => {
             try {
               const response = await simplifyTextContent(selectedText);
-
+              if (!response) return false;
+              
+              const simplifiedText = response?.data?.choices[0]?.message?.content
               // Replace the selected text with the simplified text
               editor
                 .chain()
                 .focus()
                 .deleteRange({ from, to })
-                .insertContentAt(from, response)
+                .insertContentAt(from, simplifiedText)
                 .run();
             } catch (error) {
               console.error(error);
