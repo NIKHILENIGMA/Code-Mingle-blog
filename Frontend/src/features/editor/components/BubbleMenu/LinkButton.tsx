@@ -7,11 +7,6 @@ interface LinkButtonProps {
   editor: Editor;
 }
 
-// interface ErrorText {
-//   anchorError: string;
-//   urlError: string;
-// }
-
 const getTheSelectedText = (editor: Editor): string => {
   const { from, to } = editor.state.selection;
   const text = editor.state.doc.textBetween(from, to);
@@ -27,14 +22,15 @@ const LinkButton: FC<LinkButtonProps> = ({ editor }) => {
       <Button
         variant={"link"}
         onClick={() => setShowMenu((prev: boolean) => !prev)}
-        className={`${
-          editor.isActive("link") ? "bg-orange-500 text-white" : ""
-        }`}
       >
-        <Link />
+        <Link
+          className={`${
+            editor.isActive("link") ? "text-primary" : "text-muted-foreground"
+          }`}
+        />
       </Button>
       {showMenu && (
-        <div className="absolute w-[30vw] bg-white top-[90%] rounded-lg space-y-2 left-[50%] p-4 flex flex-col">
+        <div className="absolute w-[30vw] bg-background border border-muted-foreground top-[90%] rounded-lg space-y-2 left-[50%] p-4 flex flex-col">
           <Label htmlFor="embbed-link">Embbed Link</Label>
           <Input
             id="embbed-link"
@@ -45,7 +41,7 @@ const LinkButton: FC<LinkButtonProps> = ({ editor }) => {
             onChange={(e) => setUrl(e.target.value)}
           />
           <Button
-            variant={"outline"}
+            variant={"default"}
             onClick={() =>
               editor.chain().focus().toggleLink({ href: url }).run()
             }
