@@ -113,16 +113,35 @@ const aiOptions = [
   },
 ];
 
-const AISuggestion: FC<AISuggestionProps> = () => {
+const AISuggestion: FC<AISuggestionProps> = ({ editor }) => {
   const [menu, setMenu] = useState<boolean>(false);
+  // const [selectedOption, setSelectedOption] = useState<string>("");
 
   const handleShowMenu = () => {
-    console.log("Button clicked");
     setMenu((prev) => !prev);
   };
 
   const handleOptionSelect = (option: { label: string; type?: string }) => {
-    console.log("Option selected:", option);
+    if (option?.label === "Make Long") {
+      editor.chain().focus().makeLongText().run();
+    }
+
+    if (option?.label === "Make Short") {
+      editor.chain().focus().makeShortText().run();
+    }
+
+    if (option?.label === "Simplify") {
+      editor.chain().focus().simplify().run();
+    }
+
+    if (option?.type === "Translation") {
+      editor.chain().focus().translateText(option?.label).run();
+    }
+
+    if (option?.type === "Tone") {
+      editor.chain().focus().setTone(option?.label).run();
+    }
+
     setMenu(false); // Close the menu after selecting an option
   };
 
@@ -153,7 +172,7 @@ const AISuggestion: FC<AISuggestionProps> = () => {
                 </div>
 
                 {option?.subOptions && option.subOptions?.length > 0 && (
-                  <ul className="absolute left-full top-0 w-64 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 bg-background hidden group-hover:block z-10">
+                  <ul className="absolute left-full top-0 w-64 rounded-lg shadow-lg border bg-background hidden group-hover:block z-10">
                     {option.subOptions.map((subOption, subIndex) => (
                       <li
                         key={subIndex + subOption.label}
