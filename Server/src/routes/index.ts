@@ -131,11 +131,11 @@ router.use('/mail/newletter', newLetterRoutes)
 /**
  * @name AI Routes
  * @description This route is used to get AI reports
- * @route /api/v1/ai-assistance
+ * @route /api/v1/openai
  * @access Private
  */
 
-router.use('/ai-assistance', aiRoutes)
+router.use('/openai', aiRoutes)
 
 //! Admin routes
 /**
