@@ -49,7 +49,7 @@ const AllPostsPage: FC = () => {
         <input
           type="text"
           placeholder="Search blogs, stories and more..."
-          className="w-full md:w-2/3 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+          className="w-full md:w-2/3 px-4 py-2 border border-primary/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 transition duration-200 bg-background"
         />
       </div>
 
@@ -62,7 +62,7 @@ const AllPostsPage: FC = () => {
           {dummyPosts?.map((post: PostInterface) => (
             <div
               key={post.id}
-              className="flex flex-col md:flex-row bg-white rounded-lg p-4 md:p-6 space-y-4 md:space-y-0 md:space-x-6 transition hover:shadow-md cursor-pointer"
+              className="flex flex-col md:flex-row bg-background text-muted-foreground rounded-lg p-4 md:p-6 space-y-4 md:space-y-0 md:space-x-6 transition hover:shadow-md cursor-pointer"
               onClick={() => handleReadPost(post.id.toString())}
             >
               {/* Post Image */}
@@ -78,18 +78,18 @@ const AllPostsPage: FC = () => {
               <div className="flex flex-col justify-between w-full">
                 {/* Post Header */}
                 <div>
-                  <h2 className="text-xl font-sexmibold text-gray-800 hover:underline cursor-pointer">
+                  <h2 className="text-xl font-sexmibold  hover:underline cursor-pointer">
                     {post.title}
                   </h2>
 
-                  <div className="flex items-center text-sm text-gray-500 mt-2 space-x-3">
+                  <div className="flex items-center text-sm text-muted-foreground/70 mt-2 space-x-3">
                     <span>{post.date}</span>
-                    <span className="bg-yellow-400 text-gray-800 px-2 py-1 rounded-md text-xs font-medium">
+                    <span className="bg-primary text-muted-foreground px-2 py-1 rounded-md text-xs font-medium">
                       {post.category}
                     </span>
                   </div>
 
-                  <p className="text-gray-600 mt-3 text-sm md:text-base">
+                  <p className="text-muted-foreground/50 mt-3 text-sm md:text-base">
                     {post.description}
                   </p>
                 </div>
@@ -102,10 +102,10 @@ const AllPostsPage: FC = () => {
                     className="w-10 h-10 rounded-full object-cover"
                   />
                   <div>
-                    <h4 className="text-sm font-semibold text-gray-800">
+                    <h4 className="text-sm font-semibold text-muted-foreground">
                       {post.author}
                     </h4>
-                    <p className="text-xs text-gray-500">{post.role}</p>
+                    <p className="text-xs text-muted-foreground/60">{post.role}</p>
                   </div>
                 </div>
               </div>
