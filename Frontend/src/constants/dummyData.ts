@@ -96,8 +96,6 @@ export const published: Published[] = [
   },
 ];
 
-
-
 export const profileCardData = [
   {
     cardId: "d300vefT",
