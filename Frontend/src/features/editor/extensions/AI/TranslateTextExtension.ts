@@ -34,12 +34,16 @@ export const TranslateTextExtension = Extension.create({
                 translateTo
               );
 
+              const translatedText = response?.data?.choices[0]?.message?.content;
+              console.log(translatedText);
+              if (!translatedText) return false;
+              
               // Replace the selected text with the translated text
               editor
                 .chain()
                 .focus()
                 .deleteRange({ from, to })
-                .insertContentAt(from, response)
+                .insertContentAt(from, translatedText)
                 .run();
             } catch (error) {
               console.error(error);
