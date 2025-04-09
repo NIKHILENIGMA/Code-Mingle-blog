@@ -1,36 +1,66 @@
-import { FC, useState } from "react";
+import { FC } from "react";
 import { Editor } from "@tiptap/core";
-import { ChevronDown } from "lucide-react";
-import { Button } from "@/components";
-
-const options = [
-  { value: "#FFFFFF", label: "Default" },
-  { value: "#FFD700", label: "Yellow" },
-  { value: "#00FF00", label: "Green" },
-  { value: "#007BFF", label: "Blue" },
-  { value: "#FF0000", label: "Red" },
-  { value: "#A020F0", label: "Purple" },
-  { value: "#FF8C00", label: "Orange" },
-  { value: "#FF69B4", label: "Pink" },
-  { value: "#A9A9A9", label: "Gray" },
-  { value: "#000000", label: "Black" },
-];
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from "@/components";
+import { hexOptions } from "@/constants/constants";
 
 interface HighlightTextProps {
   editor: Editor | null;
 }
 
 const HighlightText: FC<HighlightTextProps> = ({ editor }) => {
-  const [open, setOpen] = useState<boolean>(false);
+  const handleValueChange = (value: string) => {
+    if (!editor) return;
 
-  const handleSelect = (color: string) => {
-    editor?.chain().focus().toggleMark("highlight", { color }).run();
-    setOpen(false);
+    editor.chain().focus().toggleMark("highlight", { color: value }).run();
   };
 
   return (
-    <div
-      className=" bg-card  rounded-md"
+    <Select onValueChange={handleValueChange}>
+      <SelectTrigger
+        className="w-[100px]"
+        onPointerDown={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+        }}
+      >
+        Highlight
+      </SelectTrigger>
+      <SelectContent
+        onPointerDown={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+        }}
+      >
+        {hexOptions.map((option) => (
+          <SelectItem
+            key={option.value}
+            value={option.value}
+            onPointerDown={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+            }}
+          >
+            <span
+              className="inline-block w-3 h-3 rounded-full mr-2"
+              style={{ backgroundColor: option.value }}
+            />
+            {option.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+};
+
+export default HighlightText;
+{
+  /* <div
+      className="bg-card rounded-md"
       onMouseDown={(e) => e.preventDefault()} // prevents BubbleMenu from closing
     >
       <Button
@@ -65,8 +95,5 @@ const HighlightText: FC<HighlightTextProps> = ({ editor }) => {
           ))}
         </div>
       )}
-    </div>
-  );
-};
-
-export default HighlightText;
+    </div> */
+}
