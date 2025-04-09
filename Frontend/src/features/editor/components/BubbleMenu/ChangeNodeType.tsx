@@ -1,5 +1,7 @@
 import { FC } from "react";
 import { Editor } from "@tiptap/core";
+import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components";
+import { nodeOptions } from "@/constants/constants";
 
 export type Level = 1 | 2 | 3;
 
@@ -7,49 +9,60 @@ interface ChangeNodeTypeProps {
   editor: Editor;
 }
 
-const nodeOptions = [
-  { value: "paragraph", label: "Paragraph" },
-  { value: "1", label: "Heading 1" },
-  { value: "2", label: "Heading 2" },
-  { value: "3", label: "Heading 3" },
-  
-];
-
 const ChangeNodeType: FC<ChangeNodeTypeProps> = ({ editor }) => {
+  const handleValueChange = (value: string) => {
+    if (!editor) return;
+
+    // If the value is paragraph, set the paragraph
+    if (value === "paragraph") {
+      editor.chain().focus().setParagraph().run();
+    } else {
+      // Otherwise, set the heading level
+      editor
+        .chain()
+        .focus()
+        .toggleHeading({ level: parseInt(value) as Level })
+        .run();
+    }
+  };
+
   return (
-    <div className="relative flex-1">
-      <select
-        name="heading"
-        onChange={(e) => {
-          if (!editor) return null;
-          const value = e.target.value;
-          // If the value is paragraph, set the paragraph
-          if (value === "paragraph") {
-            editor.chain().focus().setParagraph().run();
-          } else {
-            // Otherwise, set the heading level
-            editor
-              .chain()
-              .focus()
-              .toggleHeading({ level: parseInt(value) as Level })
-              .run();
-          }
+    <Select onValueChange={handleValueChange}>
+      <SelectTrigger
+        className="w-[100px]"
+        onPointerDown={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
         }}
-        value={
-          editor.isActive("heading")
-            ? editor.getAttributes("heading").level
-            : "paragraph"
-        }
-        className="block min-w-[100px] appearance-none p-2 text-black bg-[#fff] hover:bg-slate-100 dark:bg-[#1E293B] dark:text-white rounded-md transition focus:ring-2 focus:ring-blue-500 focus:outline-none"
       >
-        {nodeOptions.map((option, index) => (
-          <option key={`${option.value}+${index}`} value={option.value}>
+        Paragraph
+      </SelectTrigger>
+      <SelectContent
+        onPointerDown={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+        }}
+      >
+        {nodeOptions.map((option) => (
+          <SelectItem
+            key={option.value}
+            value={option.value}
+            onPointerDown={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+            }}
+          >
+            <span
+              className="inline-block w-3 h-3 rounded-full mr-2"
+              style={{ backgroundColor: option.value }}
+            />
             {option.label}
-          </option>
+          </SelectItem>
         ))}
-      </select>
-    </div>
+      </SelectContent>
+    </Select>
   );
 };
 
 export default ChangeNodeType;
+
