@@ -30,6 +30,26 @@ export const NavItems = [
   { name: "Editor", path: "/learn", icon: ClipboardType },
 ];
 
+export const hexOptions = [
+  { value: "#FFFFFF", label: "Default" },
+  { value: "#FFD700", label: "Yellow" },
+  { value: "#00FF00", label: "Green" },
+  { value: "#007BFF", label: "Blue" },
+  { value: "#FF0000", label: "Red" },
+  { value: "#A020F0", label: "Purple" },
+  { value: "#FF8C00", label: "Orange" },
+  { value: "#FF69B4", label: "Pink" },
+  { value: "#A9A9A9", label: "Gray" },
+  { value: "#000000", label: "Black" },
+];
+
+export const nodeOptions = [
+  { value: "paragraph", label: "Paragraph" },
+  { value: "1", label: "Heading 1" },
+  { value: "2", label: "Heading 2" },
+  { value: "3", label: "Heading 3" },
+];
+
 
 export const DRAFT_STALE_TIME = import.meta.env.VITE_DRAFT_STALE_TIME || 1000 * 60 * 60 * 24;
 export const DRAFT_GC_TIME = import.meta.env.VITE_DRAFT_GARBAGE_COLLECTION_TIME || 1000 * 60 * 60 * 24 * 7;
