@@ -1,6 +1,6 @@
 import { CommandProps, Node } from "@tiptap/core";
 import { ReactNodeViewRenderer } from "@tiptap/react";
-import Title from "../../components/Ttitle";
+import Title from "../../components/Title";
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
