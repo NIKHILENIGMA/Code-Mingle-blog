@@ -9,7 +9,7 @@ type ActionOptions = {
   name: string;
   icon: JSX.Element;
   action: () => void;
-  variant?: "secondary" | "default";
+  variant?: "secondary" | "default" | "link" | "destructive" | "ghost" | "outline";
 };
 
 const DraftActions: FC = () => {
@@ -20,18 +20,18 @@ const DraftActions: FC = () => {
       name: "Preview",
       icon: <ScanEye size={16} />,
       action: handlePreview,
-      variant: "secondary",
+      variant: "outline",
     },
     {
       name: "Save",
       icon: <Save size={16} />,
       action: handleSave,
-      variant: "secondary",
+      variant: "outline",
     },
   ];
 
   return (
-    <div className="flex justify-between items-center mb-4 p-3">
+    <div className="flex justify-center md:justify-end items-center mb-4 p-3 gap-2 z-10 sticky top-0">
       <div className="flex gap-2">
         {actionOptions.map((action: ActionOptions, index) => (
           <Button
