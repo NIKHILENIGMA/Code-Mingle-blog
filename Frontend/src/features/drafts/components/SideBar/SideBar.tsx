@@ -40,22 +40,22 @@ const Sidebar: FC<SidebarProps> = ({ sidebarOpen }) => {
   }, [debouncedSearch, drafts]);
 
   //fixed md:static top-0 left-0 z-40 bg-background min-h-screen md:min-h-full p-4 flex flex-col justify-between border-r border-primary-100 transition-transform duration-300 ease-in-out w-full  ${sidebarOpen ? "translate-x-0 " : "-translate-x-full"}
-  
+
   return (
     <aside
       className={`fixed top-0 left-0 z-40 min-h-screen bg-background md:min-h-full p-4 flex flex-col justify-between border-r border-primary-100 w-full sm:w-[40%] md:w-[32%] lg:w-[25%] transform transition-transform duration-500 ease-in-out
         ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
       `}
     >
-
       {/* Header */}
-      <div className="">
-        <h1 className="text-xl font-bold mb-4">NODEDRAFTS</h1>
-        {/* Search Bar */}
-
-        {/* New Draft Button */}
+      <div className="space-y-2">
+        <h1
+          className="text-xl font-bold mb-4 cursor-pointer"
+          onClick={() => navigate("/")}
+        >
+          NODEDRAFTS
+        </h1>
         <SideBarNewDraftButton />
-        {/* Divider */}
         <Separator />
         <div className="w-full flex items-center justify-between relative">
           <Input
