@@ -31,7 +31,7 @@ const DraftActions: FC = () => {
   ];
 
   return (
-    <div className="flex justify-center md:justify-end items-center mb-4 p-3 gap-2 z-10 sticky top-0">
+    <div className="flex justify-center md:justify-end items-center mb-4 p-3 gap-2 z-10 top-0">
       <div className="flex gap-2">
         {actionOptions.map((action: ActionOptions, index) => (
           <Button
