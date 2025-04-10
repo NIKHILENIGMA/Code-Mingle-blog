@@ -41,7 +41,7 @@ const DraftLayout: FC = () => {
         className={`
           transform transition-transform duration-500 ease-in-out 
           w-full h-full overflow-y-auto 
-          ${expanded ? "ml-64" : "flex justify-center"}
+          ${expanded ? "ml-80" : "flex justify-center"}
         `}
       >
         <div className="max-w-6xl w-full flex justify-center">
