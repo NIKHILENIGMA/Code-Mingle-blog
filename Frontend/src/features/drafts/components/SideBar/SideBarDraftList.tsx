@@ -7,31 +7,30 @@ import SidebarLoader from "@/components/Loader/SidebarLoader";
 interface SideBarDraftListProps {
   isLoading: boolean;
   isError: boolean;
-  drafts: { drafts: Draft[] } | null;
-  filter?: string;
+  drafts: Draft[];
 }
 
 const SideBarDraftList: FC<SideBarDraftListProps> = ({
   isLoading,
   isError,
-  drafts = { drafts: [] },
-  // filter = "",
+  drafts = [],
 }) => {
-  const draftRenderCondition =
-    drafts && Array.isArray(drafts) && drafts?.length > 0;
-
   return (
-    <div className="space-y-2 draft-list  overflow-x-hidden overflow-y-auto py-3 h-[60%]">
+    <div className="space-y-2 draft-list  overflow-x-hidden overflow-y-auto py-3 h-[60%] hide-scrollbar">
       {isLoading ? (
         <SidebarLoader />
       ) : isError ? (
         <SideBarNotRender />
-      ) : draftRenderCondition ? (
-        drafts?.map((draft, index) => (
-          <SidebarCard key={draft?.id + index} draft={draft} />
-        ))
+      ) : drafts.length === 0 ? (
+        <p className="text-muted-foreground text-sm italic px-2">
+          No drafts found.
+        </p>
       ) : (
-        <div>No drafts found</div>
+        <>
+          {drafts.map((draft, index) => (
+            <SidebarCard key={draft.id + index} draft={draft} />
+          ))}
+        </>
       )}
     </div>
   );
