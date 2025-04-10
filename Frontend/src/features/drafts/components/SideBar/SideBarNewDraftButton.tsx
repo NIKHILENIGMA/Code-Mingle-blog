@@ -25,6 +25,17 @@ const SideBarNewDraftButton: FC = () => {
               title: "",
               content: "",
               image: "",
+              status: "DRAFT",
+              categoryId: null,
+              collectionId: null,
+              metaDescription: null,
+              publishedAt: null,
+              slug: null,
+              authorId: "",
+              readTime: null,
+              thumbnailImage: "",
+              updatedAt: "",
+              createdAt: "",
             },
           })
         );
