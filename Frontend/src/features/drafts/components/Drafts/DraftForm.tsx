@@ -27,7 +27,7 @@ const DraftForm: FC = () => {
           dispatch(updateSelectedDraft({ ...selectedDraft, title: newTitle }));
         }}
       />
-      <div className="flex flex-col h-full w-[57vw] p-2 mx-auto space-y-3 rounded-lg mb-16">
+      <div className="flex flex-col w-full h-full p-1 mx-auto space-y-3 rounded-lg mb-16">
         <TiptapEditor
           key={selectedDraft?.id}
           initialContent={selectedDraft?.content || ""}
