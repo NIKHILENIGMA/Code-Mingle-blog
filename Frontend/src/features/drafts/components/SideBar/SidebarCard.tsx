@@ -28,11 +28,11 @@ const SidebarCard: FC<DraftSideBarCardProps> = ({ draft }) => {
         className={({ isActive }: { isActive: boolean }): string =>
           `${
             isActive ? "text-primary" : "text-muted-foreground/80"
-          } flex items-center truncate w-full px-2`
+          } flex items-center truncate w-full px-1 text-nowrap overflow-hidden hover:text-primary/80 transition-colors duration-200 ease-in-out space-x-1`
         }
       >
         <FileText size={24} className="px-1" />
-        {draft?.title ? truncate(draft?.title, 20) : "Untitled"}
+        <span>{draft?.title ? truncate(draft?.title, 33) : "Untitled"}</span>
       </NavLink>
       <SideBarDraftDropDownActions draft={draft} />
     </div>
