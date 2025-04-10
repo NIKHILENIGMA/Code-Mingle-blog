@@ -10,19 +10,21 @@ interface DraftTitleProps {
 
 const DraftTitle: FC<DraftTitleProps> = ({
   name,
-  rows,
+  rows = 1,
   column,
   title,
   onTitleChange,
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  console.log("height", textareaRef.current?.scrollHeight);
 
   useEffect(() => {
     if (textareaRef.current) {
-      textareaRef.current.style.height = "auto"; // Reset height to recalculate
+      textareaRef.current.style.height = "auto";
       textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
     }
-  }, [title]); // Runs when the title changes
+  }, [title]);
+
   return (
     <textarea
       ref={textareaRef}
@@ -30,10 +32,9 @@ const DraftTitle: FC<DraftTitleProps> = ({
       rows={rows}
       maxLength={column}
       value={title}
-      placeholder="Article Title...."
+      placeholder="Article Title..."
       onChange={(e) => onTitleChange(e.target.value)}
-      className="bg-background resize-none text-3xl p-2 w-full font-bold outline-none hide-scrollbar"
-      style={{ overflow: "hidden" }} // Prevents scrollbar flickering
+      className="w-full resize-none text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold p-2 break-words outline-none bg-background   hide-scrollbar leading-snug"
     />
   );
 };
