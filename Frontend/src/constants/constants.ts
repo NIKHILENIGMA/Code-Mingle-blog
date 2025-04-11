@@ -4,7 +4,22 @@ import {
   House,
   ClipboardType,
   Rss,
+  ArrowLeftToLine,
+  ArrowRightToLine,
+  Languages,
+  Mic,
+  SwatchBook,
 } from "@/Utils/Icons";
+
+import {
+  BsEmojiGrin,
+  BsEmojiLaughing,
+  BsEmojiSmile,
+  BsEmojiSmileUpsideDown,
+  BsEmojiSunglasses,
+  BsEmojiSurprise,
+  BsEmojiWink,
+} from "react-icons/bs";
 
 export const AUTHENTICATION_URL = "/v1/users/authentication";
 export const PROFILE_URL = "/v1/users/profile";
@@ -61,9 +76,99 @@ export const languageOptions: LanguageType[] = [
   "csharp",
 ];
 
+export const aiOptions = [
+  {
+    name: "Simplify",
+    icon: SwatchBook,
+    label: "Simplify",
+    value: "simplify",
+  },
+  {
+    name: "Tone",
+    icon: Mic,
+    label: "Tone",
+    value: "tone",
+    subOptions: [
+      {
+        icon: BsEmojiSmile,
+        label: "Formal",
+      },
+      {
+        icon: BsEmojiSmileUpsideDown,
+        label: "Informal",
+      },
+      {
+        icon: BsEmojiGrin,
+        label: "Optimistic",
+      },
+      {
+        icon: BsEmojiSunglasses,
+        label: "Friendly",
+      },
+      {
+        icon: BsEmojiLaughing,
+        label: "Assertive",
+      },
+      {
+        icon: BsEmojiSurprise,
+        label: "Curious",
+      },
+      {
+        icon: BsEmojiWink,
+        label: "Persuasive",
+      },
+    ],
+  },
+  {
+    name: "Translation",
+    icon: Languages,
+    label: "Translation",
+    value: "translation",
+    subOptions: [
+      {
+        icon: Languages,
+        label: "Chinese",
+      },
+      {
+        icon: Languages,
+        label: "English",
+      },
+      {
+        icon: Languages,
+        label: "French",
+      },
+      {
+        icon: Languages,
+        label: "German",
+      },
+      {
+        icon: Languages,
+        label: "Greek",
+      },
+      {
+        icon: Languages,
+        label: "Japanese",
+      },
+    ],
+  },
+  {
+    name: "Make Long",
+    icon: ArrowRightToLine,
+    label: "Make Long",
+    value: "makeLong",
+  },
+  {
+    name: "Make Short",
+    icon: ArrowLeftToLine,
+    label: "Make Short",
+    value: "makeShort",
+  },
+];
 
-export const DRAFT_STALE_TIME = import.meta.env.VITE_DRAFT_STALE_TIME || 1000 * 60 * 60 * 24;
-export const DRAFT_GC_TIME = import.meta.env.VITE_DRAFT_GARBAGE_COLLECTION_TIME || 1000 * 60 * 60 * 24 * 7;
+export const DRAFT_STALE_TIME =
+  import.meta.env.VITE_DRAFT_STALE_TIME || 1000 * 60 * 60 * 24;
+export const DRAFT_GC_TIME =
+  import.meta.env.VITE_DRAFT_GARBAGE_COLLECTION_TIME || 1000 * 60 * 60 * 24 * 7;
 
 export const dummyPosts = [
   {
