@@ -55,6 +55,7 @@ import {
   Clipboard,
   Moon,
   Search,
+  ClipboardCheck, 
   CircleUser,
   MonitorPlay,
   ClipboardList,
@@ -83,6 +84,7 @@ import {
 
 export {
   BookCheck,
+  ClipboardCheck, 
   ImagePlus,
   GripVertical,
   ShieldAlert,
