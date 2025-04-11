@@ -14,28 +14,31 @@ export const useRenderEmbbedImg = ({
   const [showModal, setShowModal] = useState<boolean>(false);
   const [bubbleMenu, setBubbleMenu] = useState<boolean>(false);
 
-  const handleImageChange = useCallback(() => {
-    const url = prompt("Enter new image URL:")!;
-    if (!url) return;
-    try {
-      if (!isValidURL(url)) {
-        alert("Invalid URL");
-        return;
-      }
+  const handleImageChange = useCallback(
+    () => {
+      const url = prompt("Enter the new image URL:");
+      if (!url) return;
+      try {
+        if (!isValidURL(url)) {
+          alert("Invalid URL");
+          return;
+        }
 
-      if (url && updateAttributes) {
-        updateAttributes({
-          src: url,
-          alt: "Image",
-        });
+        if (url && updateAttributes) {
+          updateAttributes({
+            src: url,
+            alt: "Image",
+          });
+        }
+      } catch (error) {
+        console.error("Error updating image:", error);
+        alert("Failed to update image. Please try again with a valid URL.");
       }
-    } catch (error) {
-      console.error("Error updating image:", error);
-      alert("Failed to update image. Please try again with a valid URL.");
-    }
-    setBubbleMenu((prev) => !prev);
-    editor.chain().focus().run();
-  }, [editor, updateAttributes, setBubbleMenu]);
+      setBubbleMenu((prev) => !prev);
+      editor.chain().focus().run();
+    },
+    [editor, updateAttributes, setBubbleMenu]
+  );
 
   const handleRemoveImage = useCallback(() => {
     editor
