@@ -1,10 +1,11 @@
-import { Input, Label } from "@/components";
+import { Button, Input, Label } from "@/components";
 import { useDebounce } from "@/hooks/useDebounce";
 import { uploadUnslashImageService } from "@/services/api/draftApiServices";
 import unsplashService from "@/services/unsplashApi/unsplashService";
 import { ChangeEvent, FC, MouseEvent, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { updateSelectedDraft } from "../../slices/draftSlice";
+import { Plus } from "@/Utils/Icons";
 
 interface UnsplashImageProps {
   id: string;
@@ -22,7 +23,7 @@ const UnsplashImage: FC<UnsplashImageProps> = ({ id }) => {
     e.preventDefault();
     setUnslashURL(e.currentTarget.src);
     console.log("Unsplash URL: ", unslashURL);
-    
+
     if (!id) throw new Error("Draft ID is required to upload unsplash image");
 
     // Upload Unsplash image to the server
@@ -68,31 +69,43 @@ const UnsplashImage: FC<UnsplashImageProps> = ({ id }) => {
   return (
     <div className="flex flex-col space-y-2">
       <Label htmlFor="unsplash-image">Search for images on Unsplash</Label>
-      <Input
-        type="text"
-        id="unsplash-image"
-        placeholder="Search for images on Unsplash"
-        className="text-lg focus:ring-2 focus:ring-blue-500"
-        onChange={handleSearchUnsplashImage}
-      />
-      <div className="w-full h-[20vw] my-2 overflow-y-auto overflow-x-hidden border border-gray-300 rounded-lg hide-scrollbar">
-        {/* Unsplash Image Grid */}
-        <div className="grid grid-cols-3 gap-2 p-2 ">
-          {unsplashImages ? (
-            unsplashImages.map((image, index) => (
-              <img
-                key={index}
-                src={image}
-                alt="unsplash"
-                className="w-full h-20 object-cover cursor-pointer rounded-md hover:opacity-80"
-                onClick={handleUploadUnsplashURL}
-              />
-            ))
-          ) : (
-            <p>No images found</p>
-          )}
-        </div>
+      <div className="w-full py-1 relative">
+        <Input
+          type="text"
+          id="unsplash-image"
+          placeholder="Search for images on Unsplash"
+          className="text-lg focus:ring-2 focus:ring-primary/30"
+          onChange={handleSearchUnsplashImage}
+        />
+        {search && (
+          <Button
+            variant={"link"}
+            onClick={() => setSearch("")}
+            className="absolute right-2 top-1 end-1"
+          >
+            <Plus className="rotate-45" />
+          </Button>
+        )}
       </div>
+      {search && (
+        <div className="w-full h-[20vw] my-2 overflow-y-auto overflow-x-hidden border border-primary/30 rounded-lg">
+          <div className="grid grid-cols-3 gap-2 p-2 ">
+            {unsplashImages ? (
+              unsplashImages.map((image, index) => (
+                <img
+                  key={index}
+                  src={image}
+                  alt="unsplash"
+                  className="w-full h-44 object-cover cursor-pointer rounded-md hover:opacity-80"
+                  onClick={handleUploadUnsplashURL}
+                />
+              ))
+            ) : (
+              <p>No images found</p>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
