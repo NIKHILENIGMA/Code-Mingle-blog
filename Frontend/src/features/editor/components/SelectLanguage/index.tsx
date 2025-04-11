@@ -33,7 +33,7 @@ export const SelectLanguage: FC<SelectLanguageProps> = ({
 
   return (
     <Select value={language} onValueChange={handleLanguageChange} >
-      <SelectTrigger className="w-[96px] text-foreground bg-background">
+      <SelectTrigger className="w-[96px] text-white bg-trasparent border-none shadow-none hover:bg-primary/10 hover:text-primary transition-colors rounded-md p-2">
         <SelectValue placeholder="Language" />
       </SelectTrigger>
       <SelectContent>
