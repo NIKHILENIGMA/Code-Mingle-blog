@@ -8,7 +8,7 @@ const PreviewToggleDevice: FC<{
   const navigate = useNavigate();
   
   return (
-    <div className="flex justify-center w-full gap-10 p-5 text-2xl font-semibold text-white">
+    <div className="flex justify-center w-full gap-10 p-5 text-2xl font-semibold rounded-lg shadow-md">
       <Button onClick={() => navigate(-1)}>Back</Button>
       <Button className="" onClick={() => onToggle("laptop")}>
         Laptop
