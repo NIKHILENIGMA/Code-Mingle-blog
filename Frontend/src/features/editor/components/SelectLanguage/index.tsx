@@ -32,8 +32,8 @@ export const SelectLanguage: FC<SelectLanguageProps> = ({
   };
 
   return (
-    <Select value={language} onValueChange={handleLanguageChange}>
-      <SelectTrigger className="w-[96px]">
+    <Select value={language} onValueChange={handleLanguageChange} >
+      <SelectTrigger className="w-[96px] text-foreground bg-background">
         <SelectValue placeholder="Language" />
       </SelectTrigger>
       <SelectContent>
