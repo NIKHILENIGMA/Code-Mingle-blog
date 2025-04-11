@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import SideBar from "../components/SideBar/SideBar";
 import { Outlet } from "react-router-dom";
 import { Toaster } from "sonner";
@@ -12,8 +12,30 @@ const DraftLayout: FC = () => {
     setExpanded((prev) => !prev);
   };
 
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.key.toLocaleLowerCase() === "e") {
+        e.preventDefault();
+        setExpanded((prev) => !prev); // Expand the sidebar
+      } else if (e.key === "Escape") {
+        setExpanded(false); // Collapse the sidebar
+      }
+    };
+
+    // Add event listener for keydown events
+    addEventListener("keydown", handleKeyPress);
+
+    // Cleanup the event listener on component unmount
+    return () => {
+      removeEventListener("keydown", handleKeyPress); 
+    };
+  }, []);
+
   return (
-    <div className="flex w-full h-screen bg-background overflow-hidden relative ">
+    <div
+      className="flex w-full h-screen bg-background overflow-hidden relative"
+      tabIndex={0} // Make the div focusable to capture key events
+    >
       <SideBar sidebarOpen={expanded} />
 
       {/* Toggle Button */}
@@ -22,7 +44,7 @@ const DraftLayout: FC = () => {
           <Button
             variant="outline"
             onClick={toggleSidebar}
-            className="fixed top-2 start-52 md:start-48 lg:start-80 border-none z-50 p-2 rounded "
+            className="fixed top-2 start-52 md:start-48 lg:start-80 border-none z-50 p-2 rounded"
           >
             <GoSidebarCollapse size={20} />
           </Button>
