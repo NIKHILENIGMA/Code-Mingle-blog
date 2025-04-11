@@ -83,7 +83,7 @@ const extensions = [
     },
   }),
   GlobalDragHandle.configure({
-    dragHandleWidth: 15,
+    dragHandleWidth: 23,
     scrollTreshold: 100,
   }),
   Youtube.configure({
