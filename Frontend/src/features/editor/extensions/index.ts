@@ -15,6 +15,7 @@ import { MakeShortTextExtension } from "./AI/MakeShortTextExtension";
 import { MakeLongTextExtension } from "./AI/MakeLongTextExtension";
 import { ChangeToneExtension } from "./AI/ChangeToneExtension";
 import { ExtendedCodeBlock } from "./ExtendedCodeBlock";
+import { lowLightConfig } from "@/Utils/lowLightConfig";
 
 const extensions = [
   StarterKit.configure({
@@ -75,6 +76,7 @@ const extensions = [
   }),
   ImageNode,
   ExtendedCodeBlock.configure({
+    lowlight: lowLightConfig,
     defaultLanguage: "plaintext",
     HTMLAttributes: {
       class: "rounded-md",
