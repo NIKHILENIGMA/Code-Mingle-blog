@@ -1,14 +1,11 @@
 import { StarterKit } from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
-import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import GlobalDragHandle from "tiptap-extension-global-drag-handle";
 import Youtube from "@tiptap/extension-youtube";
 import Underline from "@tiptap/extension-underline";
 import Highlight from "@tiptap/extension-highlight";
 import Link from "@tiptap/extension-link";
-import { lowLightConfig } from "../config/lowLightConfig";
 import { SlashExtension } from "./SlashExtension";
-// import { TitleNode } from "../nodes/title/TitleNode";
 import { ImageNode } from "../nodes/media/ImageNode";
 import TextStyle from "@tiptap/extension-text-style";
 import { Color } from "@tiptap/extension-color";
@@ -17,6 +14,7 @@ import { TranslateTextExtension } from "./AI/TranslateTextExtension";
 import { MakeShortTextExtension } from "./AI/MakeShortTextExtension";
 import { MakeLongTextExtension } from "./AI/MakeLongTextExtension";
 import { ChangeToneExtension } from "./AI/ChangeToneExtension";
+import { ExtendedCodeBlock } from "./ExtendedCodeBlock";
 
 const extensions = [
   StarterKit.configure({
@@ -76,11 +74,10 @@ const extensions = [
     },
   }),
   ImageNode,
-  CodeBlockLowlight.configure({
-    lowlight: lowLightConfig,
-    defaultLanguage: "javascript",
+  ExtendedCodeBlock.configure({
+    defaultLanguage: "plaintext",
     HTMLAttributes: {
-      class: "rounded-md bg-gray-100 dark:bg-gray-800",
+      class: "rounded-md",
     },
   }),
   GlobalDragHandle.configure({
