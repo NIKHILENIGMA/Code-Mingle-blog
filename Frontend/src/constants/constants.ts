@@ -1,4 +1,5 @@
 // Description: All the constants used in the frontend are defined here.
+import { LanguageType } from "@/features/editor/types";
 import {
   House,
   ClipboardType,
@@ -48,6 +49,16 @@ export const nodeOptions = [
   { value: "1", label: "Heading 1" },
   { value: "2", label: "Heading 2" },
   { value: "3", label: "Heading 3" },
+];
+
+export const languageOptions: LanguageType[] = [
+  "plaintext",
+  "html",
+  "css",
+  "javascript",
+  "java",
+  "cpp",
+  "csharp",
 ];
 
 
