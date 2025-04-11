@@ -68,7 +68,7 @@ const Sidebar: FC<SidebarProps> = ({ sidebarOpen }) => {
           {search && (
             <Button
               variant={"link"}
-              className="absolute inset-y-0 end-2 p-0 hover:no-underline"
+              className="absolute inset-y-0 end-2 hover:no-underline p-2"
               onClick={() => setSearch("")}
             >
               clear
