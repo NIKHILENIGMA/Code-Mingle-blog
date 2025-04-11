@@ -66,8 +66,8 @@ const DraftCoverImage: FC<DraftCoverImageProps> = ({ id }) => {
               <ImagePlus /> Add Cover Image
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[800px]">
-            <DialogHeader>
+          <DialogContent className="sm:max-w-[700px]">
+            <DialogHeader className="px-5">
               <DialogTitle>Add Cover Image</DialogTitle>
               <DialogDescription>
                 Add a cover image to your draft to make it more appealing.
@@ -76,11 +76,15 @@ const DraftCoverImage: FC<DraftCoverImageProps> = ({ id }) => {
 
             <div className=" w-full p-4 rounded-lg min-h-full space-y-2">
               <div className="flex space-x-3 w-full p-1">
-                <Button onClick={() => setNavigate("upload")}>
+                <Button
+                  variant={navigate === "upload" ? "default" : "outline"}
+                  onClick={() => setNavigate("upload")}
+                >
                   <Upload />
                   Upload
                 </Button>
                 <Button
+                  variant={navigate === "unslash" ? "default" : "outline"}
                   className="overflow-hidden"
                   onClick={() => setNavigate("unslash")}
                 >
