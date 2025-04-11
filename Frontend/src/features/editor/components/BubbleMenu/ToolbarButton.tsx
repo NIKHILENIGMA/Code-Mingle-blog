@@ -30,18 +30,18 @@ const ToolbarButton: React.FC<ToolbarButtonProps> = ({
           <Button
             variant={"link"}
             onClick={onClick}
-            className={`p-2 flex-1 text-muted-foreground rounded-md transition ${
+            className={`p-2 flex-1 text-muted-foreground rounded-md border-none shadow-none hover:bg-primary/10 hover:text-primary transition-colors ${
               isActive ? "bg-primary rounded-lg p-2 text-white " : ""
             }`}
           >
             {icon}
           </Button>
         </TooltipTrigger>
-        <TooltipContent side="top" className="z-[9999] space-x-3">
-            <div className="flex flex-col items-center space-y-1">
-            <p className="text-sm font-medium">{content}</p>
-            <span className="text-xs text-muted-foreground">{shortcut}</span>
-            </div>
+        <TooltipContent side="top" className="z-[9999] space-x-3 bg-card border border-secondary/50">
+          <div className="flex flex-col items-center space-y-1">
+            <p className="text-sm font-medium text-foreground">{content}</p>
+            <span className="text-xs text-foreground/30">{shortcut}</span>
+          </div>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
