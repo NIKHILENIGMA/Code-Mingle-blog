@@ -26,7 +26,7 @@ const LinkButton: FC<LinkButtonProps> = ({ editor }) => {
   const [url, setUrl] = useState<string>(getTheSelectedText(editor));
 
   return (
-    <div>
+    <>
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -43,12 +43,12 @@ const LinkButton: FC<LinkButtonProps> = ({ editor }) => {
               />
             </Button>
           </TooltipTrigger>
-          <TooltipContent side="top" className="z-[9999] space-x-3">
+          <TooltipContent side="top" className="z-[9999] space-x-3 bg-card border border-secondary/50">
             <div className="flex flex-col items-center space-y-1">
-              <p className="text-sm font-medium">
+              <p className="text-sm font-medium text-foreground">
                 Link
               </p>
-              <span className="text-xs text-muted-foreground">
+              <span className="text-xs text-foreground/30">
                 Ctrl + K
               </span>
             </div>
@@ -78,7 +78,7 @@ const LinkButton: FC<LinkButtonProps> = ({ editor }) => {
           </Button>
         </div>
       )}
-    </div>
+    </>
   );
 };
 
