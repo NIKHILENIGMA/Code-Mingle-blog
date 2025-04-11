@@ -18,7 +18,7 @@ const ChangeTextColor: FC<ChangeTextColorProps> = ({ editor }) => {
   return (
     <Select onValueChange={handleValueChange}>
       <SelectTrigger
-        className="w-[100px]"
+        className="w-[90px] border-none bg-transparent hover:bg-transparent shadow-none" 
         onPointerDown={(e) => {
           e.stopPropagation();
           e.preventDefault();
