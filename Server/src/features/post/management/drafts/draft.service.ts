@@ -133,7 +133,7 @@ class DraftService {
 
     public async getUserDraftsService(req: Request, next: NextFunction, options: { where: DraftWhereStatus }): Promise<Post[] | void> {
         try {
-            const drafts: Post[] | null = await this.DraftRepository.findDraftsByAuthorId(options.where)
+            const drafts: Post[] | null = await this.DraftRepository.findDraftsByAuthorId(options.where, { createdAt: 'desc' })
 
             if (!drafts) {
                 return ApiError(new Error(NOT_FOUND('drafts').message), req, next, NOT_FOUND().code)
