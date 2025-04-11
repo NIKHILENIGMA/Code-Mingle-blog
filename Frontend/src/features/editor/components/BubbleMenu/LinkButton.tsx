@@ -1,5 +1,13 @@
 import { FC, useState } from "react";
-import { Button, Input, Label } from "@/components";
+import {
+  Button,
+  Input,
+  Label,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components";
 import { Link } from "@/Utils/Icons";
 import { Editor } from "@tiptap/core";
 
@@ -19,18 +27,37 @@ const LinkButton: FC<LinkButtonProps> = ({ editor }) => {
 
   return (
     <div>
-      <Button
-        variant={"link"}
-        onClick={() => setShowMenu((prev: boolean) => !prev)}
-      >
-        <Link
-          className={`${
-            editor.isActive("link") ? "text-primary" : "text-muted-foreground"
-          }`}
-        />
-      </Button>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant={"link"}
+              onClick={() => setShowMenu((prev: boolean) => !prev)}
+            >
+              <Link
+                className={`${
+                  editor.isActive("link")
+                    ? "text-primary"
+                    : "text-muted-foreground"
+                }`}
+              />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="top" className="z-[9999] space-x-3">
+            <div className="flex flex-col items-center space-y-1">
+              <p className="text-sm font-medium">
+                Link
+              </p>
+              <span className="text-xs text-muted-foreground">
+                Ctrl + K
+              </span>
+            </div>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+
       {showMenu && (
-        <div className="absolute w-[30vw] bg-background border border-muted-foreground top-[90%] rounded-lg space-y-2 left-[50%] p-4 flex flex-col">
+        <div className="absolute w-[30vw] bg-background border border-primary/50 top-[110%] rounded-lg space-y-2 left-[20%] p-4 flex flex-col shadow-md">
           <Label htmlFor="embbed-link">Embbed Link</Label>
           <Input
             id="embbed-link"
