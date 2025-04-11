@@ -49,7 +49,7 @@ const CustomBubbleMenu: FC<CustomeBubbleMenuProps> = ({ editor }) => {
         duration: 100,
       }}
       shouldShow={shouldShow}
-      className="flex items-center bg-card border border-secondary p-1 px-2 space-x-1 shadow-lg rounded-md w-full lg:min-w-[750px] overflow-y-auto lg:overflow-hidden"
+      className="flex items-center bg-card border border-secondary p-1 px-2 space-x-1 shadow-lg rounded-md w-full lg:min-w-[750px] overflow-y-auto lg:overflow-hidden scrollbar-thin"
     >
       <AISuggestion editor={editor} />
 
