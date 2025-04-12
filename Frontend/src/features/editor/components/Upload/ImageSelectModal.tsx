@@ -14,7 +14,7 @@ const ImageSelectModal: FC<ImageSelectModalProps> = ({ onModalChange, deleteNode
   return (
     <div
       onClick={() => onModalChange(!editor.isActive('image'))}
-      className="relative w-full p-4 flex flex-col items-center justify-center cursor-pointer transition-colors duration-200"
+      className="relative w-full p-4 flex flex-col items-center justify-center cursor-pointer transition-colors duration-200 border border-secondary bg-card"
     >
       <div className="absolute top-0 right-0 p-2 z-50">
         <Button
