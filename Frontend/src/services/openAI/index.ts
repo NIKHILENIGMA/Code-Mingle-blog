@@ -85,3 +85,20 @@ export const makeTextShort = async (prompt: string) => {
     console.error(error);
   }
 };
+
+
+export const generateAiContentService = async (prompt: string) => {
+  try {
+    const response = await apiInstance.post(`${OPEN_AI_URL}/generate-ai-content`, {
+      prompt,
+    });
+
+    if (response.status !== 200) {
+      throw new Error("Failed to generate AI content");
+    }
+
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+}
