@@ -9,6 +9,7 @@ import AIService from './ai.service'
 import { Prompt } from './ai.types'
 import { promptSchema } from './ai.schema'
 import { validateBody } from '../../utils/Validations'
+import { PromptType, ToneType } from '../../types/types'
 
 const aiService = new AIService()
 const {
@@ -117,6 +118,39 @@ export const makeTextShort = AsyncHandler(async (req: ProtectedRequest, res: Res
         const chatGPTResponse = await aiService.makeTextShortService(req, next, text)
 
         return ApiResponse(req, res, SUCCESS().code, SUCCESS('Text condensed successfully').message, chatGPTResponse)
+    } catch (error) {
+        return ApiError(
+            error instanceof Error ? error : new Error(INTERNAL_SERVICE('Failed to get GPT response').message),
+            req,
+            next,
+            INTERNAL_SERVICE().code
+        )
+    }
+})
+
+export const generateAiContent = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
+    // Request body validation
+    // validateBody(promptSchema, req.body)
+    const { text, tone, type } = req.body as {
+        text: string
+        tone: ToneType
+        type: PromptType
+    }
+
+    const options = {
+        text,
+        tone,
+        type
+    }
+
+    try {
+        const chatGPTResponse = await aiService.generateContent(req, next, options)
+
+        if (!chatGPTResponse) {
+            return ApiError(new Error(INTERNAL_SERVICE('No response got from gpt').message), req, next, INTERNAL_SERVICE().code)
+        }
+
+        return ApiResponse(req, res, SUCCESS().code, SUCCESS('AI Content generated successfully').message, chatGPTResponse)
     } catch (error) {
         return ApiError(
             error instanceof Error ? error : new Error(INTERNAL_SERVICE('Failed to get GPT response').message),
