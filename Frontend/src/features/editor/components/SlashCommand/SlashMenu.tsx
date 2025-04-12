@@ -51,7 +51,7 @@ const SlashMenu: FC<SlashMenuProps> = ({ editor, onClose, query }) => {
 
   return (
     <div
-      className="absolute z-50 p-4 md:p-5 w-[90vw] md:w-[27vw] max-h-[400px] overflow-y-auto rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-lg transition-all duration-200 ease-in-out hide-scrollbar"
+      className="absolute z-50 p-4 md:p-5 w-[90vw] md:w-[27vw] max-h-[400px] overflow-y-auto rounded-lg border border-card bg-card shadow-lg transition-all duration-200 ease-in-out hide-scrollbar"
       tabIndex={0}
       onKeyDown={handleKeyDown}
     >
