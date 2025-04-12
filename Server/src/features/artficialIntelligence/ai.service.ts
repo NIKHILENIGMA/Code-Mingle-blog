@@ -4,10 +4,12 @@ import { ApiError } from '../../utils/ApiError'
 import { NextFunction, Request } from 'express'
 import { responseMessage } from '../../constant'
 import { ChatCompletion } from 'openai/resources'
+import { promptSelection } from '../../utils/PromptSelection'
+import { PromptType, ToneType } from '../../types/types'
 // import { AxiosResponse } from 'axios'
 // import { apiInstance } from './aiRequest'
 
-const { METHOD_FAILED } = responseMessage
+const { METHOD_FAILED, BAD_REQUEST } = responseMessage
 
 export default class AIService {
     private openai: OpenAI
@@ -80,9 +82,9 @@ export default class AIService {
 
     /**
      *  Translate the given text into the specified language.
-     * @param {Request} req - The Express request object 
-     * @param {NextFunction} next - Express next middleware function 
-     * @param {String} text - The text to be translated 
+     * @param {Request} req - The Express request object
+     * @param {NextFunction} next - Express next middleware function
+     * @param {String} text - The text to be translated
      * @param type - The desired language to translate the text into
      * @returns  {Promise<ChatCompletion>} The AI-generated translated text
      * @throws {ApiError} When the AI request fails or returns no response
@@ -110,9 +112,9 @@ export default class AIService {
 
     /**
      *  Generate a long-form text based on the given text.
-     * @param {Request} req - The Express request object 
-     * @param {NextFunction} next - Express next middleware function 
-     * @param {String} text - The text to be expanded 
+     * @param {Request} req - The Express request object
+     * @param {NextFunction} next - Express next middleware function
+     * @param {String} text - The text to be expanded
      * @returns  {Promise<ChatCompletion>} The AI-generated expanded text
      * @throws {ApiError} When the AI request fails or returns no response
      */
@@ -139,9 +141,9 @@ export default class AIService {
 
     /**
      *  Generate a short-form text based on the given text.
-     * @param {Request} req - The Express request object 
-     * @param {NextFunction} next - Express next middleware function 
-     * @param {String} text - The text to be condensed 
+     * @param {Request} req - The Express request object
+     * @param {NextFunction} next - Express next middleware function
+     * @param {String} text - The text to be condensed
      * @returns  {Promise<ChatCompletion>} The AI-generated condensed text
      * @throws {ApiError} When the AI request fails or returns no response
      */
@@ -166,7 +168,33 @@ export default class AIService {
         }
     }
 
-    
+    public async generateContent(req: Request, next: NextFunction, options: { text: string; tone: ToneType; type: PromptType }) {
+        const { text, tone, type } = options
+
+        const promptMessage = promptSelection({ type, tone, text })
+
+        if (typeof promptMessage === 'object') {
+            return ApiError(new Error(BAD_REQUEST(promptMessage.message).message), req, next, BAD_REQUEST().code)
+        }
+
+        try {
+            const response: ChatCompletion = await this.requestOpenAI(promptMessage)
+
+            if (!response) {
+                return ApiError(new Error(METHOD_FAILED('No response got from gpt').message), req, next, METHOD_FAILED().code)
+            }
+
+            return response
+        } catch (error) {
+            return ApiError(
+                error instanceof Error ? error : new Error(METHOD_FAILED('Generate Ai response failed').message),
+                req,
+                next,
+                METHOD_FAILED().code
+            )
+        }
+    }
+
     private async requestOpenAI(prompt: string) {
         return await this.openai.chat.completions.create({
             model: this.model,
