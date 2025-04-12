@@ -1,19 +1,19 @@
 export interface Draft {
   id: string;
   title: string;
-  status: "DRAFT";
   content: string;
-  categoryId: null;
-  collectionId: null;
-  image: string;
-  metaDescription: null;
-  publishedAt: null;
-  slug: null;
-  authorId: string;
-  readTime: null;
-  thumbnailImage: string;
-  createdAt: string;
-  updatedAt: string;
+  status?: "DRAFT";
+  categoryId?: null;
+  collectionId?: null;
+  image?: string;
+  metaDescription?: null;
+  publishedAt?: null;
+  slug?: null;
+  authorId?: string;
+  readTime?: null;
+  thumbnailImage?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface PreviewDraft {
