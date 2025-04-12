@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { changeTone, makeTextLong, makeTextShort, simplifiedTheText, translateText } from './ai.controller'
+import { changeTone, generateAiContent, makeTextLong, makeTextShort, simplifiedTheText, translateText } from './ai.controller'
 // import { isAuthenticated } from '../../middleware'
 
 const router = Router()
@@ -28,7 +28,7 @@ const router = Router()
  * @property {string} language - The language to be translated
  * @property {string} length - The length of the text to be made
  * @property {string} short - The text to be made short
- * 
+ *
  */
 
 router.route('/simplify-text').post(simplifiedTheText)
@@ -40,5 +40,7 @@ router.route('/translate-text').post(translateText)
 router.route('/make-text-long').post(makeTextLong)
 
 router.route('/make-text-short').post(makeTextShort)
+
+router.route('/generate-ai-content').post(generateAiContent)
 
 export default router
