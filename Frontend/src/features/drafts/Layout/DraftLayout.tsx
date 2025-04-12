@@ -2,7 +2,13 @@ import { FC, useEffect, useState } from "react";
 import SideBar from "../components/SideBar/SideBar";
 import { Outlet } from "react-router-dom";
 import { Toaster } from "sonner";
-import { Button } from "@/components";
+import {
+  Button,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components";
 import { GoSidebarCollapse, GoSidebarExpand } from "react-icons/go";
 
 const DraftLayout: FC = () => {
@@ -27,7 +33,7 @@ const DraftLayout: FC = () => {
 
     // Cleanup the event listener on component unmount
     return () => {
-      removeEventListener("keydown", handleKeyPress); 
+      removeEventListener("keydown", handleKeyPress);
     };
   }, []);
 
@@ -41,13 +47,32 @@ const DraftLayout: FC = () => {
       {/* Toggle Button */}
       <div className="fixed top-4 left-4 z-50">
         {expanded ? (
-          <Button
-            variant="outline"
-            onClick={toggleSidebar}
-            className="fixed top-2 start-52 md:start-48 lg:start-80 border-none z-50 p-2 rounded"
-          >
-            <GoSidebarCollapse size={20} />
-          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  onClick={toggleSidebar}
+                  className="fixed top-2 start-52 md:start-48 lg:start-80 border-none z-50 p-2 rounded"
+                >
+                  <GoSidebarCollapse size={20} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent
+                side="top"
+                className="z-[9999] space-x-3 bg-card border border-secondary/50"
+              >
+                <div className="flex flex-col items-center space-y-1">
+                  <p className="text-sm font-medium text-foreground">
+                    Collapse Sidebar
+                  </p>
+                  <span className="text-xs text-foreground/30">
+                    Ctrl + E / Escape
+                  </span>
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         ) : (
           <Button
             variant="outline"
