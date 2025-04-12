@@ -17,6 +17,7 @@ import { ChangeToneExtension } from "./AI/ChangeToneExtension";
 import { ExtendedCodeBlock } from "./ExtendedCodeBlock";
 import { lowLightConfig } from "@/Utils/lowLightConfig";
 import { YoutubeVideoNode } from "../nodes/media/YoutubeVideoNode";
+import { AIContentNode } from "../nodes/AIContentNode/AIContentNode ";
 
 const extensions = [
   StarterKit.configure({
@@ -64,6 +65,7 @@ const extensions = [
   }).extend({
     inclusive: false,
   }),
+  AIContentNode,
   TextStyle,
   Color.configure({
     types: ["textStyle", "heading", "paragraph"],
@@ -94,11 +96,6 @@ const extensions = [
     excludedTags: ["hr"], // hide handle on tags that shouldn’t be moved
     dragHandleSelector: undefined, // use global handle
   }),
-  // Youtube.configure({
-  //   controls: false,
-  //   width: 560,
-  //   height: 315,
-  // }),
   Underline,
   Highlight.configure({
     multicolor: true,
