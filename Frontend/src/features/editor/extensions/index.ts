@@ -1,7 +1,7 @@
 import { StarterKit } from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import GlobalDragHandle from "tiptap-extension-global-drag-handle";
-import Youtube from "@tiptap/extension-youtube";
+// import Youtube from "@tiptap/extension-youtube";
 import Underline from "@tiptap/extension-underline";
 import Highlight from "@tiptap/extension-highlight";
 import Link from "@tiptap/extension-link";
@@ -16,6 +16,7 @@ import { MakeLongTextExtension } from "./AI/MakeLongTextExtension";
 import { ChangeToneExtension } from "./AI/ChangeToneExtension";
 import { ExtendedCodeBlock } from "./ExtendedCodeBlock";
 import { lowLightConfig } from "@/Utils/lowLightConfig";
+import { YoutubeVideoNode } from "../nodes/media/YoutubeVideoNode";
 
 const extensions = [
   StarterKit.configure({
@@ -56,6 +57,10 @@ const extensions = [
         class: "border-t-2 border-gray-300 dark:border-gray-600 my-4",
       },
     },
+    dropcursor: {
+      color: "#7c3aed",
+      width: 2,
+    },
   }).extend({
     inclusive: false,
   }),
@@ -64,6 +69,7 @@ const extensions = [
     types: ["textStyle", "heading", "paragraph"],
   }),
   SlashExtension,
+  YoutubeVideoNode,
   Placeholder.configure({
     placeholder: ({ node }) => {
       if (node.type.name === "heading") {
@@ -83,14 +89,16 @@ const extensions = [
     },
   }),
   GlobalDragHandle.configure({
-    dragHandleWidth: 23,
-    scrollTreshold: 100,
+    dragHandleWidth: 24,
+    scrollTreshold: 0, // disables annoying auto-scroll on mobile/small screens
+    excludedTags: ["hr"], // hide handle on tags that shouldn’t be moved
+    dragHandleSelector: undefined, // use global handle
   }),
-  Youtube.configure({
-    controls: false,
-    width: 560,
-    height: 315,
-  }),
+  // Youtube.configure({
+  //   controls: false,
+  //   width: 560,
+  //   height: 315,
+  // }),
   Underline,
   Highlight.configure({
     multicolor: true,
