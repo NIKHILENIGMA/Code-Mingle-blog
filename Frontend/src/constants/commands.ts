@@ -175,61 +175,6 @@ export const BASIC_COMMANDS = [
     description: "Add an ordered list",
     shortcut: "cntrl + shift + 7",
   },
-  // {
-  //   title: "Task List",
-  //   action: ({ editor }: { editor: Editor }) => {
-  //     editor.chain().focus()
-  //   },
-  //   icon: ListTodo,
-  //   group: "List",
-  //   description: "Add a task list",
-  //   shortcut: "cntrl + shift + 9",
-  // },
-  // {
-  //   title: "Simplify text",
-  //   action: ({ editor }: { editor: Editor }) =>
-  //     editor.chain().focus().setHeading({ level: 1 }).run(),
-  //   icon: SwatchBook,
-  //   group: "Artificial Intelligence",
-  //   description: "Simplify the text",
-  //   shortcut: "#",
-  // },
-  // {
-  //   title: "Spelling & Grammar",
-  //   action: ({ editor }: { editor: Editor }) =>
-  //     editor.chain().focus().setHeading({ level: 2 }).run(),
-  //   icon: Eraser,
-  //   group: "Artificial Intelligence",
-  //   description: "Summarize the text",
-  //   shortcut: "##",
-  // },
-  // {
-  //   title: "Make longer",
-  //   action: ({ editor }: { editor: Editor }) =>
-  //     editor.chain().focus().setHeading({ level: 3 }).run(),
-  //   icon: ArrowRightToLine,
-  //   group: "Artificial Intelligence",
-  //   description: "Expand the text",
-  //   shortcut: "###",
-  // },
-  // {
-  //   title: "Make shorter",
-  //   action: ({ editor }: { editor: Editor }) =>
-  //     editor.chain().focus().setNode("paragraph").run(),
-  //   icon: ArrowLeftToLine,
-  //   group: "Artificial Intelligence",
-  //   description: "Make the text shorter",
-  //   shortcut: "cntrl + shift + p",
-  // },
-  // {
-  //   title: "Change tone",
-  //   action: ({ editor }: { editor: Editor }) =>
-  //     editor.chain().focus().setNode("paragraph").run(),
-  //   icon: Mic,
-  //   group: "Artificial Intelligence",
-  //   description: "Change the tone of the text",
-  //   shortcut: "cntrl + shift + p",
-  // },
   {
     title: "Image",
     action: ({ editor }: { editor: Editor }) => {
