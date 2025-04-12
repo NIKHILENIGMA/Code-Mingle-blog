@@ -13,6 +13,7 @@ import {
   Text,
   TextQuote,
 } from "@/Utils/Icons";
+import { PiMagicWandFill } from "react-icons/pi";
 
 export interface CommandInterface {
   title: string;
@@ -29,6 +30,17 @@ export interface CommandInterface {
  * @returns An array of commands
  */
 export const BASIC_COMMANDS = [
+  {
+    title: "Ask AI",
+    action: ({ editor }: { editor: Editor }) => {
+      // const { from, to } = editor.state.selection;
+      editor.chain().focus().setContentGeneration().run();
+    },
+    icon: PiMagicWandFill,
+    group: "Basic",
+    description: "Generate text using AI",
+    shortcut: "%askai",
+  },
   {
     title: "Paragraph",
     action: ({ editor }: { editor: Editor }) => {
