@@ -26,7 +26,7 @@ const RenderEmbbedImage: FC<NodeViewProps> = ({
 
   return (
     <NodeViewWrapper
-      className="embbed-image relative max-w-4xl mx-auto my-6"
+      className="embbed-image relative max-w-4xl mx-auto bg-card text-foreground rounded-lg py-3"
       contentEditable={false}
     >
       <div className="w-full h-auto relative rounded-lg overflow-hidden transition-colors duration-200">
