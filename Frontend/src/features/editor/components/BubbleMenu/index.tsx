@@ -36,7 +36,21 @@ const CustomBubbleMenu: FC<CustomeBubbleMenuProps> = ({ editor }) => {
         isNodeSelection &&
         (state.selection as NodeSelection).node.type.name === "embbed-image";
 
-      return isTextSelected && !editor.isEmpty && !isImageNode;
+      const isAICustomNode =
+        isNodeSelection &&
+        (state.selection as NodeSelection).node.type.name === "aiContent";
+
+      const isYoutubeNodeSelected =
+        isNodeSelection &&
+        (state.selection as NodeSelection).node.type.name === "youtube-video";
+
+      return (
+        isTextSelected &&
+        !editor.isEmpty &&
+        !isImageNode &&
+        !isAICustomNode &&
+        !isYoutubeNodeSelected
+      );
     },
     []
   );
@@ -53,11 +67,17 @@ const CustomBubbleMenu: FC<CustomeBubbleMenuProps> = ({ editor }) => {
     >
       <AISuggestion editor={editor} />
 
-      <Separator orientation="vertical" className="bg-gray-200 dark:bg-gray-400 py-3" />
+      <Separator
+        orientation="vertical"
+        className="bg-gray-200 dark:bg-gray-400 py-3"
+      />
 
       <ChangeNodeType editor={editor} />
 
-      <Separator orientation="vertical" className="bg-gray-200 dark:bg-gray-400 py-3" />
+      <Separator
+        orientation="vertical"
+        className="bg-gray-200 dark:bg-gray-400 py-3"
+      />
       {/* Bold the selected text */}
       <ToolbarButton
         icon={<Bold className="" />}
@@ -115,15 +135,24 @@ const CustomBubbleMenu: FC<CustomeBubbleMenuProps> = ({ editor }) => {
         shortcut="Ctrl + Shift + K"
       />
 
-      <Separator orientation="vertical" className="bg-gray-200 dark:bg-gray-400 py-3"/>
+      <Separator
+        orientation="vertical"
+        className="bg-gray-200 dark:bg-gray-400 py-3"
+      />
 
       <LinkButton editor={editor} />
 
-      <Separator orientation="vertical" className="bg-gray-200 dark:bg-gray-400 py-3" />
+      <Separator
+        orientation="vertical"
+        className="bg-gray-200 dark:bg-gray-400 py-3"
+      />
 
       <HighlightText editor={editor} />
 
-      <Separator orientation="vertical" className="bg-gray-200 dark:bg-gray-400 py-3" />
+      <Separator
+        orientation="vertical"
+        className="bg-gray-200 dark:bg-gray-400 py-3"
+      />
 
       <ChangeTextColor editor={editor} />
       {/* Change the text color */}
