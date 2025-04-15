@@ -64,7 +64,7 @@ const SlashMenu: FC<SlashMenuProps> = ({ editor, onClose, query }) => {
       ).map(([group, commands]) => (
         <div key={group} className="mb-4">
           {/* Group Title */}
-          <h4 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase mb-2">
+          <h4 className="text-sm font-semibold text-muted-foreground uppercase mb-2">
             {group}
           </h4>
 
