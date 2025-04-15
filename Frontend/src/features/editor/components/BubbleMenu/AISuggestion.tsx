@@ -47,7 +47,7 @@ const AISuggestion: FC<AISuggestionProps> = ({ editor }) => {
       <Button
         variant={"outline"}
         onClick={handleShowMenu}
-        className="border-none shadow-none hover:bg-primary/10 hover:text-primary transition-colors"
+        className="border-none shadow-none bg-transparent hover:bg-primary/10 hover:text-primary transition-colors"
       >
         <Wand />
         Ask AI
