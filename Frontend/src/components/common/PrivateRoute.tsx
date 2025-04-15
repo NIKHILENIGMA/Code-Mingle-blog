@@ -21,13 +21,16 @@ const PrivateRoute: FC<PrivateRouteProps> = ({
   } = useAuth();
 
   if (loading || !initialized) {
-    return <Loader />;
+    return <Loader size={10} />;
   }
 
   return reduxAccessToken && persist && authStatus ? (
     <>{children}</>
   ) : (
-    <Navigate to="/login" state={{ from: location }} />
+    <Navigate
+      to="/login"
+      state={{ from: { pathname: location.pathname, search: location.search } }}
+    />
   );
 };
 

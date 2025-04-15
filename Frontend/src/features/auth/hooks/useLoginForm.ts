@@ -15,7 +15,7 @@ export const useLoginForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const destination = location.state?.from || "/";
+  const destination = location.state?.from;
 
   const {
     register,
@@ -67,7 +67,11 @@ export const useLoginForm = () => {
         dispatch(setUser({ user: user }));
 
         // Navigate to last path or home
-        navigate(destination, { replace: true });
+        if (destination && typeof destination === 'object' && typeof destination.pathname === 'string') {
+          navigate(destination.pathname, { replace: true });
+        } else {
+          navigate("/", { replace: true });
+        }
       } catch (error) {
         throw new Error(`Failed to login: ${error}`);
       }
