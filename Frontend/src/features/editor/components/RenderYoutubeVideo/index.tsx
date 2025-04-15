@@ -66,7 +66,7 @@ const RenderYoutubeVideo: FC<NodeViewProps> = ({
         contentEditable={false}
       >
         {node?.attrs?.src !== "" ? (
-          <div className="relative w-full h-full overflow-hidden rounded-lg shadow-sm">
+          <div className="relative w-full h-full overflow-hidden rounded-lg shadow-sm youtube-video">
             <iframe
               className="absolute inset-0 w-full h-full object-cover"
               src={node?.attrs?.src}
@@ -130,7 +130,7 @@ const RenderYoutubeVideo: FC<NodeViewProps> = ({
             )}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center w-full h-full lg:h-[55%] bg-card border-2 border-secondary rounded-lg shadow-sm px-6 transition-colors duration-200">
+          <div className="flex flex-col items-center justify-center w-full h-full lg:h-[55%] bg-card border-2 border-secondary rounded-lg shadow-sm px-6 transition-colors duration-200 youtube-video">
             <div className="flex flex-col items-start justify-center w-full mb-4 space-y-0 leading-tight relative">
               <h4 className="text-xl md:text-2xl flex items-center font-bold text-muted-foreground tracking-tight space-x-2 w-full">
                 <FaYoutube size={27} color="red" />
