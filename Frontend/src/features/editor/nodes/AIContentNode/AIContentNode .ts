@@ -79,6 +79,11 @@ export const AIContentNode = Node.create({
         ({ commands }: CommandProps) => {
           return commands.insertContent({
             type: this.name,
+            attrs: {
+              prompt: "",
+              response: "",
+              status: "",
+            },
           });
         },
     };
