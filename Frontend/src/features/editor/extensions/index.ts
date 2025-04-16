@@ -18,6 +18,7 @@ import { ExtendedCodeBlock } from "./ExtendedCodeBlock";
 import { lowLightConfig } from "@/Utils/lowLightConfig";
 import { YoutubeVideoNode } from "../nodes/media/YoutubeVideoNode";
 import { AIContentNode } from "../nodes/AIContentNode/AIContentNode ";
+import { TitleNode } from "../nodes/title/TitleNode";
 
 const extensions = [
   StarterKit.configure({
@@ -70,16 +71,18 @@ const extensions = [
   Color.configure({
     types: ["textStyle", "heading", "paragraph"],
   }),
+  TitleNode,
   SlashExtension,
   YoutubeVideoNode,
   Placeholder.configure({
     placeholder: ({ node }) => {
       if (node.type.name === "heading") {
         return "Heading";
-      } else if (node.type.name == "paragraph") {
+      } else if (node.type.name == "title") {
+        return "Title of the document";
+      } else {
         return 'Type something or Type "/" for commands';
       }
-      return "";
     },
   }),
   ImageNode,
