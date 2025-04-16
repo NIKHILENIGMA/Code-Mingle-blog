@@ -1,4 +1,10 @@
-import { CommandProps, mergeAttributes, Node, RawCommands } from "@tiptap/core";
+import {
+  CommandProps,
+  mergeAttributes,
+  Node,
+  nodeInputRule,
+  RawCommands,
+} from "@tiptap/core";
 import { ReactNodeViewRenderer } from "@tiptap/react";
 import RenderEmbbedImage from "../../components/Upload/RenderEmbbedImage";
 
@@ -29,6 +35,20 @@ export const ImageNode = Node.create({
         class: "embbed-image",
       },
     };
+  },
+
+  addInputRules() {
+    return [
+      // Add any input rules here if needed
+      nodeInputRule({
+        find: /^%img/,
+        type: this.type,
+        getAttributes: () => ({
+          src: "",
+          alt: "",
+        }),
+      }),
+    ];
   },
 
   // defining the default attributes
