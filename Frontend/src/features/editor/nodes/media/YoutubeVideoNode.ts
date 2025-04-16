@@ -1,4 +1,4 @@
-import { CommandProps, mergeAttributes, Node, RawCommands } from "@tiptap/core";
+import { CommandProps, mergeAttributes, Node, nodeInputRule, RawCommands } from "@tiptap/core";
 import { ReactNodeViewRenderer } from "@tiptap/react";
 import RenderYoutubeVideo from "../../components/RenderYoutubeVideo";
 
@@ -46,6 +46,20 @@ export const YoutubeVideoNode = Node.create({
         class: "youtube-video",
       },
     };
+  },
+
+  addInputRules() {
+    return [
+          // Add any input rules here if needed
+          nodeInputRule({
+            find: /^%yt/,
+            type: this.type,
+            getAttributes: () => ({
+              src: "",
+              alt: "",
+            }),
+          }),
+        ];
   },
 
   /**
