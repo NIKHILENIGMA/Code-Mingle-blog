@@ -24,7 +24,7 @@ const LearnEditorPage: React.FC = () => {
     setEditor((prev) => ({ ...prev, title: e.target.value }));
   };
   return (
-    <div className="flex flex-col items-center justify-center w-full h-screen px-[5vw] py-10">
+    <div className="flex flex-col items-center justify-center w-full min-h-screen px-[5vw] py-10 bg-background mb-16">
       <div className="flex items-center justify-end w-full h-20 px-4 space-x-4">
         <Button
           variant={"outline"}
@@ -40,7 +40,6 @@ const LearnEditorPage: React.FC = () => {
         <div className="flex flex-col justify-start w-full mb-4 space-y-4 ">
           <textarea
             placeholder="Article Title...."
-            className="text-4xl font-bold border-none shadow-none outline-none resize-none px-2 focus:border-white focus:ring-0 focus:outline-none focus:ring-offset-white dark:bg-[#030712]"
             rows={2}
             maxLength={90}
             onInput={(e) => {
@@ -51,6 +50,7 @@ const LearnEditorPage: React.FC = () => {
               target.style.overflow = "hidden";
             }}
             onChange={(e) => handleChange(e)}
+            className="text-4xl font-bold border-none shadow-none outline-none resize-none px-2 bg-background focus:ring-0 focus:outline-none  "
           />
         </div>
 
