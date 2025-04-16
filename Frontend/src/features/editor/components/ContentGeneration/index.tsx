@@ -1,35 +1,13 @@
-import { ChangeEvent, FC, useState } from "react";
+import { FC } from "react";
 import { NodeViewContent, NodeViewProps, NodeViewWrapper } from "@tiptap/react";
-import {
-  Button,
-  Label,
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-  Textarea,
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components";
+import { Button, Label, Textarea } from "@/components";
 import { RxMagicWand } from "react-icons/rx";
-import { Clipboard, ClipboardCheck, Plus, Wand } from "@/Utils/Icons";
-import { generateAiContentService } from "@/services/openAI";
-import { BsBoxArrowDown } from "react-icons/bs";
-import { VscDiscard } from "react-icons/vsc";
+import { Plus, Wand } from "@/Utils/Icons";
 import { ToneType, PromptType } from "@/Types/types";
-import { AnimatePresence, motion } from "framer-motion";
-import { convertToHTML } from "@/Utils/markdownToHTML";
-
-interface PromptInterface {
-  prompt: string;
-  type: PromptType;
-  tone: ToneType;
-}
+import { useAIContent } from "../../hooks/useAIContent";
+import SelectResponseType from "./SelectResponseType";
+import RenderAIContent from "./RenderAIContent";
+import { TONE_OPTIONS, TYPE_OPTIONS } from "@/constants/constants";
 
 const ContentGeneration: FC<NodeViewProps> = ({
   node,
@@ -37,69 +15,19 @@ const ContentGeneration: FC<NodeViewProps> = ({
   updateAttributes,
   editor,
 }) => {
-  const [prompt, setPrompt] = useState<PromptInterface>({
-    prompt: node?.attrs.prompt || "",
-    type: "simple",
-    tone: "Formal",
-  });
-  const [error, setError] = useState<string>("");
-  const [copy, setCopy] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [response, setResponse] = useState<string>(node?.attrs.response || "");
-
-  const handlePromptChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    e.preventDefault();
-
-    setPrompt({ ...prompt, prompt: e.target.value });
-    updateAttributes({ prompt: e.target.value });
-  };
-
-  const handleResponse = async () => {
-    if (!prompt) {
-      setError("Please enter a prompt.");
-      return;
-    }
-
-    setLoading(true);
-    setError("");
-
-    const response = await generateAiContentService({
-      prompt: prompt?.prompt,
-      type: prompt?.type,
-      tone: prompt?.tone,
-    });
-
-    const content =
-      response?.data?.chatGPTResponse?.choices[0]?.message?.content || "";
-
-    if (!content || content === "") {
-      setError("Failed to generate content. Please try again.");
-      setLoading(false);
-      return;
-    }
-    updateAttributes({ response: content });
-    setResponse(content);
-    setLoading(false);
-  };
-
-  const handleCopyText = () => {
-    navigator.clipboard.writeText(response);
-    setCopy(true);
-    setTimeout(() => {
-      setCopy(false);
-    }, 2000);
-  };
-
-  const handleInsertText = async (): Promise<void> => {
-    if (!response) return;
-    const html = await convertToHTML(response);
-    editor?.commands.insertContent(html);
-  };
-
-  const handleDiscard = () => {
-    setResponse("");
-    updateAttributes({ response: "" });
-  };
+  const {
+    prompt,
+    error,
+    copy,
+    loading,
+    response,
+    handlePromptChange,
+    handleGeneratedResponse,
+    handleCopyText,
+    handleInsertText,
+    handleDiscard,
+    setPrompt,
+  } = useAIContent({ node, updateAttributes, editor });
 
   return (
     <NodeViewWrapper className="ai-content w-full min-h-[20vh] p-4 bg-card border border-secondary rounded-md shadow-md">
@@ -141,47 +69,24 @@ const ContentGeneration: FC<NodeViewProps> = ({
 
             {error && <span className="text-sm text-red-500">{error}</span>}
             <div className="flex justify-start items-center space-x-2 mb-2">
-              <Select
+              <SelectResponseType
                 value={prompt?.type}
-                onValueChange={(value) => {
+                onChange={(value) => {
                   setPrompt({ ...prompt, type: value as PromptType });
                 }}
-              >
-                <SelectTrigger className="w-[180px] border-secondary shadow-none">
-                  <SelectValue placeholder="Response Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>Response Type</SelectLabel>
-                    <SelectItem value="simple">Simple</SelectItem>
-                    <SelectItem value="advanced">Advanced</SelectItem>
-                    <SelectItem value="condense">Condense</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-
-              <Select
+                placeholder="Response Type"
+                label="Response Type"
+                options={TYPE_OPTIONS}
+              />
+              <SelectResponseType
                 value={prompt?.tone}
-                onValueChange={(value) =>
-                  setPrompt({ ...prompt, tone: value as ToneType })
-                }
-              >
-                <SelectTrigger className="w-[180px] border-secondary shadow-none">
-                  <SelectValue placeholder="Tone" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>Response Tone</SelectLabel>
-                    <SelectItem value="Professional">Professional</SelectItem>
-                    <SelectItem value="Casual">Casual</SelectItem>
-                    <SelectItem value="Confident">Confident</SelectItem>
-                    <SelectItem value="Optimistic">Optimistic</SelectItem>
-                    <SelectItem value="Formal">Formal</SelectItem>
-                    <SelectItem value="Empathetic">Empathetic</SelectItem>
-                    <SelectItem value="Assertive">Assertive</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
+                onChange={(value) => {
+                  setPrompt({ ...prompt, tone: value as ToneType });
+                }}
+                placeholder="Response Tone"
+                label="Response Tone"
+                options={TONE_OPTIONS}
+              />
             </div>
             <Button
               type="button"
@@ -190,7 +95,7 @@ const ContentGeneration: FC<NodeViewProps> = ({
                 response !== "" ? "cursor-not-allowed" : "cursor-pointer"
               }`}
               size="sm"
-              onClick={handleResponse}
+              onClick={handleGeneratedResponse}
               disabled={response !== ""}
             >
               {loading ? (
@@ -207,22 +112,22 @@ const ContentGeneration: FC<NodeViewProps> = ({
                     <stop
                       offset=".3"
                       stopColor="#FFFFFF"
-                      stop-opacity=".9"
+                      stopOpacity=".9"
                     ></stop>
                     <stop
                       offset=".6"
                       stopColor="#FFFFFF"
-                      stop-opacity=".6"
+                      stopOpacity=".6"
                     ></stop>
                     <stop
                       offset=".8"
                       stopColor="#FFFFFF"
-                      stop-opacity=".3"
+                      stopOpacity=".3"
                     ></stop>
                     <stop
                       offset="1"
                       stopColor="#FFFFFF"
-                      stop-opacity="0"
+                      stopOpacity="0"
                     ></stop>
                   </radialGradient>
                   <circle
@@ -231,8 +136,7 @@ const ContentGeneration: FC<NodeViewProps> = ({
                     stroke="url(#a12)"
                     strokeWidth="13"
                     strokeLinecap="round"
-                    stroke-dasharray="200 1000"
-                    strokeDasharray="0"
+                    strokeDasharray="200 1000"
                     cx="100"
                     cy="100"
                     r="70"
@@ -269,78 +173,13 @@ const ContentGeneration: FC<NodeViewProps> = ({
         </NodeViewContent>
 
         {response && (
-          <div className="w-full min-h-44 bg-card border border-secondary my-4 overflow-y-auto relative">
-            <div className="sticky top-4 right-2 bg-card p-2 border-b border-secondary z-10 flex justify-end gap-2 mt-2">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant={"link"}
-                      size="icon"
-                      className="mr-2 hover:bg-primary/20 hover:text-primary"
-                      onClick={handleInsertText}
-                    >
-                      <BsBoxArrowDown size={15} />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="top" className="z-[9999]">
-                    <p>Insert</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant={"link"}
-                      size="icon"
-                      onClick={handleCopyText}
-                      className="mr-2 hover:bg-primary/20 hover:text-primary"
-                    >
-                      {copy ? (
-                        <ClipboardCheck size={15} />
-                      ) : (
-                        <Clipboard size={15} />
-                      )}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="top" className="z-[9999]">
-                    <p>Copy</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant={"link"}
-                      size="icon"
-                      className="mr-2 hover:bg-primary/20 hover:text-primary"
-                      onClick={handleDiscard}
-                    >
-                      <VscDiscard size={15} />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="top" className="z-[9999]">
-                    <p>Discard</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-            <AnimatePresence>
-              <motion.div
-                initial={{ opacity: 0, y: 5 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                className="border border-muted p-3 rounded-md bg-muted/30"
-              >
-                <div
-                  dangerouslySetInnerHTML={{ __html: response }}
-                  className="whitespace-pre-wrap"
-                />
-              </motion.div>
-            </AnimatePresence>
-          </div>
+          <RenderAIContent
+            response={response}
+            handleInsertText={handleInsertText}
+            handleCopyText={handleCopyText}
+            handleDiscard={handleDiscard}
+            copy={copy}
+          />
         )}
       </div>
     </NodeViewWrapper>
