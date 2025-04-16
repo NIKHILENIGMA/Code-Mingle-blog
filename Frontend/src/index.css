@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+* {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 300;
+}
+
+
 .poppins-thin {
   font-family: "Poppins", sans-serif;
   font-weight: 100;
@@ -189,6 +195,14 @@
 .tiptap hr {
   margin: 1rem 0; /* 48px */
 }
+
+/* .tiptap code {
+  background: #7c3aed1a;
+  border-radius: 0.5rem;
+  color: #fafafa;
+  font-family: 'JetBrainsMono', monospace;
+  padding: 0.5rem 1rem;
+} */
 
 .tiptap pre {
   background: #111;
