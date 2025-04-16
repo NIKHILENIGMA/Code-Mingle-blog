@@ -30,8 +30,8 @@ export default class AIService {
      * @throws {ApiError} When the AI request fails or returns no response
      */
     public async simplifyTextService(req: Request, next: NextFunction, text: string): Promise<ChatCompletion | void> {
-        const promptMessage = `Rewrite the following text to make it clear, concise, and accessible for a general audience. Use simple language, short sentences, and avoid technical jargon to ensure easy understanding: ${text}`
-
+        const promptMessage = `Rewrite the following text to make it clear, concise, and accessible for a general audience. Use simple language, short sentences, and avoid technical jargon to ensure easy understanding. Format the response in valid HTML markup that can be rendered in an editor (use appropriate HTML tags like <p>, <ul>, <li>, <h1>, <h2>, etc. where needed): ${text}`
+        
         try {
             const response: ChatCompletion = await this.requestOpenAI(promptMessage)
 
@@ -60,7 +60,7 @@ export default class AIService {
      * @throws {ApiError} When the AI request fails or returns no response
      */
     public async toneChangeService(req: Request, next: NextFunction, text: string, type: string) {
-        const promptMessage = `Please transform the following text to embody a ${type} tone, ensuring it gracefully adopts the desired style. Correct any grammatical or spelling errors, and enhance the text to sound natural and human-like. Focus on clarity, confidence, and maintaining an engaging narrative: ${text}`
+        const promptMessage = `Please transform the following text to embody a ${type} tone, ensuring it gracefully adopts the desired style. Correct any grammatical or spelling errors, and enhance the text to sound natural and human-like. Focus on clarity, confidence, and maintaining an engaging narrative. Format the response in valid HTML markup that can be rendered in an editor (use appropriate HTML tags like <p>, <ul>, <li>, <h1>, <h2>, etc. where needed): ${text}`
 
         try {
             const response: ChatCompletion = await this.requestOpenAI(promptMessage)
