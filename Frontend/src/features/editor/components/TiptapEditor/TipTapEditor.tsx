@@ -15,7 +15,7 @@ const TiptapEditor: FC<TiptapEditorProps> = ({
 }) => {
   const editor: Editor | null = useEditor({
     extensions: extensions,
-    content: initialContent || `<p></p>`, // Initial content if no content present
+    content: initialContent || `<h1></h1><p>Your content here...</p>`, // Initial content if no content present
     onUpdate: ({ editor }) => {
       const htmlContent = editor.getHTML();
       if (onContentChange) {
@@ -32,7 +32,7 @@ const TiptapEditor: FC<TiptapEditorProps> = ({
       },
     },
   });
-  
+
   useEffect(() => {
     if (editor && initialContent && editor.getHTML() !== initialContent) {
       queueMicrotask(() => {
@@ -40,7 +40,6 @@ const TiptapEditor: FC<TiptapEditorProps> = ({
       });
     }
   }, [initialContent, editor]);
-  
 
   useEffect(() => {
     // Cleanup the editor
