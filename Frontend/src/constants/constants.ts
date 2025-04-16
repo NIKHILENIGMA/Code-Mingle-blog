@@ -165,6 +165,22 @@ export const aiOptions = [
   },
 ];
 
+export const TYPE_OPTIONS = [
+  { value: "simple", label: "Simple" },
+  { value: "advanced", label: "Advanced" },
+  { value: "condense", label: "Condense" },
+];
+
+export const TONE_OPTIONS = [
+  { value: "Professional", label: "Professional" },
+  { value: "Casual", label: "Casual" },
+  { value: "Confident", label: "Confident" },
+  { value: "Optimistic", label: "Optimistic" },
+  { value: "Formal", label: "Formal" },
+  { value: "Empathetic", label: "Empathetic" },
+  { value: "Assertive", label: "Assertive" },
+];
+
 export const DRAFT_STALE_TIME =
   import.meta.env.VITE_DRAFT_STALE_TIME || 1000 * 60 * 60 * 24;
 export const DRAFT_GC_TIME =
