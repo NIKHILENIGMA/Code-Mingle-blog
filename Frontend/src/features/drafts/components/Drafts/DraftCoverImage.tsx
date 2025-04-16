@@ -96,7 +96,7 @@ const DraftCoverImage: FC<DraftCoverImageProps> = ({ id }) => {
               <div className="w-full p-2">
                 {navigate === "upload" ? (
                   isLoading ? (
-                    <Loader />
+                    <Loader size={16}/>
                   ) : (
                     <UploadImage id={id} onLoading={setIsLoading} />
                   )
