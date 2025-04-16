@@ -72,6 +72,10 @@ export default {
               marginTop: 0,
               marginBottom: 0,
             },
+            ".tiptap code": {
+              color: "#7c3aed",
+              backgroundColor: "#7c3aed1a",
+            },
             ".tiptap p.is-empty::before": {
               content: "attr(data-placeholder)",
               float: "left",
