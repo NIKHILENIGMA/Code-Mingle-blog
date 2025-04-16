@@ -1,85 +1,55 @@
-import { FC, useState } from "react";
-import {
-  Button,
-  Input,
-  Label,
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components";
-import { Link } from "@/Utils/Icons";
+import { FC, useEffect, useRef, useState } from "react";
 import { Editor } from "@tiptap/core";
+import TooltipLink from "./TooltipLink";
+import LinkModal from "./LinkModal";
 
 interface LinkButtonProps {
   editor: Editor;
 }
 
-const getTheSelectedText = (editor: Editor): string => {
-  const { from, to } = editor.state.selection;
-  const text = editor.state.doc.textBetween(from, to);
-  return text;
-};
-
 const LinkButton: FC<LinkButtonProps> = ({ editor }) => {
   const [showMenu, setShowMenu] = useState<boolean>(false);
-  const [url, setUrl] = useState<string>(getTheSelectedText(editor));
+  const modalRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        modalRef.current &&
+        !modalRef.current.contains(event.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target as Node)
+      ) {
+        setShowMenu(false);
+      }
+    };
+
+    if (showMenu) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showMenu]);
 
   return (
     <>
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant={"link"}
-              onClick={() => setShowMenu((prev: boolean) => !prev)}
-            >
-              <Link
-                className={`${
-                  editor.isActive("link")
-                    ? "text-primary"
-                    : "text-muted-foreground"
-                }`}
-              />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="top" className="z-[9999] space-x-3 bg-card border border-secondary/50">
-            <div className="flex flex-col items-center space-y-1">
-              <p className="text-sm font-medium text-foreground">
-                Link
-              </p>
-              <span className="text-xs text-foreground/30">
-                Ctrl + K
-              </span>
-            </div>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      <div ref={buttonRef}>
+        <TooltipLink
+          editor={editor}
+          onToggleModal={() => setShowMenu((prev) => !prev)}
+        />
+      </div>
 
       {showMenu && (
-        <div className="absolute w-[30vw] bg-background border border-primary/50 top-[110%] rounded-lg space-y-2 left-[20%] p-4 flex flex-col shadow-md">
-          <Label htmlFor="embbed-link">Embbed Link</Label>
-          <Input
-            id="embbed-link"
-            placeholder="Enter Url link"
-            value={url}
-            type="text"
-            className="w-full"
-            onChange={(e) => setUrl(e.target.value)}
-          />
-          <Button
-            variant={"default"}
-            onClick={() =>
-              editor.chain().focus().toggleLink({ href: url }).run()
-            }
-            className="w-full"
-          >
-            upload
-          </Button>
+        <div ref={modalRef}>
+          <LinkModal editor={editor} onToggleMenu={() => setShowMenu(false)} />
         </div>
       )}
     </>
   );
 };
+
 
 export default LinkButton;
