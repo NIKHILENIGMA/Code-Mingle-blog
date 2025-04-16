@@ -123,7 +123,7 @@ const CustomBubbleMenu: FC<CustomeBubbleMenuProps> = ({ editor }) => {
         isActive={editor.isActive("code")}
         onClick={() => editor.chain().focus().toggleCode().run()}
         content="Code"
-        shortcut="Ctrl + Shift + C"
+        shortcut="Ctrl + e"
       />
 
       {/* Add code block to the text */}
