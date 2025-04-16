@@ -10,5 +10,14 @@ export const ExtendedCodeBlock = CodeBlockLowlight.extend({
 
   addNodeView() {
     return ReactNodeViewRenderer(LanguageSelectorNodeView);
+  },
+
+  addKeyboardShortcuts() {
+    return {
+      "Mod-Shift-K": () => {
+        this.editor.commands.toggleCodeBlock();
+        return true;
+      },
+    };
   }
 });
