@@ -32,17 +32,6 @@ export interface CommandInterface {
 export const BASIC_COMMANDS = [
   {
     title: "Ask AI",
-    // action: ({ editor }: { editor: Editor }) => {
-    //   const selection = editor.view.state.selection;
-    //   const from = selection.$from.posAtIndex(0);
-    //   const to = selection.$from.posAtIndex(1);
-    //   editor
-    //     .chain()
-    //     .focus()
-    //     .deleteRange({ from, to })
-    //     .setContentGeneration()
-    //     .run();
-    // },
     action: ({ editor }: { editor: Editor }) => {
       const selection = editor.view.state.selection;
       const from = selection.$from.posAtIndex(0);
@@ -242,7 +231,7 @@ export const BASIC_COMMANDS = [
     icon: MonitorPlay,
     group: "Media",
     description: "Add a youtube video link",
-    shortcut: "%youtube",
+    shortcut: "%yt",
   },
   // {
   //   title: "Audio",
