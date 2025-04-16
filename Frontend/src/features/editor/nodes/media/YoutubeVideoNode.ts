@@ -114,11 +114,18 @@ export const YoutubeVideoNode = Node.create({
     return {
       setYoutubeVideo:
         (attributes: { src: string; alt?: string }) =>
-        ({ commands }: CommandProps) => {
-          return commands.insertContent({
-            type: this.name,
-            attrs: attributes,
-          });
+        ({ chain }: CommandProps) => {
+          return chain()
+            .focus()
+            .insertContent({
+              type: this.name,
+              attrs: attributes,
+            })
+            .insertContent({
+              type: "paragraph",
+              content: [{ type: "text", text: "" }],
+            })
+            .run();
         },
       unsetYoutubeVideo:
         () =>
