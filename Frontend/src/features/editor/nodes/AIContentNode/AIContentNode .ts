@@ -1,4 +1,4 @@
-import { CommandProps, mergeAttributes, Node } from "@tiptap/core";
+import { CommandProps, mergeAttributes, Node, nodeInputRule } from "@tiptap/core";
 import { ReactNodeViewRenderer } from "@tiptap/react";
 import ContentGeneration from "../../components/ContentGeneration";
 
@@ -24,6 +24,21 @@ export const AIContentNode = Node.create({
         class: "ai-content",
       },
     };
+  },
+
+  addInputRules() {
+    return [
+      // Add any input rules here if needed
+      nodeInputRule({
+        find: /^%askai/,
+        type: this.type,
+        getAttributes: () => ({
+          prompt: "",
+          response: "",
+          status: "",
+        }),
+      }),
+    ];
   },
 
   // defining the default attributes
