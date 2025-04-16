@@ -16,7 +16,6 @@ const DraftTitle: FC<DraftTitleProps> = ({
   onTitleChange,
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-  console.log("height", textareaRef.current?.scrollHeight);
 
   useEffect(() => {
     if (textareaRef.current) {
