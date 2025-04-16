@@ -77,11 +77,19 @@ const extensions = [
   Placeholder.configure({
     placeholder: ({ node }) => {
       if (node.type.name === "heading") {
-        return "Heading";
+        if (node.attrs.level === 1) {
+          return "Title of the document";
+        } else if (node.attrs.level === 2) {
+          return "Document Subtitle";
+        } else if (node.attrs.level === 3) {
+          return "Subheading ";
+        } else {
+          return "Heading ";
+        }
       } else if (node.type.name == "title") {
         return "Title of the document";
       } else {
-        return 'Type something or Type "/" for commands';
+        return 'Type "/" for commands or Ask AI to generate content';
       }
     },
   }),
