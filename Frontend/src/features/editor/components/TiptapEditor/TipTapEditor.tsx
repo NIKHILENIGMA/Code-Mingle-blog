@@ -2,7 +2,6 @@ import { useEditor, EditorContent, Editor } from "@tiptap/react";
 import { FC, useEffect } from "react";
 import extensions from "@/features/editor/extensions";
 import CustomBubbleMenu from "@/features/editor/components/BubbleMenu";
-// import Title from "../Ttitle";
 
 interface TiptapEditorProps {
   initialContent: string;
@@ -57,9 +56,6 @@ const TiptapEditor: FC<TiptapEditorProps> = ({
         editor={editor}
         className="min-h-[20vw] rounded-lg py-2 w-full flex justify-start pl-2 items-start "
       />
-
-      {/* <hr />
-      <div>{editor && <div>{editor.getHTML()}</div>}</div> */}
     </div>
   );
 };
