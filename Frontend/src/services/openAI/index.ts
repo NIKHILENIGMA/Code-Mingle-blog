@@ -1,5 +1,6 @@
 import { OPEN_AI_URL } from "@/constants/constants";
 import { apiInstance } from "../api/apiInstance";
+import { PromptType, ToneType } from "@/Types/types";
 
 export const simplifyTextContent = async (prompt: string) => {
   try {
@@ -87,17 +88,27 @@ export const makeTextShort = async (prompt: string) => {
 };
 
 
-export const generateAiContentService = async (prompt: string) => {
+export const generateAiContentService = async ({
+  prompt,
+  tone,
+  type,
+}: {
+  prompt: string;
+  tone: ToneType;
+  type: PromptType;
+}) => {
   try {
     const response = await apiInstance.post(`${OPEN_AI_URL}/generate-ai-content`, {
-      prompt,
+      text: prompt,
+      tone,
+      type,
     });
 
     if (response.status !== 200) {
       throw new Error("Failed to generate AI content");
     }
-
-    return response.data;
+    
+    return response?.data;
   } catch (error) {
     console.error(error);
   }
