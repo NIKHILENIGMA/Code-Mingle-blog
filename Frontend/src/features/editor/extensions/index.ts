@@ -2,7 +2,7 @@ import { StarterKit } from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import GlobalDragHandle from "tiptap-extension-global-drag-handle";
 // import Youtube from "@tiptap/extension-youtube";
-import Underline from "@tiptap/extension-underline";
+// import Underline from "@tiptap/extension-underline";
 import Highlight from "@tiptap/extension-highlight";
 import Link from "@tiptap/extension-link";
 import { SlashExtension } from "./SlashExtension";
@@ -19,6 +19,7 @@ import { lowLightConfig } from "@/Utils/lowLightConfig";
 import { YoutubeVideoNode } from "../nodes/media/YoutubeVideoNode";
 import { AIContentNode } from "../nodes/AIContentNode/AIContentNode ";
 import { TitleNode } from "../nodes/title/TitleNode";
+import { ExtendedUnderline } from "./ExtendedUnderline";
 
 const extensions = [
   StarterKit.configure({
@@ -34,18 +35,18 @@ const extensions = [
     code: {
       HTMLAttributes: {
         class:
-          "rounded-md bg-gray-100 dark:bg-gray-800 text-black dark:text-white p-2",
+          "rounded-md bg-primary p-2",
       },
     },
     bulletList: {
       HTMLAttributes: {
-        class: "list-disc pl-4 marker:text-blue-500 dark:marker:text-blue-300",
+        class: "list-disc pl-4 marker:text-primary",
       },
     },
     orderedList: {
       HTMLAttributes: {
         class:
-          "list-decimal pl-4 marker:text-blue-500  dark:marker:text-blue-300",
+          "list-decimal pl-4 marker:text-primary ",
       },
     },
     blockquote: {
@@ -107,7 +108,7 @@ const extensions = [
     excludedTags: ["hr"], // hide handle on tags that shouldn’t be moved
     dragHandleSelector: undefined, // use global handle
   }),
-  Underline,
+  ExtendedUnderline,
   Highlight.configure({
     multicolor: true,
     HTMLAttributes: {
