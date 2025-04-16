@@ -86,29 +86,29 @@ const SlashMenu: FC<SlashMenuProps> = ({ editor, onClose, query }) => {
                   (commandRefs.current[index] = el as HTMLDivElement)
                 }
                 className={`${
-                  selectedIndex === index ? "bg-gray-100 dark:bg-gray-800" : ""
-                } flex items-center space-x-4 p-3 rounded-lg transition-all duration-150 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/60`}
+                  selectedIndex === index ? "bg-card" : ""
+                } flex items-center space-x-4 p-3 rounded-lg transition-all duration-150 cursor-pointer hover:bg-primary/10 hover:text-primary`}
               >
                 {/* Icon Box */}
-                <div className="flex items-center justify-center w-10 h-10 rounded-md bg-gray-200 dark:bg-gray-700">
-                  <div className="text-gray-600 dark:text-gray-300">
+                <div className="flex items-center justify-center w-10 h-10 rounded-md bg-accent">
+                  <div className="text-lg text-accent-foreground">
                     {createElement(command.icon)}
                   </div>
                 </div>
 
                 {/* Command Details */}
                 <div className="flex-1">
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                  <h3 className="text-sm font-semibold text-foreground">
                     {command.title}
                   </h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">
+                  <p className="text-xs text-accent-foreground/80 ">
                     {command.description}
                   </p>
                 </div>
 
                 {/* Shortcut Key */}
                 {command.shortcut && (
-                  <span className="text-xs text-gray-400 dark:text-gray-500">
+                  <span className="text-xs text-foreground/80 font-semibold px-2 py-1 rounded-md">
                     {command.shortcut}
                   </span>
                 )}
