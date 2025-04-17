@@ -7,23 +7,20 @@ import { PublishedPostDTO, PublishPostPayload, UpdatePublishedPost, PublishWhere
 const { INTERNAL_SERVICE, NOT_FOUND } = responseMessage
 
 export default class PublishService {
-    constructor() {}
-
     /**
      * Publish a post.
      *
-     * This function publishes a post by updating the post status to published.
-     *
-     * @param {Request} req - The request object.
-     * @param {NextFunction} next - The next function.
-     * @param {string} id - The post ID.
-     * @param {PublishPostPayload} payload - The post payload.
-     * @returns {Promise<PublishedPostDTO | void>} - A promise that resolves to the published post.
-     *
-     * @throws {ApiError} - Throws an error if there is an error publishing the post.
+     * @param {Request} req - The Express request object.
+     * @param {NextFunction} next - Express next function for error handling.
+     * @param {string} id - The unique identifier of the post to publish.
+     * @param {PublishPostPayload} payload - The data to update when publishing.
+     * @returns {Promise<PublishedPostDTO | void>} The published post or void if error occurs.
+     * @throws {ApiError} When post not found or publishing fails.
      */
     public async publishPost(req: Request, next: NextFunction, id: string, payload: PublishPostPayload): Promise<PublishedPostDTO | void> {
         try {
+            
+
             const publishedPost = await prisma.post.update({
                 where: {
                     id
@@ -33,9 +30,39 @@ export default class PublishService {
 
             return publishedPost
         } catch (error) {
-            return ApiError(error instanceof Error ? error : new Error(INTERNAL_SERVICE('save draft').message), req, next, INTERNAL_SERVICE().code)
+            if (error instanceof Error) {
+                if (error.message.includes('Record to update not found')) {
+                    return ApiError(new Error(NOT_FOUND(`Post with ID ${id} not found`).message), req, next, NOT_FOUND().code)
+                }
+
+                return ApiError(new Error(INTERNAL_SERVICE('publish post').message), req, next, INTERNAL_SERVICE().code)
+            }
+
+            return ApiError(new Error(INTERNAL_SERVICE('An error occurred while publishing the post').message), req, next, INTERNAL_SERVICE().code)
         }
     }
+
+    /**
+     * Check if a slug is available for use.
+     * 
+     * This function checks if a given slug is already in use by any existing post.
+     * A slug is considered available if no post is found with the given slug.
+     *
+     * @param {Request} req - The Express request object.
+     * @param {NextFunction} next - Express next function for error handling.
+     * @param {string} slug - The slug to check for availability.
+     * @returns {Promise<boolean | void>} Returns true if the slug is available,
+     *                                   false if it's taken, or void if an error occurs.
+     * 
+     * @throws {ApiError} Throws an error if there's a problem checking the slug availability.
+     * 
+     * @example
+     * /// Check if a slug is available
+     * const isAvailable = await publishService.isSlugAvailable(req, next, 'my-post-slug');
+     * if (isAvailable) {
+     *   /// Slug can be used
+     * }
+     */
 
     public async isSlugAvailable(req: Request, next: NextFunction, slug: string): Promise<boolean | void> {
         try {
@@ -52,17 +79,14 @@ export default class PublishService {
     }
 
     /**
-     * Update a published post.
+     * Update an existing published post.
      *
-     * This function updates a published post.
-     *
-     * @param {Request} req - The request object.
-     * @param {NextFunction} next - The next function.
-     * @param {PublishWhere} where - The post where clause.
-     * @param {UpdatePublishedPost} payload - The post payload.
-     * @returns {Promise<PublishedPostDTO | void>} - A promise that resolves to the updated post.
-     *
-     * @throws {ApiError} - Throws an error if there is an error updating the post.
+     * @param {Request} req - The Express request object.
+     * @param {NextFunction} next - Express next function for error handling.
+     * @param {PublishWhere} where - Criteria to find the post to update.
+     * @param {UpdatePublishedPost} payload - The update data.
+     * @returns {Promise<PublishedPostDTO | void>} The updated post or void if error occurs.
+     * @throws {ApiError} When update fails.
      */
     public async updatePublishedPost(
         req: Request,
@@ -192,7 +216,7 @@ export default class PublishService {
             }
             return publishedPost
         } catch (error) {
-            return ApiError(error instanceof Error ? error : new Error(INTERNAL_SERVICE('save draft').message), req, next, INTERNAL_SERVICE().code)
+            return ApiError(error instanceof Error ? error : new Error(INTERNAL_SERVICE('post found').message), req, next, INTERNAL_SERVICE().code)
         }
     }
 }
