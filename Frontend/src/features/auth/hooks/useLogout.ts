@@ -25,10 +25,7 @@ export const useLogout = () => {
       navigate(from);
     },
     onError: (error) => {
-      console.error(
-        "Logout Mutation Failed, Potential Reason could be: ",
-        error
-      );
+      console.error("Logout Mutation Failed, Potential Reason could be: %s", error);
     },
   });
 
@@ -37,7 +34,7 @@ export const useLogout = () => {
       // Call the logoutService function
       await logoutUserMutation.mutateAsync();
     } catch (error) {
-      console.error("Logout failed: ", error);
+      console.error("Logout failed: %s", error);
     }
   }, [logoutUserMutation]);
 
@@ -45,7 +42,7 @@ export const useLogout = () => {
     try {
       await logout();
     } catch (error) {
-      console.error(error);
+      console.error("Error during logout: %s", error);
     }
   };
 
