@@ -13,6 +13,7 @@ const RenderEmbbedImage: FC<NodeViewProps> = ({
   deleteNode,
 }) => {
   const {
+    error,
     showModal,
     setShowModal,
     bubbleMenu,
@@ -50,6 +51,7 @@ const RenderEmbbedImage: FC<NodeViewProps> = ({
       </div>
       {showModal && (
         <ImageUploadModal
+          error={error}
           onModalChange={setShowModal}
           updateAttributes={updateAttributes}
         />
