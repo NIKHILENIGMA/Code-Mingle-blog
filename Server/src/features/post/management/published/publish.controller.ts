@@ -63,15 +63,15 @@ export const publishPost = AsyncHandler(async (req: ProtectedRequest, res: Respo
 
 /**
  * ! Handles user checking if a slug is available
- * 
+ *
  * This function is an asynchronous request handler that is responsible for handling a user checking if a slug is available.
  * It expects a request body containing the slug to check.
- * 
+ *
  * @param {Request} req - The request object containing the slug to check.
  * @param {Response} res - The response object used to send the response back to the client.
  * @param {NextFunction} next - The next middleware function in the stack.
  * @returns {Promise<void>} A promise that resolves to void.
- * 
+ *
  *  @throws {Error} Will throw an error if there is an issue checking the slug.
  */
 export const checkIsSlugAvailable = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
@@ -79,7 +79,6 @@ export const checkIsSlugAvailable = AsyncHandler(async (req: ProtectedRequest, r
 
     if (!slug) {
         return ApiError(new Error(BAD_REQUEST('slug needed to check').message), req, next, BAD_REQUEST().code)
-        
     }
 
     try {
@@ -299,14 +298,13 @@ export const unarchivePublishedPost = AsyncHandler(async (req: ProtectedRequest,
  * @throws {Error} Will throw an error if there is an issue fetching the posts.
  */
 export const fetchPublishedPosts = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
-    // Get the user id from the request object
-    // const userId = (req.user as User)?.id
-    // if (!userId) {
-    //     return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
-    // }
-
     // Get the limit and page query parameters
     const { limit, page } = req.query as { limit: string; page: string }
+
+    // Validate the limit and page query parameters
+    if (limit && isNaN(Number(limit))) {
+        return ApiError(new Error(BAD_REQUEST('limit must be a number').message), req, next, BAD_REQUEST().code)
+    }
 
     // Calculate the number of posts to skip
     const skip = limit && page ? (+page - 1) * +limit : 0
@@ -316,6 +314,10 @@ export const fetchPublishedPosts = AsyncHandler(async (req: ProtectedRequest, re
 
     // Create the payload to find the posts
     const status = req.body as DRAFT_STATUS
+
+    if (!Object.values(DRAFT_STATUS).includes(status)) {
+        return ApiError(new Error(BAD_REQUEST('Invalid status').message), req, next, BAD_REQUEST().code)
+    }
 
     // Create the payload to find the posts
     const payload: PublishedWhere = {
