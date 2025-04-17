@@ -9,8 +9,6 @@ export const createUser = async (data: unknown): Promise<AxiosResponse> => {
       throw new Error(`User creation failed: ${response.data}`);
     }
 
-    console.log("User created successfully: ", response.data);
-
     return response.data;
   } catch (error) {
     throw new Error(`User creation failed ${(error as AxiosError).message}`);
@@ -28,7 +26,6 @@ export const updateUser = async (
       throw new Error(`User update failed: ${response.data}`);
     }
 
-    console.log("User updated successfully: ", response.data);
 
     return response.data;
   } catch (error) {
