@@ -31,11 +31,11 @@ process.on('beforeExit', () => {
             server.close(); // Close the server
             logger.info('Server shutting down');
         } catch (error) {
-            logger.error('Error shutting down server: ', error);
+            logger.error('Error shutting down server: %s', error);
             process.exit(1); // Exit with failure code
         }
     })().catch(err => {
-        logger.error('Error during shutdown process: ', err);
+        logger.error('Error during shutdown process: %s', err);
         process.exit(1); // Exit with failure code
     });;
 });
