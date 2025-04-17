@@ -13,6 +13,15 @@ export const useRenderEmbbedImg = ({
 }: UseRenderEmbbedImgProps) => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [bubbleMenu, setBubbleMenu] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleError = (errorMessage: string) => {
+    setError(errorMessage);
+    setTimeout(() => {
+      setError(null);
+    }, 3000); // Clear error after 3 seconds
+  };
+  
 
   const handleImageChange = useCallback(
     () => {
@@ -20,7 +29,8 @@ export const useRenderEmbbedImg = ({
       if (!url) return;
       try {
         if (!isValidURL(url)) {
-          alert("Invalid URL");
+
+          handleError("Invalid URL");
           return;
         }
 
@@ -32,7 +42,7 @@ export const useRenderEmbbedImg = ({
         }
       } catch (error) {
         console.error("Error updating image:", error);
-        alert("Failed to update image. Please try again with a valid URL.");
+        handleError("Failed to update image. Please try again with a valid URL.");
       }
       setBubbleMenu((prev) => !prev);
       editor.chain().focus().run();
@@ -52,6 +62,7 @@ export const useRenderEmbbedImg = ({
 
   return {
     showModal,
+    error,
     setShowModal,
     bubbleMenu,
     setBubbleMenu,
