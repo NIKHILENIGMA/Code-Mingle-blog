@@ -4,11 +4,13 @@ import { Separator } from "@/components/ui/separator";
 import { Plus, Upload } from "@/Utils/Icons";
 
 interface ImageUploadModalProps {
+  error: string | null;
   updateAttributes: (attributes: { src: string; alt: string }) => void;
   onModalChange: (show: boolean) => void;
 }
 
 const ImageUploadModal: FC<ImageUploadModalProps> = ({
+  error,
   updateAttributes,
   onModalChange,
 }) => {
@@ -124,6 +126,7 @@ const ImageUploadModal: FC<ImageUploadModalProps> = ({
             <Upload className="w-5 h-5" />
             <span>Embbed Image</span>
           </Button>
+          {error && <p>{error}</p>}
         </div>
       )}
     </div>
