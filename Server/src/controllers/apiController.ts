@@ -11,7 +11,6 @@ export const apiController = () => {
         get: (req: Request, res: Response) => {
             const { id, name } = req.body as IApiRequest
 
-            logger.info('GET request to the homepage', id, name)
             res.json({
                 message: {
                     msg: 'GET request to the homepage',
