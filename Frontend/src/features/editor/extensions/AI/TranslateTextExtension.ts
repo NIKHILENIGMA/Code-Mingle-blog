@@ -35,7 +35,7 @@ export const TranslateTextExtension = Extension.create({
               );
 
               const translatedText = response?.data?.choices[0]?.message?.content;
-              console.log(translatedText);
+              // If there is no translated text, return
               if (!translatedText) return false;
               
               // Replace the selected text with the translated text
@@ -46,13 +46,14 @@ export const TranslateTextExtension = Extension.create({
                 .insertContentAt(from, translatedText)
                 .run();
             } catch (error) {
-              console.error(error);
+              console.error('Error translating text:', error);
               return false;
             }
           };
           translatedText();
 
           return true;
+
         },
     };
   },
