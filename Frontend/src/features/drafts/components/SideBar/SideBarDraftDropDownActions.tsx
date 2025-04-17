@@ -24,7 +24,6 @@ const SideBarDraftDropDownActions: FC<{ draft: Draft }> = ({ draft }) => {
   const handlePreview = (id: string) => {
     // Preview draft
     navigation(`/preview/${id}/`);
-    console.log("Preview draft", id);
   };
 
   return (
