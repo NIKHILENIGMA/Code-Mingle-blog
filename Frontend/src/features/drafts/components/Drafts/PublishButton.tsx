@@ -104,13 +104,13 @@ const PublishButton: React.FC = () => {
                       toast.error("Please wait for the upload to finish.");
                     }
                   }}
-                  className="flex items-center justify-center w-full h-64 p-2 rounded-lg  outline-dashed focus:outline-2 outline-offset-2 focus:ring outline-slate-500/50 space-x-3"
+                  className="flex items-center justify-center w-full h-64 p-2 rounded-lg  outline-dashed focus:outline-2 outline-offset-2  space-x-3"
                 >
                   {draftState && draftState?.thumbnailImage ? (
                     <div className="relative w-full h-64 p-2">
                       {loading ? (
-                        <div className="absolute inset-0 flex items-center justify-center bg-gray-200 rounded-lg">
-                          <Loader />
+                        <div className="absolute inset-0 flex items-center justify-center rounded-lg">
+                          <Loader size={15} />
                         </div>
                       ) : (
                         <div className="relative w-full h-full">
