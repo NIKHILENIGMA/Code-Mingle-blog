@@ -3,8 +3,22 @@ import { createLogger, format, transports } from 'winston'
 import * as fs from 'fs'
 import * as path from 'path'
 import { isProduction } from '@/config'
+import morgan from 'morgan'
 
+const skip = () => isProduction
 
+morgan(function (tokens, req, res) {
+    return [
+        tokens.method(req, res),
+        tokens.url(req, res),
+        tokens.status(req, res),
+        tokens.res(req, res, 'content-length'),
+        '-',
+        tokens['response-time'](req, res),
+        'ms',
+        tokens.date(req, res, 'web')
+    ].join(' ')
+})
 
 // Ensure log directory exists
 const logDir = path.join(__dirname, '..', '..', 'logs')
@@ -34,5 +48,11 @@ const logger = createLogger({
 export const winstonStream = {
     write: (message: string) => logger.info(message.trim())
 }
+
+const morganCustomFormat = ':date :method :url :status :res[content-length] - :response-time ms'
+const morganFormat: string = isProduction ? 'combined' : morganCustomFormat
+
+
+export const morganMiddleware = morgan(morganFormat, { stream: winstonStream, skip })
 
 export default logger

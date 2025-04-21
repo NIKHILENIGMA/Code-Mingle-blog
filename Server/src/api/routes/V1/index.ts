@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import openaiRoutes from './ai.routes'
+import aiRoutes from './ai.routes'
 import authRoutes from './auth.routes'
 import categoryRoutes from './category.routes'
 import collectionRoutes from './collection.routes'
@@ -40,7 +40,7 @@ router.use('/draft', draftRoutes)
 // Publish routes
 router.use('/published', publishRoutes)
 // OpenAI routes
-router.use('/openai', openaiRoutes)
+router.use('/openai', aiRoutes)
 // Newsletter routes
 router.use('/mail/newletter', newLetterRoutes)
 
