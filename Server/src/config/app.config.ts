@@ -2,9 +2,17 @@ import dotenvFlow from 'dotenv-flow'
 
 dotenvFlow.config()
 
-export const isProduction = process.env.NODE_ENV === 'production'
+interface IAppConfig {
+    ENV: string | undefined
+    PORT: string | undefined
+    SERVER_URL: string | undefined
+    DATABASE_URL: string | undefined
+}
 
-export const appConfig = {
+
+export const isProduction: boolean = process.env.NODE_ENV === 'production'
+
+export const appConfig: IAppConfig = {
     ENV: process.env.ENV,
     PORT: process.env.PORT,
     SERVER_URL: process.env.SERVER_URL,
@@ -19,7 +27,6 @@ export const tokenInfo = {
     role: process.env.JWT_ROLE,
     reset_validity: process.env.RESET_TOKEN_VALIDITY_IN_SEC
 }
-
 
 export const keyPath = {
     PUBLIC_KEY_PATH: (process.env.PUBLIC_KEY_PATH as string) || '../../keys/public_key.pem',
