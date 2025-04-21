@@ -1,4 +1,4 @@
-import { ProtectedRequest } from '../../../types/app-request'
+import { ProtectedRequest } from '../../../types/extended/app-request'
 import { ApiError } from '../../../utils/ApiError'
 import { AsyncHandler } from '../../../utils/AsyncHandler'
 import { NextFunction, Response } from 'express'

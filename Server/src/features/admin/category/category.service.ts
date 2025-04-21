@@ -1,7 +1,7 @@
 import { ApiError } from '../../../utils/ApiError'
 import { NextFunction, Request } from 'express'
 import { responseMessage } from '../../../constant'
-import prisma from '../../../config/prisma.config'
+import prisma from '@/config/prisma.config'
 import { CategoryDTO, CategoryWhere } from './category.types'
 
 const { METHOD_FAILED, NOT_FOUND } = responseMessage
