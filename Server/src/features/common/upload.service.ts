@@ -1,10 +1,10 @@
 import { UploadApiResponse } from 'cloudinary'
-import { CloundinaryOption, UploadOptions } from '../../types/types'
+import { CloundinaryOption, UploadOptions } from '@/types/common/base.types'
 import { NextFunction, Request } from 'express'
 import { ApiError } from '../../utils/ApiError'
 import { responseMessage } from '../../constant'
 import { deleteFromCloudinary, uploadOnCloudinary } from '../../utils/Cloudinary'
-import { ALLOWED_FORMATS, FORMAT, INVALIDATE, MAX_BYTES, OVERWRITE } from '../../config/config'
+import { ALLOWED_FORMATS, FORMAT, INVALIDATE, MAX_BYTES, OVERWRITE } from '@/config'
 
 const { METHOD_FAILED } = responseMessage
 

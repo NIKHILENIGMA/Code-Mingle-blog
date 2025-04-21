@@ -1,6 +1,6 @@
 import crypto from 'crypto'
 import { Request, NextFunction } from 'express'
-import { tokenInfo } from '../../config/config'
+import { tokenInfo } from '@/config'
 import { decode, encode } from '../../helpers/JWT'
 import { RepositoryFactory } from '../../Lib/Repositories'
 import { ApiError } from '../../utils/ApiError'
