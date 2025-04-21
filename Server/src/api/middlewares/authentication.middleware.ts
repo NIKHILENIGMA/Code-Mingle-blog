@@ -1,7 +1,7 @@
 import { Response, NextFunction } from 'express'
 import { decode } from '@/helpers/JWT'
 import { RepositoryFactory } from '@/Lib/Repositories'
-import { ProtectedRequest } from '@/types/app-request'
+import { ProtectedRequest } from '@/types/extended/app-request'
 import { ApiError } from '@/utils/ApiError'
 import { AsyncHandler } from '@/utils/AsyncHandler'
 import responseMessage from '@/constant/responseMessage'
