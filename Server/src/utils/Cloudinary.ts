@@ -1,10 +1,10 @@
 import { v2 as cloudinary, UploadApiResponse } from 'cloudinary'
-import { cloudinaryConfig } from '../config/config'
+import { cloudinaryConfig } from '@/config'
 import { ApiError } from './ApiError'
 import { NextFunction, Request } from 'express'
 import { responseMessage } from '../constant'
 import { unlinkSync } from 'node:fs'
-import { UploadOptions } from '../types/types'
+import { UploadOptions } from '@/types/common/base.types'
 
 const { INTERNAL_SERVICE, BAD_REQUEST } = responseMessage
 
@@ -93,4 +93,10 @@ export const deleteFromCloudinary = async (req: Request, next: NextFunction, pub
             INTERNAL_SERVICE().code
         )
     }
+}
+
+
+export const cloundinaryUtil = {
+    uploadOnCloudinary,
+    deleteFromCloudinary
 }

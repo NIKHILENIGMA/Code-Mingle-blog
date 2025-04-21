@@ -1,4 +1,4 @@
-import { errorResponse, PromptSelectionProps, PromptType, ToneType } from '../types/types'
+import { errorResponse, PromptSelectionProps, PromptType, ToneType } from '@/types/common/base.types'
 
 /**
  *  Prompt Selection
@@ -10,6 +10,7 @@ import { errorResponse, PromptSelectionProps, PromptType, ToneType } from '../ty
  */
 
 const validTones: ToneType[] = ['Professional', 'Casual', 'Friendly', 'Formal', 'Confident', 'Optimistic', 'Empathetic', 'Assertive']
+
 const validTypes: PromptType[] = ['simple', 'advanced', 'condense']
 
 export function promptSelection({ type, tone, text, maxLength = 1000 }: PromptSelectionProps): string | errorResponse {
