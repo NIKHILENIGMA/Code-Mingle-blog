@@ -3,10 +3,10 @@ import { ApiError } from '../utils/ApiError'
 import jwt from 'jsonwebtoken'
 import { promisify } from 'node:util'
 import path from 'node:path'
-import { ProtectedRequest } from '../types/app-request'
+import { ProtectedRequest } from '../types/extended/app-request'
 import { NextFunction, Request } from 'express'
 import responseMessage from '../constant/responseMessage'
-import { keyPath } from '../config/config'
+import { keyPath } from '@/config'
 
 const { BAD_REQUEST, METHOD_FAILED } = responseMessage
 

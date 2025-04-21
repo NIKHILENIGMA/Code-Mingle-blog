@@ -1,10 +1,6 @@
 import { Resend } from 'resend'
-import { configMailService } from '../config/config'
+import { resendConfig } from '@/config'
 
-const apiKey = configMailService.resendApiKey?.toString()
+const apiKey = resendConfig.resendApiKey?.toString()
 
 export const resend = new Resend(apiKey)
-
-
-
-
