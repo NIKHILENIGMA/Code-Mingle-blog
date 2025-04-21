@@ -3,13 +3,13 @@ import { AsyncHandler } from '../../utils/AsyncHandler'
 import { NextFunction, Response } from 'express'
 import { responseMessage } from '../../constant'
 import { ApiResponse } from '../../utils/ApiResponse'
-import { ProtectedRequest } from '../../types/app-request'
+import { ProtectedRequest } from '../../types/extended/app-request'
 // import { User } from '../../Lib/Models/User'
 import AIService from './ai.service'
 import { Prompt } from './ai.types'
 import { promptSchema } from './ai.schema'
 import { validateBody } from '../../utils/Validations'
-import { PromptType, ToneType } from '../../types/types'
+import { PromptType, ToneType } from '@/types/common/base.types'
 // import { response } from './ai.dummyContent'
 
 const aiService = new AIService()
@@ -155,7 +155,7 @@ export const generateAiContent = AsyncHandler(async (req: ProtectedRequest, res:
             chatGPTResponse
         })
 
-        // Testing purpose only 
+        // Testing purpose only
         //choices[0]?.message?.content
         // const vari = options
         // await Promise.resolve(

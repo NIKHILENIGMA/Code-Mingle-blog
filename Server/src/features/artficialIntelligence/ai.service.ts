@@ -1,13 +1,11 @@
 import OpenAI from 'openai'
-import { openAIConfig } from '../../config/config'
+import { openAIConfig } from '@/config'
 import { ApiError } from '../../utils/ApiError'
 import { NextFunction, Request } from 'express'
 import { responseMessage } from '../../constant'
 import { ChatCompletion } from 'openai/resources'
 import { promptSelection } from '../../utils/PromptSelection'
-import { PromptType, ToneType } from '../../types/types'
-// import { AxiosResponse } from 'axios'
-// import { apiInstance } from './aiRequest'
+import { PromptType, ToneType } from '@/types/common/base.types'
 
 const { METHOD_FAILED, BAD_REQUEST } = responseMessage
 
@@ -31,7 +29,7 @@ export default class AIService {
      */
     public async simplifyTextService(req: Request, next: NextFunction, text: string): Promise<ChatCompletion | void> {
         const promptMessage = `Rewrite the following text to make it clear, concise, and accessible for a general audience. Use simple language, short sentences, and avoid technical jargon to ensure easy understanding. Format the response in valid HTML markup that can be rendered in an editor (use appropriate HTML tags like <p>, <ul>, <li>, <h1>, <h2>, etc. where needed): ${text}`
-        
+
         try {
             const response: ChatCompletion = await this.requestOpenAI(promptMessage)
 
