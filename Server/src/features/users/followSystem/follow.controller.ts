@@ -1,10 +1,10 @@
 import { NextFunction, Response } from 'express'
-import { AsyncHandler } from '../../../utils/AsyncHandler'
-import { ApiError } from '../../../utils/ApiError'
-import responseMessage from '../../../constant/responseMessage'
-import { ApiResponse } from '../../../utils/ApiResponse'
-import { ProtectedRequest } from '../../../types/app-request'
-import { User } from '../../../Lib/Models/User'
+import { AsyncHandler } from '@/utils/AsyncHandler'
+import { ApiError } from '@/utils/ApiError'
+import responseMessage from '@/constant/responseMessage'
+import { ApiResponse } from '@/utils/ApiResponse'
+import { ProtectedRequest } from '@/types/extended/app-request'
+import { User } from '@/Lib/Models/User'
 import FollowService from './follow.service'
 
 // Follow service instance
