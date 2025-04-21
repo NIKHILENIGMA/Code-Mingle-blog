@@ -4,7 +4,7 @@ import responseMessage from '../../../constant/responseMessage'
 import prisma from '../../../config/prisma.config'
 import { PostCardDTO, UpdateUserDTO, User, UserProfileDTO, UserUsernameWhere } from '../../../Lib/Models/User'
 import bcrypt from 'bcrypt'
-import { UserDTO } from '../../../types/types'
+import { UserDTO } from '@/types/common/base.types'
 
 interface ChangePassword {
     oldPassword: string
@@ -13,7 +13,6 @@ interface ChangePassword {
 const { METHOD_FAILED, NOT_FOUND, BAD_REQUEST } = responseMessage
 
 export default class ProfileService {
-    
     /**
      * Updates user profile information in the database
      *
@@ -231,7 +230,7 @@ export default class ProfileService {
                         followingId: userProfile.id
                     }
                 }
-            })  
+            })
 
             // Fetch all posts
             const allPosts: PostCardDTO[] = userProfile.posts.map((post) => ({
@@ -242,8 +241,8 @@ export default class ProfileService {
                 image: post.image || '',
                 category: post.category ? (typeof post.category === 'string' ? post.category : post.category.name) : '',
                 createdAt: post.createdAt,
-                updatedAt: post.updatedAt,
-              }));
+                updatedAt: post.updatedAt
+            }))
 
             const userProfileDTP: UserProfileDTO = {
                 id: userProfile.id,
@@ -258,10 +257,9 @@ export default class ProfileService {
                 postCount: postsCount,
                 isFollowedByLoggedInUser: !!isFollowedByLoggedInUser,
                 allPosts
-            } 
+            }
 
             return userProfileDTP
-
         } catch (error) {
             return ApiError(
                 error instanceof Error ? error : new Error(METHOD_FAILED('get user dashboard service').message),

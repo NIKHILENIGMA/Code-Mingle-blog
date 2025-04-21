@@ -3,10 +3,10 @@ import { AsyncHandler } from '../../../utils/AsyncHandler'
 import { ApiError } from '../../../utils/ApiError'
 import responseMessage from '../../../constant/responseMessage'
 import { ApiResponse } from '../../../utils/ApiResponse'
-import { ProtectedRequest } from '../../../types/app-request'
+import { ProtectedRequest } from '../../../types/extended/app-request'
 import { UpdateUserDTO, User } from '../../../Lib/Models/User'
 import ProfileService from './profile.service'
-import { CloundinaryOption } from '../../../types/types'
+import { CloundinaryOption } from '@/types/common/base.types'
 import { uploadService } from '../../common/upload.service'
 
 const profileServices = new ProfileService()
