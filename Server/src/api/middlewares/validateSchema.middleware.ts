@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import { z, AnyZodObject } from 'zod'
 import { ApiError } from '@/utils/ApiError'
-import { ProfileImageSchema } from '@/features/users/profile/profile.schema'
+import { ProfileImageSchema } from '../validators/profile.validator'
 
 /**
  * Middleware to validate the request body against a schema
