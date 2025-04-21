@@ -3,7 +3,8 @@ import prisma from '../../../config/prisma.config'
 import { IDraftRepository } from '../Interfaces/IDraftRepository'
 import { Blog, PostDTO } from '../../Models/Blog'
 import { DraftWhere, DraftWhereSlug, DraftOrderBy, GenerateDraft } from '../../../types/draft'
-import { DRAFT_STATUS } from '../../../constant/draftStatus'
+import { ENUMS } from '@/types'
+
 
 export class PrismaDraftRepository implements IDraftRepository {
     public async create(payload: GenerateDraft): Promise<Blog> {
@@ -49,7 +50,7 @@ export class PrismaDraftRepository implements IDraftRepository {
     }
 
     public async findDrafts(): Promise<Post[] | null> {
-        return await prisma.post.findMany({ where: { status: DRAFT_STATUS.DRAFT } })
+        return await prisma.post.findMany({ where: { status: ENUMS.DRAFT_STATUS.DRAFT } })
     }
 
     public async findDraftById(where: DraftWhere): Promise<Post | null> {
