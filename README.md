@@ -1,26 +1,33 @@
-# Nodedrafts Blog Application
-```markdown
 # Nodedrafts Blog Application 🚀
 
 A modern, full-stack blogging platform built with the MERN stack.
 
 ## Table of Contents
-- [Nodedrafts Blog Application](#nodedrafts-blog-application)
+- [Nodedrafts Blog Application 🚀](#nodedrafts-blog-application-)
   - [Table of Contents](#table-of-contents)
   - [Introduction](#introduction)
+  - [Overview 📝](#overview-)
   - [Features](#features)
+  - [Key Features ✨](#key-features-)
   - [Technologies Used](#technologies-used)
+  - [Tech Stack 💻](#tech-stack-)
+    - [Frontend](#frontend)
   - [Installation](#installation)
+    - [Backend](#backend)
   - [Usage](#usage)
+  - [Getting Started 🚀](#getting-started-)
   - [Contributing](#contributing)
+    - [Prerequisites](#prerequisites)
   - [License](#license)
-- [Overview](#overview)
-- [Key Features](#key-features)
-- [Tech Stack](#tech-stack) 
-- [Getting Started](#getting-started)
-- [Development](#development)
-- [Contributing](#contributing)
-- [License](#license)
+    - [Installation](#installation-1)
+  - [Overview 📝](#overview--1)
+  - [Key Features ✨](#key-features--1)
+  - [Tech Stack 💻](#tech-stack--1)
+    - [Frontend](#frontend-1)
+    - [Backend](#backend-1)
+  - [Getting Started 🚀](#getting-started--1)
+    - [Prerequisites](#prerequisites-1)
+    - [Installation](#installation-2)
 
 ## Introduction
 nodedrafts is a full-stack blog application that allows users to create, edit, and delete blog posts. It also supports user authentication and comment functionality.
