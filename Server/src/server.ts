@@ -1,5 +1,5 @@
 import app from './app'
-import config from './config/config'
+import { appConfig } from './config'
 import logger, { winstonStream } from './utils/logger'
 import prisma from './config/prisma.config'
 import morgan from 'morgan'
@@ -8,8 +8,8 @@ const morganFormat = ':method :url :status :response-time ms'
 
 app.use(morgan(morganFormat, { stream: winstonStream })) // Logging HTTP requests
 
-const server = app.listen(config.PORT, () => {
-    logger.info(`Server running on port ${config.PORT}`)
+const server = app.listen(appConfig.PORT, () => {
+    logger.info(`Server running on port ${appConfig.PORT}`)
 })
 
 // Connect to the database
@@ -25,19 +25,19 @@ void (() => {
 // Handle graceful shutdown
 // Graceful shutdown
 process.on('beforeExit', () => {
-    (async () => {
+    ;(async () => {
         try {
-            await prisma.$disconnect(); // Disconnect Prisma client
-            server.close(); // Close the server
-            logger.info('Server shutting down');
+            await prisma.$disconnect() // Disconnect Prisma client
+            server.close() // Close the server
+            logger.info('Server shutting down')
         } catch (error) {
-            logger.error('Error shutting down server: %s', error);
-            process.exit(1); // Exit with failure code
+            logger.error('Error shutting down server: %s', error)
+            process.exit(1) // Exit with failure code
         }
-    })().catch(err => {
-        logger.error('Error during shutdown process: %s', err);
-        process.exit(1); // Exit with failure code
-    });;
-});
+    })().catch((err) => {
+        logger.error('Error during shutdown process: %s', err)
+        process.exit(1) // Exit with failure code
+    })
+})
 
 export default server
