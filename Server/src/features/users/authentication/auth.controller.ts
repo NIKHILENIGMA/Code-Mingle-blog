@@ -10,6 +10,7 @@ import { UserDTO } from '@/types/common/base.types'
 import AuthService from '../authentication/auth.service'
 import TokenServices from '../../../features/common/token.service'
 import MailService from '../../../features/mail/ResetPassword/mail.service'
+import { logger } from '@/utils'
 
 // Initialize the services
 const authServices = new AuthService()
@@ -93,7 +94,8 @@ export const login = AsyncHandler(async (req: Request, res: Response, next: Next
             sameSite: 'strict',
             maxAge: 1000 * parseInt(tokenInfo.refresh_validity as string)
         })
-
+        logger.info('User logged in successfully', { userId })
+        
         return ApiResponse(req, res, SUCCESS().code, SUCCESS('User logged in successfully').message, {
             token: tokens.accessToken
         })

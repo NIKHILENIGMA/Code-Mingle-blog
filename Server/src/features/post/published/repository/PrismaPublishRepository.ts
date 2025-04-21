@@ -1,5 +1,5 @@
-import prisma from '../../../../../config/prisma.config'
-import { DRAFT_STATUS } from '../../../../../constant'
+import prisma from '@/config/prisma.config'
+import { ENUMS } from '@/types'
 import { IPublishRepository, PublishPostPayload } from './IPublishRepo'
 
 export class PrismaPublishRepository implements IPublishRepository {
@@ -35,7 +35,7 @@ export class PrismaPublishRepository implements IPublishRepository {
         })
     }
 
-    public async changePostStatus(postId: string, authorId: string, status: DRAFT_STATUS) {
+    public async changePostStatus(postId: string, authorId: string, status: ENUMS.DRAFT_STATUS) {
         return prisma.post.update({
             where: { id: postId, authorId },
             data: { status }
@@ -44,25 +44,25 @@ export class PrismaPublishRepository implements IPublishRepository {
 
     public async findPublishedPostById(postId: string) {
         return prisma.post.findFirst({
-            where: { id: postId, status: DRAFT_STATUS.PUBLISHED }
+            where: { id: postId, status: ENUMS.DRAFT_STATUS.PUBLISHED }
         })
     }
 
     public async findPublishedPostBySlug(slug: string) {
         return prisma.post.findFirst({
-            where: { slug, status: DRAFT_STATUS.PUBLISHED }
+            where: { slug, status: ENUMS.DRAFT_STATUS.PUBLISHED }
         })
     }
 
     public async findPublishedPostByAuthor(authorId: string) {
         return prisma.post.findMany({
-            where: { authorId, status: DRAFT_STATUS.PUBLISHED }
+            where: { authorId, status: ENUMS.DRAFT_STATUS.PUBLISHED }
         })
     }
 
     public async findPublishedPostByCategory(categoryId: number) {
         return prisma.post.findMany({
-            where: { categoryId, status: DRAFT_STATUS.PUBLISHED }
+            where: { categoryId, status: ENUMS.DRAFT_STATUS.PUBLISHED }
         })
     }
 
@@ -70,7 +70,7 @@ export class PrismaPublishRepository implements IPublishRepository {
         return prisma.post.findMany({
             where: {
                 authorId: { in: followingIds },
-                status: DRAFT_STATUS.PUBLISHED
+                status: ENUMS.DRAFT_STATUS.PUBLISHED
             }
         })
     }
