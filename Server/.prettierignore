@@ -1,0 +1,11 @@
+
+*.min.js
+*.bundle.js
+dist/
+coverage/
+build/
+node_modules/
+vendor/
+.next/
+.cache/
+public/
