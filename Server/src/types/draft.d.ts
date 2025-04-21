@@ -1,7 +1,7 @@
-import { DRAFT_STATUS } from '@/constant/draftStatus'
+import { ENUMS } from '@/types'
 
 export interface GenerateDraft {
-    status: DRAFT_STATUS.DRAFT
+    status: ENUMS.DRAFT_STATUS.DRAFT
     authorId: string
 }
 
