@@ -53,7 +53,6 @@ export const isAuthenticated = AsyncHandler(async (req: ProtectedRequest, _: Res
 
         // Attach user to request object
         req.user = user
-
         // Find key store by user id
         const keyStore = await keyStoreRepository.findKeyStoreByUserId(user.id)
 
