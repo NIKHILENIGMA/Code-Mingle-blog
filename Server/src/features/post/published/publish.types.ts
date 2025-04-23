@@ -8,16 +8,13 @@ export interface PublishPostBody {
     tags?: string[]
 }
 
-export interface PublishPostPayload extends PublishPostBody {
-    status: ENUMS.DRAFT_STATUS.PUBLISHED
-}
 
 export interface UpdatePublishedPost {
-    title: string
-    content: string
-    image: string
-    thumbnailImage: string
-    slug: string
+    title?: string
+    content?: string
+    image?: string
+    thumbnailImage?: string
+    slug?: string
 }
 
 export interface PublishWhere {
