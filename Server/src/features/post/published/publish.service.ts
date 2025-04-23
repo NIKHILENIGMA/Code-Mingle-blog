@@ -2,7 +2,7 @@ import { NextFunction, Request } from 'express'
 import { responseMessage } from '@/constant'
 import { ApiError } from '@/utils/ApiError'
 import prisma from '@/config/prisma.config'
-import { PublishedPostDTO, PublishPostPayload, UpdatePublishedPost, PublishWhere, PublishedWhere, QueryParameter } from './publish.types'
+import { PublishedPostDTO, UpdatePublishedPost, PublishWhere, PublishedWhere, QueryParameter, PublishPostBody } from './publish.types'
 import { ENUMS } from '@/types'
 
 const { INTERNAL_SERVICE, NOT_FOUND, POST_NOT_FOUND } = responseMessage
@@ -17,7 +17,7 @@ export default class PublishService {
      * @returns {Promise<PublishedPostDTO>} - The published post.
      */
 
-    public async publishPost(userId: string, postId: string, payload: PublishPostPayload): Promise<PublishedPostDTO | void> {
+    public async publishPost(userId: string, postId: string, payload: PublishPostBody): Promise<PublishedPostDTO | void> {
         try {
             const existingDraft = await prisma.post.findFirst({
                 where: {
@@ -27,8 +27,17 @@ export default class PublishService {
                 }
             })
 
+            // Check if the draft exists and is owned by the user
             if (!existingDraft) {
                 throw new Error(POST_NOT_FOUND(`draft with id:${postId} does not exist or deleted already`).message)
+            }
+
+            // if slug is not provided, generate it from the title
+            if (!payload.slug) {
+                if (!existingDraft.title) {
+                    throw new Error(POST_NOT_FOUND('Post title is required to generate slug').message)
+                }
+                payload.slug = this.changeTitleToSlug(existingDraft.title)
             }
 
             const publishedPost = await prisma.post.update({
@@ -251,5 +260,12 @@ export default class PublishService {
         } catch (error) {
             return ApiError(error instanceof Error ? error : new Error(INTERNAL_SERVICE('post found').message), req, next, INTERNAL_SERVICE().code)
         }
+    }
+
+    private changeTitleToSlug(title: string): string {
+        return title
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '')
     }
 }
