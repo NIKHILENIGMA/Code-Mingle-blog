@@ -1,8 +1,8 @@
 import { Post } from '@prisma/client'
-import prisma from '../../../config/prisma.config'
-import { IDraftRepository } from '../Interfaces/IDraftRepository'
+import prisma from '@/config/prisma.config'
+import { IDraftRepository } from '@/Lib/Repositories/Interfaces/IDraftRepository'
 import { Blog, PostDTO } from '../../Models/Blog'
-import { DraftWhere, DraftWhereSlug, DraftOrderBy, GenerateDraft } from '../../../types/draft'
+import { DraftWhere, DraftWhereSlug, DraftOrderBy, GenerateDraft } from '@/types/draft'
 import { ENUMS } from '@/types'
 
 
