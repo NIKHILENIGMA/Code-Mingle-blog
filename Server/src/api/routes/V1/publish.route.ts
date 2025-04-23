@@ -1,6 +1,5 @@
 import { Router } from 'express'
-import { isAuthenticated, validateBody, validateParams } from '@/api/middlewares'
-import { RequestHandler } from 'express'
+import { isAuthenticated, validateParams } from '@/api/middlewares'
 import {
     archivePublishedPost,
     checkIsSlugAvailable,
@@ -10,7 +9,9 @@ import {
     publishPost,
     updatePublishedPost
 } from '@/features/post/published/publish.controller'
-import { PublishBodySchema, PublishParamsSchema, UpdatePublishedPostSchema } from '../../validators/publish.validator'
+import {  PublishParamsSchema } from '../../validators/publish.validator'
+import { checkPermission } from '@/api/middlewares/checkPermission.middleware'
+import { ENUMS } from '@/types'
 
 const router = Router()
 
@@ -29,7 +30,7 @@ const router = Router()
  * @route /api/v1/published/new
  * @access Private
  */
-router.route('/new').post(isAuthenticated as RequestHandler, validateBody(PublishBodySchema) as RequestHandler, publishPost as RequestHandler)
+router.route('/:id').post(isAuthenticated, publishPost)
 // router.route('/new').post(isAuthenticated, validateBody(PublishBodySchema), publishPost)
 
 /**
@@ -39,7 +40,14 @@ router.route('/new').post(isAuthenticated as RequestHandler, validateBody(Publis
  * @access Private
  *
  */
-router.route('/:id').patch(isAuthenticated, validateParams(PublishParamsSchema), validateBody(UpdatePublishedPostSchema), updatePublishedPost)
+router
+    .route('/:id')
+    .patch(
+        isAuthenticated,
+        // validateParams(PublishParamsSchema),
+        checkPermission(ENUMS.ACTION.UPDATE, ENUMS.RESOURCE.POST),
+        updatePublishedPost
+    )
 
 /**
  * ! Route to delete a published post
