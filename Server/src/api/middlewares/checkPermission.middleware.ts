@@ -2,9 +2,10 @@ import { NextFunction, Response } from 'express'
 import prisma from '@/config/prisma.config'
 import { AsyncHandler, ApiError, resourceResolvers } from '@/utils'
 import { User } from '@/Lib/Models/User'
-import { ENUMS, APP_REQUEST } from '@/types'
+import { ENUMS } from '@/types'
 import jexl from 'jexl'
 import { responseMessage } from '@/constant'
+import { ProtectedRequest } from '@/types/extended/app-request'
 
 const { ACCESS_DENIED, NOT_FOUND, METHOD_FAILED } = responseMessage
 
@@ -23,7 +24,7 @@ const { ACCESS_DENIED, NOT_FOUND, METHOD_FAILED } = responseMessage
  */
 
 export const checkPermission = (actions: ENUMS.ACTION, resource: ENUMS.RESOURCE) => {
-    return AsyncHandler(async (req: APP_REQUEST.ProtectedRequest, _: Response, next: NextFunction): Promise<void> => {
+    return AsyncHandler(async (req: ProtectedRequest, _: Response, next: NextFunction): Promise<void> => {
         const user = req?.user as User
         if (!user) {
             return ApiError(new Error('Unauthenticated user please login!'), req, next, 401)
