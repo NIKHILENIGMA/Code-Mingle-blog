@@ -11,7 +11,7 @@ export interface User {
     bio?: string | null
     avatarImg?: string | null
     coverImg?: string | null
-    role: string
+    role: string 
     createdAt: Date
     updatedAt: Date
 }
