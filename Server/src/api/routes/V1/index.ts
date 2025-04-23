@@ -36,7 +36,7 @@ router.use('/posts/:postId/collection', collectionRoutes)
 // Comment routes
 router.use('/posts/:postId/comments', commentRoutes)
 // Draft routes
-router.use('/draft', draftRoutes)
+router.use('/drafts', draftRoutes)
 // Publish routes
 router.use('/published', publishRoutes)
 // OpenAI routes
