@@ -7,6 +7,7 @@ export default {
     INTERNAL_SERVICE: (message?: string) => ({ code: 500, message: `Internal service error: ${message}` }),
     MISSING_ID: (message?: string) => ({ code: 400, message: `Missing id in request params for ${message} operation` }),
     POST_NOT_FOUND: (message?: string) => ({ code: 404, message: `Post not found: ${message}` }),
+    ACCESS_DENIED: (message?: string) => ({ code: 403, message: `You don't have access for this resource:  ${message}` }),
     HEALTH_CHECK: { code: 200, message: 'Server is up and running' },
     INVALID_PASSWORD: { code: 401, message: 'Provided password is incorrect' },
     INVALID_TOKEN: { code: 401, message: 'Provided token is invalid' },
