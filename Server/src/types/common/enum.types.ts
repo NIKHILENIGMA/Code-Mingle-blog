@@ -12,3 +12,25 @@ export enum DRAFT_STATUS {
     PUBLISHED = 'PUBLISHED',
     ARCHIVED = 'ARCHIVED'
 }
+
+export enum ROLE {
+    ADMIN = 'ADMIN',
+    USER = 'USER',
+    MODERATOR = 'MODERATOR'
+}
+
+export enum ACTION {
+    READ = 'READ',
+    WRITE = 'WRITE',
+    UPDATE = 'UPDATE',
+    DELETE = 'DELETE'
+}
+
+export enum RESOURCE {
+    POST = 'POST',
+    COMMENT = 'COMMENT',
+    USER = 'USER',
+    ADMIN_PANEL = 'ADMIN_PANEL',
+    ALL = '*',
+    REPORT = 'REPORT'
+}
