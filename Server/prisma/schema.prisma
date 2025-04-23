@@ -24,7 +24,7 @@ model User {
   bio         String?      @map("bio_data")
   avatarImg   String?      @map("avatar_img")
   coverImg    String?      @map("cover_img")
-  role        String       @default("USER")
+  role        Role         @default(USER) @map("user_role") // USER, ADMIN, MODERATOR
   collections Collection[]
   savedPosts  SavedPost[]
   posts       Post[]
@@ -159,12 +159,12 @@ model Like {
 }
 
 model Category {
-  id           Int      @id @default(autoincrement())
-  name         String   @unique
-  description  String?
-  posts        Post[]
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?
+  posts       Post[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   @@map("categories")
 }
@@ -195,4 +195,38 @@ model ResetPassword {
   updatedAt  DateTime @updatedAt
 
   @@map("reset_password")
+}
+
+model Policy {
+  id        String   @id @default(cuid())
+  role      Role
+  resource  Resource
+  actions   Action[]
+  condition String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("policies")
+}
+
+enum Role {
+  USER
+  ADMIN
+  MODERATOR
+}
+
+enum Resource {
+  POST
+  COMMENT
+  USER
+  ADMIN_PANEL
+  REPORT
+  ALL
+}
+
+enum Action {
+  READ
+  WRITE
+  UPDATE
+  DELETE
 }
