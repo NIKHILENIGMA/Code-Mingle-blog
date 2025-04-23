@@ -6,7 +6,7 @@ import { ApiResponse } from '@/utils/ApiResponse'
 import { ProtectedRequest } from '@/types/extended/app-request'
 import { User } from '@/Lib/Models/User'
 import PublishService from './publish.service'
-import { PublishPostBody, PublishPostPayload, UpdatePublishedPost, PublishWhere, PublishedWhere, QueryParameter } from './publish.types'
+import { PublishPostBody, UpdatePublishedPost, PublishWhere, PublishedWhere, QueryParameter } from './publish.types'
 import { ENUMS } from '@/types'
 
 // Create an instance of the PublishService class
@@ -55,7 +55,7 @@ export const publishPost = AsyncHandler(async (req: ProtectedRequest, res: Respo
     }
 
     // Create the payload to be saved
-    const payload: PublishPostPayload = {
+    const payload: PublishPostBody = {
         slug,
         categoryId,
         status,
