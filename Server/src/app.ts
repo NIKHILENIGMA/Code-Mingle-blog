@@ -5,7 +5,7 @@ import helmet from 'helmet'
 import cookieParser from 'cookie-parser'
 import { corsOptions } from './constant/corsOptions'
 import { globalErrorHandler, notFound } from '@/api/middlewares'
-import { morganMiddleware } from './utils/logger'
+import { morganMiddleware } from '@/utils/logger/morgan'
 
 
 const app: Application = express()
