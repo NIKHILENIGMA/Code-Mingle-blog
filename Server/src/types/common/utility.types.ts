@@ -1,56 +1,19 @@
-// Pagination type
-
 /**
- * Interface for pagination parameters
- * @interface PaginationParams
- * @property {number} [page] - The page number to retrieve
- * @property {number} [limit] - Number of items per page
- * @property {string} [sortBy] - Field name to sort by
- * @property {'asc' | 'desc'} [order] - Sort order direction (ascending or descending)
+ * Represents metadata associated with a log entry.
+ * This interface allows for flexible key-value pairs while providing
+ * optional properties for common logging details.
+ *
+ * @property {string} [requestId] - A unique identifier for the request.
+ * @property {string} [userId] - The identifier of the user associated with the log entry.
+ * @property {string} [path] - The request path or endpoint being logged.
+ * @property {string} [method] - The HTTP method (e.g., GET, POST) of the request.
+ * @property {Record<string, unknown>} [key: string] - Additional metadata as key-value pairs.
  */
-export interface PaginationParams {
-    page?: number;
-    limit?: number;
-    sortBy?: string;
-    order?: 'asc' | 'desc';
+
+export interface LogMetadata {
+    [key: string]: unknown
+    requestId?: string
+    userId?: string
+    path?: string
+    method?: string
 }
-
-// Filter type
-/**
- * Interface for filter parameters
- * @interface FilterParams
- * @property {string} [search] - Search query string
- * @property {Date} [startDate] - Start date for filtering
- * @property {Date} [endDate] - End date for filtering
- * @property {string[]} [status] - Array of status values to filter by
- */
-export interface FilterParams {
-    search?: string;
-    startDate?: Date;
-    endDate?: Date;
-    status?: string[];
-}
-
-// Make all properties optional
-/**
- * Utility type to make all properties of a type optional
- * @template T - The type to modify
- * @typedef {Partial<T>} Partial<T>
- * @property {T} [P] - The properties of the type T, made optional
- */
-export type Partial<T> = {
-    [P in keyof T]?: T[P];
-};
-
-// Make all properties required
-
-/**
- * Utility type to make all properties of a type required
- * @template T - The type to modify
- * @typedef {Required<T>} Required<T>
- * @property {T} [P] - The properties of the type T, made required
- */
-export type Required<T> = {
-    [P in keyof T]-?: T[P];
-};
-

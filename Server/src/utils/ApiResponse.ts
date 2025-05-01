@@ -1,9 +1,8 @@
 import { Request, Response } from 'express'
 import { THttpResponse } from '@/types/api/responses.types'
-import logger from './logger'
-import { EApplicationEnvironment } from '../constant/application'
-import { appConfig } from '@/config';
-
+import { logger } from './logger/index'
+import { ENUMS } from '@/types'
+import { appConfig } from '@/config'
 
 /**
  * Sends a standardized API response.
@@ -32,26 +31,9 @@ export const ApiResponse = (req: Request, res: Response, responseStatusCode: num
 
     logger.info(`${response.request.method} ${response.request.url} ${response.statusCode} ${response.message}`)
 
-    if (appConfig.ENV === EApplicationEnvironment.PRODUCTION) {
+    if (appConfig.ENV === ENUMS.EApplicationEnvironment.PRODUCTION) {
         delete response.request.ip
     }
 
     res.status(responseStatusCode).json(response)
 }
-
-
-
-// class ApiResponse<T> {
-//     statusCode: number
-//     data: T
-//     message: string
-//     success: boolean
-//     constructor(statusCode: number, data: T, message: string = 'Success') {
-//         this.statusCode = statusCode
-//         this.data = data
-//         this.message = message
-//         this.success = statusCode < 400
-//     }
-// }
-
-// export { ApiResponse }

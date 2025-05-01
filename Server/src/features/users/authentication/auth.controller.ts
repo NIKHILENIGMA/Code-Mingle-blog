@@ -4,13 +4,14 @@ import { ApiResponse } from '../../../utils/ApiResponse'
 import { AsyncHandler } from '../../../utils/AsyncHandler'
 import { SignupCredentials, LoginCredentials, ForgotPasswordCredentials, ResetCredentials, AuthResponse } from './auth.types'
 import { tokenInfo, appConfig } from '@/config'
-import { EApplicationEnvironment, responseMessage } from '../../../constant'
+import { responseMessage } from '@/constant'
 import { ProtectedRequest } from '../../../types/extended/app-request'
 import { UserDTO } from '@/types/common/base.types'
 import AuthService from '../authentication/auth.service'
 import TokenServices from '../../../features/common/token.service'
 import MailService from '../../../features/mail/ResetPassword/mail.service'
-import { logger } from '@/utils'
+import { logger } from '@/utils/logger/index'
+import { ENUMS } from '@/types'
 
 // Initialize the services
 const authServices = new AuthService()
@@ -85,12 +86,12 @@ export const login = AsyncHandler(async (req: Request, res: Response, next: Next
 
         res.cookie('access_token', tokens.accessToken, {
             httpOnly: true,
-            secure: !(appConfig.ENV === EApplicationEnvironment.PRODUCTION),
+            secure: !(appConfig.ENV === ENUMS.EApplicationEnvironment.PRODUCTION),
             sameSite: 'strict',
             maxAge: 1000 * parseInt(tokenInfo.access_validity as string)
         }).cookie('refresh_token', tokens.refreshToken, {
             httpOnly: true,
-            secure: !(appConfig.ENV === EApplicationEnvironment.PRODUCTION),
+            secure: !(appConfig.ENV === ENUMS.EApplicationEnvironment.PRODUCTION),
             sameSite: 'strict',
             maxAge: 1000 * parseInt(tokenInfo.refresh_validity as string)
         })
@@ -246,12 +247,12 @@ export const refreshAccessToken = AsyncHandler(async (req: Request, res: Respons
         // Set the new tokens in the cookies
         res.cookie('access_token', newTokens.accessToken, {
             httpOnly: true,
-            secure: !(appConfig.ENV === EApplicationEnvironment.PRODUCTION),
+            secure: !(appConfig.ENV === ENUMS.EApplicationEnvironment.PRODUCTION),
             sameSite: 'strict',
             maxAge: 1000 * parseInt(tokenInfo.access_validity as string)
         }).cookie('refresh_token', newTokens.refreshToken, {
             httpOnly: true,
-            secure: !(appConfig.ENV === EApplicationEnvironment.PRODUCTION),
+            secure: !(appConfig.ENV === ENUMS.EApplicationEnvironment.PRODUCTION),
             sameSite: 'strict',
             maxAge: 1000 * parseInt(tokenInfo.refresh_validity as string)
         })

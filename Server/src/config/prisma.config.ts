@@ -8,7 +8,7 @@
 */
 
 
-import { logger } from '@/utils'
+import { logger } from '@/utils/logger/index'
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()

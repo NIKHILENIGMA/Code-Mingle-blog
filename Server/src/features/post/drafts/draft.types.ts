@@ -59,3 +59,29 @@ export interface DraftDTO {
     createdAt: Date
     updatedAt: Date
 }
+
+export interface DraftPreview {
+    id: string
+    title: string | null
+    content: string | null
+    slug: string | null
+    image: string | null
+    readTime: number | null
+    category: {
+        name: string
+    } | null
+    author: {
+        id: string
+        username: string | null
+        avatarImg: string | null
+    }
+}
+
+export interface SelectedDraftFields {
+    id: boolean
+    title: boolean
+    content: boolean
+    thumbnailImage?: boolean
+    image?: boolean
+    createdAt?: boolean
+}

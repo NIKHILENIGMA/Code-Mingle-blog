@@ -34,3 +34,8 @@ export enum RESOURCE {
     ALL = '*',
     REPORT = 'REPORT'
 }
+
+export enum EApplicationEnvironment {
+    DEVELOPMENT = 'development',
+    PRODUCTION = 'production',
+}
