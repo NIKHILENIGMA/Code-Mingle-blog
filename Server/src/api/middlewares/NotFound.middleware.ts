@@ -1,24 +1,24 @@
-import { Request, Response } from 'express'
+import { ERROR_TYPES } from '@/constant/error-types'
+import { ApiError, AppError } from '@/utils/ApiError'
+import { NextFunction, Request, Response } from 'express'
 
 /**
- * Handles 404 Not Found errors by sending a JSON response with error details
- * @param {Request} req - Express request object
- * @param {Response} res - Express response object
- * @returns {void} - Returns nothing, sends JSON response
+ * Middleware to handle 404 Not Found errors.
+ *
+ * This middleware is triggered when a request is made to a route
+ * that does not exist in the application. It creates a custom
+ * `AppError` instance with a 404 status code and a descriptive
+ * error message indicating the requested route was not found.
+ * The error is then passed to the `ApiError` handler for further
+ * processing.
+ *
+ * @param req - The incoming HTTP request object.
+ * @param _ - The outgoing HTTP response object (unused).
+ * @param next - The next middleware function in the stack.
  */
-export const notFound = (req: Request, res: Response): void => {
-    res.status(404).json({
-        error: {
-            code: 404,
-            message: 'The requested resource was not found',
-            request: {
-                ip: req.ip,
-                params: req.params || {},
-                query: req.query || {},
-                method: req.method || 'unknown',
-                url: req.originalUrl,
-                userAgent: req.get('user-agent') || 'unknown',
-            }
-        }
-    });
+
+export const notFound = (req: Request, _: Response, next: NextFunction): void => {
+    const notFoundError = AppError.from({ code: 404, message: ERROR_TYPES.NOT_FOUND(`Route ${req.path} not found`).message })
+
+    return ApiError(notFoundError, req, next, 404)
 }

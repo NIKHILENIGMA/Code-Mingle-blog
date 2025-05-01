@@ -1,6 +1,7 @@
 import { NextFunction, Response } from 'express'
 import prisma from '@/config/prisma.config'
 import { AsyncHandler, ApiError, resourceResolvers } from '@/utils'
+import { logger } from '@/utils/logger/index'
 import { User } from '@/Lib/Models/User'
 import { ENUMS } from '@/types'
 import jexl from 'jexl'
@@ -8,10 +9,6 @@ import { responseMessage } from '@/constant'
 import { ProtectedRequest } from '@/types/extended/app-request'
 
 const { ACCESS_DENIED, NOT_FOUND, METHOD_FAILED } = responseMessage
-
-// actions: WRITE, READ, UPDATE, DELETE
-// resource: POST, COMMENT, USER, ADMIN_PANEL, ALL, REPORT
-// role: ADMIN, USER, MODERATOR
 
 /**
  * Middleware to check if a user has permission to perform specific actions on a resource
@@ -33,10 +30,11 @@ export const checkPermission = (actions: ENUMS.ACTION, resource: ENUMS.RESOURCE)
         let resourceData: { authorId?: string } | null = null
 
         const fetchResource = resourceResolvers[resource as keyof typeof resourceResolvers]
-
+        
         // Check if the resource is abstract (like ADMIN_PANEL) and doesn't require an ID
         if (fetchResource && typeof fetchResource === 'function') {
             const fetchedResource = await fetchResource(resourceId)
+            req.resource = fetchedResource
             resourceData = fetchedResource ? { authorId: (fetchedResource as { authorId: string }).authorId } : null
 
             // If the resource is not found and it's not an abstract resource, return an error
@@ -68,20 +66,25 @@ export const checkPermission = (actions: ENUMS.ACTION, resource: ENUMS.RESOURCE)
         }
 
         // Check if the user has permission to perform the action on the resource
-        const isAllowed: boolean = policies.some((policy) => {
-            return (
-                policy.role === user.role &&
-                policy.actions.includes(actions) &&
-                policy.resource === resource &&
-                jexl.evalSync(policy.condition, context)
-            )
-        })
-
-        // If the user doesn't have permission, return an error
-        if (!isAllowed) {
-            return ApiError(new Error(ACCESS_DENIED(resource).message), req, next, ACCESS_DENIED().code)
+        try {
+            const isAllowed: boolean = policies.some((policy) => {
+                return (
+                    policy.role === user.role &&
+                    policy.actions.includes(actions) &&
+                    policy.resource === resource &&
+                    jexl.evalSync(policy.condition, context)
+                )
+            })
+            // If the user doesn't have permission, return an error
+            if (!isAllowed) {
+                return ApiError(new Error(ACCESS_DENIED(resource).message), req, next, ACCESS_DENIED().code)
+            }
+        } catch (error) {
+            logger.error('Error evaluating policy condition:', error)
+            return ApiError(new Error(METHOD_FAILED('Error evaluating policy condition').message), req, next, METHOD_FAILED().code)
         }
 
+        
         // If the user has permission, proceed to the next middleware or route handler
         next()
     })

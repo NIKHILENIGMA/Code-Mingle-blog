@@ -36,7 +36,7 @@ export const validateParams = <T extends AnyZodObject>(schema: T) => {
             next()
         } catch (error) {
             if (error instanceof z.ZodError) {
-                return ApiError(new Error(`Schema Error: ${error.errors[0].message}`), req, next, 400)
+                return ApiError(new Error(`Schema Invalid Param type: ${error.errors[0].message}`), req, next, 400)
             }
             next(error)
         }
