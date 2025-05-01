@@ -5,7 +5,6 @@ import { Draft } from "@/features/drafts/types";
 import { useDispatch } from "react-redux";
 import { setSelectedDraft } from "@/features/drafts/slices/draftSlice";
 import SideBarDraftDropDownActions from "./SideBarDraftDropDownActions";
-import truncate from "@/Utils/truncate";
 
 interface DraftSideBarCardProps {
   draft: Draft;
@@ -16,9 +15,6 @@ const SidebarCard: FC<DraftSideBarCardProps> = ({ draft }) => {
   const handleSelectDraft = (draft: Draft) => {
     dispatch(setSelectedDraft({ selectedDraft: draft }));
   };
-
-  // Check if the innerWidth is less than 768px
-  const size = innerWidth < 640;
 
   return (
     <div
@@ -35,8 +31,8 @@ const SidebarCard: FC<DraftSideBarCardProps> = ({ draft }) => {
         }
       >
         <FileText size={24} className="flex-shrink-0 px-1" />
-        <span className="truncate">
-          {draft?.title ? truncate(draft?.title, size ? 60 : 33) : "Untitled"}
+        <span className="truncate text-clip whitespace-nowrap overflow-hidden">
+          {draft?.title ? draft?.title : "Untitled"}
         </span>
       </NavLink>
       <SideBarDraftDropDownActions draft={draft} />
