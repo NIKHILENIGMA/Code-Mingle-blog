@@ -24,6 +24,7 @@ export interface ProtectedRequest extends Request {
     keyStore?: KeyStore
     accessToken?: string
     refreshToken?: string
+    resource?: object | null
 }
 
 
