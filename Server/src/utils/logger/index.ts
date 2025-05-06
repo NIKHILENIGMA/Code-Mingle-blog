@@ -4,9 +4,19 @@ import { logFormats } from './formats'
 import { LOG_DIR, LOG_LEVELS } from '@/constant'
 import { isProduction } from '@/config'
 
+/**
+ * Logger class implementing the Singleton pattern for winston logger configuration
+ */
 class Logger {
+    /** Static instance of winston Logger */
     static instance: winston.Logger 
 
+    /**
+     * Gets the singleton instance of the winston logger
+     * Creates a new logger instance if one doesn't exist
+     * Configures logging levels, formats and transports
+     * @returns {winston.Logger} The configured winston logger instance
+     */
     public static getInstance(): winston.Logger {
         if (!Logger.instance) {
             const transports = createTransports(LOG_DIR)
@@ -17,7 +27,7 @@ class Logger {
                 format: isProduction ? logFormats.productionFormat : logFormats.developmentFormat,
                 transports: [
                     transports.console,
-                    transports.developmentFile,
+                    transports.developmentFile, 
                     transports.errorFile,
                     transports.combinedFile
                 ],
