@@ -1,5 +1,5 @@
 import express from 'express'
-import { likeStatusOfPost } from '@/features/post/Like/like.controller'
+import { likeStatusOfPost } from '@/features/post/like/like.controller'
 
 const router = express.Router()
 

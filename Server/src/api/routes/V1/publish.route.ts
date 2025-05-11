@@ -9,7 +9,7 @@ import {
     publishPost,
     updatePublishedPost
 } from '@/features/post/published/publish.controller'
-import {  PublishParamsSchema } from '../../validators/publish.validator'
+import { PublishParamsSchema } from '../../validators/publish.validator'
 import { checkPermission } from '@/api/middlewares/checkPermission.middleware'
 import { ENUMS } from '@/types'
 
@@ -40,14 +40,12 @@ router.route('/:id').post(isAuthenticated, publishPost)
  * @access Private
  *
  */
-router
-    .route('/:id')
-    .patch(
-        isAuthenticated,
-        // validateParams(PublishParamsSchema),
-        checkPermission(ENUMS.ACTION.UPDATE, ENUMS.RESOURCE.POST),
-        updatePublishedPost
-    )
+router.route('/:id').patch(
+    isAuthenticated,
+    // validateParams(PublishParamsSchema),
+    checkPermission(ENUMS.ACTION.UPDATE, ENUMS.RESOURCE.POST),
+    updatePublishedPost
+)
 
 /**
  * ! Route to delete a published post
@@ -55,7 +53,7 @@ router
  * @route /api/v1/published/:id
  * @access Private
  */
-router.route('/:id').delete(isAuthenticated, validateParams(PublishParamsSchema), deletePublishedPost)
+router.route('/:id').delete(isAuthenticated, checkPermission(ENUMS.ACTION.DELETE, ENUMS.RESOURCE.POST), deletePublishedPost)
 
 /**
  * ! Route to check if a slug is available

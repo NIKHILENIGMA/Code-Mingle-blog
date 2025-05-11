@@ -2,7 +2,7 @@
 import { Router } from 'express'
 import { forgotPassword, login, logout, refreshAccessToken, resetPassword, signup } from '@/features/users/authentication/auth.controller'
 import { isAuthenticated, validateBody } from '@/api/middlewares'
-import { signupSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema } from '../../validators/auth.validator'
+import {  loginSchema, forgotPasswordSchema, resetPasswordSchema } from '../../validators/auth.validator'
 
 const router = Router()
 
@@ -15,7 +15,7 @@ const router = Router()
  * @param {function} validateBody - Middleware to validate request body against signupSchema.
  * @param {function} signup - Controller function to handle user signup.
  */
-router.route('/signup').post(validateBody(signupSchema), signup)
+router.route('/signup').post(signup)
 
 /**
  * Route for user login.
