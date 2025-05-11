@@ -1,6 +1,5 @@
-import { ERROR_TYPES } from '@/constant/error-types'
-import { ApiError, AppError } from '@/utils/ApiError'
 import { NextFunction, Request, Response } from 'express'
+import { NotFoundError } from '@/utils/Errors'
 
 /**
  * Middleware to handle 404 Not Found errors.
@@ -18,7 +17,5 @@ import { NextFunction, Request, Response } from 'express'
  */
 
 export const notFound = (req: Request, _: Response, next: NextFunction): void => {
-    const notFoundError = AppError.from({ code: 404, message: ERROR_TYPES.NOT_FOUND(`Route ${req.path} not found`).message })
-
-    return ApiError(notFoundError, req, next, 404)
+    next(new NotFoundError(`Route not found ${req.originalUrl} `))
 }
