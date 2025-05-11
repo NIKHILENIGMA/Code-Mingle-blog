@@ -9,7 +9,6 @@ interface IAppConfig {
     DATABASE_URL: string | undefined
 }
 
-
 export const isProduction: boolean = process.env.NODE_ENV === 'production'
 
 export const appConfig: IAppConfig = {
@@ -28,7 +27,14 @@ export const tokenInfo = {
     reset_validity: process.env.RESET_TOKEN_VALIDITY_IN_SEC
 }
 
-export const keyPath = {
-    PUBLIC_KEY_PATH: (process.env.PUBLIC_KEY_PATH as string) || '../../keys/public_key.pem',
-    PRIVATE_KEY_PATH: (process.env.PRIVATE_KEY_PATH as string) || '../../keys/private_key.pem'
-}
+export const JWT_ISSUER = String(process.env.JWT_ISSUER) || 'NodeDrafts'
+export const JWT_AUDIENCE = String(process.env.JWT_AUDIENCE) || 'NodeDrafts'
+export const JWT_ROLE = String(process.env.JWT_ROLE) || 'user'
+export const JWT_SECRET = String(process.env.JWT_SECRET) || 'your-secret-key'
+export const JWT_ALGORITHM = String(process.env.JWT_ALGORITHM) || 'RS256'
+export const ACCESS_TOKEN_VALIDITY_IN_SEC = Number(process.env.ACCESS_TOKEN_VALIDITY_IN_SEC) || 3600 // 1 hour
+export const REFRESH_TOKEN_VALIDITY_IN_SEC = Number(process.env.REFRESH_TOKEN_VALIDITY_IN_SEC) || 86400 // 24 hours
+export const RESET_TOKEN_VALIDITY_IN_SEC = Number(process.env.RESET_TOKEN_VALIDITY_IN_SEC) || 3600 // 1 hour
+
+export const PUBLIC_KEY_PATH = String(process.env.PUBLIC_KEY_PATH) || '../../keys/public_key.pem' // Path to your public key file
+export const PRIVATE_KEY_PATH = String(process.env.PRIVATE_KEY_PATH) || '../../keys/private_key.pem' // Path to your private key file
