@@ -4,9 +4,8 @@ import cors from 'cors'
 import helmet from 'helmet'
 import cookieParser from 'cookie-parser'
 import { corsOptions } from './constant/corsOptions'
-import { globalErrorHandler, notFound } from '@/api/middlewares'
+import { notFound, errorHandler } from '@/api/middlewares'
 import { morganMiddleware } from '@/utils/logger/morgan'
-
 
 const app: Application = express()
 
@@ -41,7 +40,6 @@ const app: Application = express()
  * @description Global error handler
  */
 
-
 // Middlewares
 app.use(helmet()) // Security middleware to set various HTTP headers
 app.use(morganMiddleware) // Logging HTTP requests
@@ -57,7 +55,10 @@ app.use('/api', V1Routes)
 // 404 Handler
 app.use(notFound)
 
+// Error Handler
+app.use(errorHandler)
+
 // Global Error Handler
-app.use(globalErrorHandler)
+// app.use(globalErrorHandler)
 
 export default app
