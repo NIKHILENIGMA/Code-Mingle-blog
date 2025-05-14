@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,220 +7,284 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id          String       @id @default(cuid())
-  email       String       @unique
-  firstName   String?      @map("first_name")
-  lastName    String?      @map("last_name")
-  username    String?      @unique @map("username")
-  password    String
-  dob         DateTime?    @map("date_of_birth")
-  bio         String?      @map("bio_data")
-  avatarImg   String?      @map("avatar_img")
-  coverImg    String?      @map("cover_img")
-  role        Role         @default(USER) @map("user_role") // USER, ADMIN, MODERATOR
-  collections Collection[]
-  savedPosts  SavedPost[]
-  posts       Post[]
-  comments    Comment[]
-  replies     Reply[]
-  Like        Like[]
-  followers   Follow[]     @relation("user_followers")
-  following   Follow[]     @relation("user_followings")
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-
-  @@map("users")
-}
-
-model Post {
-  id              String      @id @default(uuid())
-  title           String?
-  content         String?     @db.Text
-  publishedAt     DateTime?   @map("published_at")
-  slug            String?     @unique
-  metaDescription String?     @map("meta_description")
-  image           String?     @map("image_url")
-  thumbnailImage  String?     @map("thumbnail_image_url")
-  readTime        Int?        @map("read_time")
-  authorId        String      @map("author_id")
-  categoryId      Int?        @map("category_id")
-  collectionId    String?
-  category        Category?   @relation(fields: [categoryId], references: [id])
-  author          User        @relation(fields: [authorId], references: [id])
-  comments        Comment[]
-  postTags        Tag[]
-  Like            Like[]
-  SaveBy          SavedPost[]
-  status          PostStatus
-  createdAt       DateTime    @default(now()) @map("created_at")
-  updatedAt       DateTime    @updatedAt @map("updated_at")
-
-  @@index(status)
-  @@map("posts")
-}
-
-model Comment {
-  id        String   @id @default(cuid())
-  content   String
-  postId    String   @map("post_id")
-  authorId  String   @map("author_id")
-  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
-  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  replies   Reply[]
-  like      Like[]
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@map("comments")
-}
-
-model Reply {
-  id        String   @id @default(cuid())
-  content   String
-  commentId String   @map("comment_id")
-  authorId  String   @map("author_id")
-  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
-  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  like      Like[]
-  createdAt DateTime @default(now()) @map("created_at")
-
-  @@map("replies")
-}
-
-model Follow {
-  id          String   @id @default(cuid())
-  followerId  String   @map("follower_id")
-  followingId String   @map("following_id")
-  follower    User     @relation("user_followers", fields: [followerId], references: [id], onDelete: Cascade)
-  following   User     @relation("user_followings", fields: [followingId], references: [id], onDelete: Cascade)
-  createdAt   DateTime @default(now()) @map("created_at")
-
-  @@unique([followerId, followingId])
-  @@map("follows")
-}
-
-model Collection {
-  id          String      @id @default(cuid())
-  name        String      @unique
-  description String?
-  userId      String      @map("user_id")
-  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  savedPosts  SavedPost[]
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-
-  @@unique([name, userId])
-  @@map("collections")
-}
-
-model SavedPost {
-  id           String     @id @default(cuid())
-  userId       String     @map("user_id")
-  postId       String     @map("post_id")
-  collectionId String     @map("collection_id")
-  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  post         Post       @relation(fields: [postId], references: [id], onDelete: Cascade)
-  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-
-  @@unique([userId, postId, collectionId]) // A user can only save a post once in a collection
-  @@map("save_posts") // This is the table name
-}
-
-model Tag {
-  id     Int     @id @default(autoincrement())
-  postId String  @map("post_id")
-  tag    String?
-  post   Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
-
-  @@map("tags")
-}
-
-model Like {
-  id        String   @id @default(cuid())
-  userId    String   @map("user_id")
-  postId    String   @map("post_id")
-  commentId String   @map("comment_id")
-  replyId   String   @map("reply_id")
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  post      Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
-  comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
-  reply     Reply?   @relation(fields: [replyId], references: [id], onDelete: Cascade)
-
-  @@map("likes")
-}
-
-model Category {
-  id          Int      @id @default(autoincrement())
-  name        String   @unique
-  description String?
-  posts       Post[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@map("categories")
-}
-
-enum PostStatus {
-  PUBLISHED
-  DRAFT
-  ARCHIVED
-}
-
-model KeyStore {
-  id         Int      @id @default(autoincrement())
-  userId     String   @unique @map("user_id")
-  accessKey  String   @unique @map("access_key")
-  refreshKey String   @unique @map("refresh_key")
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  @@map("key_store")
-}
-
-model ResetPassword {
-  id         Int      @id @default(autoincrement())
-  userId     String   @map("user_id")
-  resetToken String   @unique @map("reset_token")
-  expiresAt  DateTime @map("expires_at")
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  @@map("reset_password")
-}
-
-model Policy {
-  id        String   @id @default(cuid())
-  role      Role
-  resource  Resource
-  actions   Action[]
-  condition String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("policies")
-}
-
-enum Role {
-  USER
-  ADMIN
-  MODERATOR
-}
-
 enum Resource {
   POST
   COMMENT
+  REPLY
   USER
   ADMIN_PANEL
   REPORT
   ALL
 }
 
-enum Action {
-  READ
-  WRITE
+// Enums for action types 
+enum ActionType {
+  CREATE
   UPDATE
+  READ
   DELETE
+}
+
+// Enums for like target types
+enum LikeTarget {
+  POST
+  COMMENT
+  REPLY
+}
+
+// Enums for user roles
+enum PostStatus {
+  PUBLISHED
+  DRAFT
+  ARCHIVED
+}
+
+// User model 
+model User {
+  id                   String           @id @default(cuid())
+  firstName            String?          @map("first_name")
+  lastName             String?          @map("last_name")
+  username             String           @unique @map("username")
+  email                String           @unique
+  password             String?
+  verifiedEmail        Boolean          @default(false) @map("verified_email")
+  bio                  String?          @map("bio_data")
+  profileImage         String?          @map("profile_image")
+  coverImage           String?          @map("cover_image") // Cover image URL
+  isActive             Boolean         @default(true) @map("is_active") // Is the user active?
+  lastLoginAt          DateTime?        @map("last_login_at") // Last login date
+  authProvider         String?          @map("auth_provider") // local, google, facebook, etc.
+  providerId           String?          @map("auth_provider_id") // ID from the auth provider
+  providerAccessToken  String?          @map("auth_provider_access_token") // Access token from the auth provider
+  providerRefreshToken String?          @map("auth_provider_refresh_token") // Refresh token from the auth provider
+  providerTokenExpiry  DateTime?        @map("auth_provider_token_expiry") // Expiry date of the access token
+  roleId               String?          @map("role_id") // Role ID for the user
+  socialLinks          UserSocialMedia?
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+
+  savedPosts         SavedPost[] // Posts saved by the user
+  posts              Post[] // Posts created by the user
+  comments           Comment[] // Comments made by the user
+  replies            Reply[] // Replies made by the user
+  Like               Like[] // Likes made by the user
+  followers          Follow[]             @relation("user_followers") // Users who follow this user
+  following          Follow[]             @relation("user_followings") // Users this user follows
+  role               Role?                @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  Session            Session[] // User sessions
+  passwordResetToken PasswordResetToken[] // Password reset tokens for the user
+
+  @@map("users")
+}
+
+model UserSocialMedia {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  linkedin  String?
+  twitter   String?
+  youtube   String?
+  instagram String?
+  github    String?
+  website   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_social_media")
+}
+
+model Role {
+  id          String           @id @default(cuid())
+  name        String           @unique // "ADMIN", "MODERATOR", "USER"
+  displayName String // User-friendly name
+  description String? // Description of the role
+  users       User[]
+  rolePerms   RolePermission[] //in back to roles
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@map("roles")
+}
+
+// Dynamic Permission model
+model Permission {
+  id          String           @id @default(cuid())
+  name        String           @unique // "CREATE_POST", "DELETE_COMMENT", etc.
+  description String?
+  resource    Resource // "POST", "COMMENT", "USER", etc. 
+  actions     ActionType // "READ", "WRITE", "UPDATE", "DELETE"
+  rolePerms   RolePermission[] // join back to roles
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@map("permissions")
+}
+
+// Join table for Role and Permission
+model RolePermission {
+  roleId       String
+  permissionId String
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+// Session model for user authentication
+model Session {
+  id           String   @id @default(cuid())
+  userId       String   @map("user_id")
+  accessToken  String   @unique @map("access_token")
+  refreshToken String   @unique @map("refresh_token")
+  userAgent    String?  @map("user_agent") // User agent string
+  ipAddress    String?  @map("ip_address") // IP address of the user
+  valid        Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+// Post model 
+model Post {
+  id             String     @id @default(uuid())
+  title          String?
+  content        String?    @db.Text
+  slug           String     @unique
+  status         PostStatus @default(DRAFT)
+  postCoverImage String?    @map("post_cover_image_url")
+  thumbnailImage String?    @map("thumbnail_image_url")
+  readTime       Int?       @map("read_time")
+  userId         String     @map("user_id")
+  createdAt      DateTime   @default(now()) @map("created_at")
+  updatedAt      DateTime   @updatedAt @map("updated_at")
+
+  comments Comment[]
+  replies  Reply[]
+  tags     PostTag[]
+  saveBy   SavedPost[] // Posts saved by the user
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index(status)
+  @@index([userId]) 
+  @@map("posts")
+}
+// Can you show the improvements in the chat ??
+model Tag {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  postTags PostTag[]
+
+  @@map("tags")
+}
+
+model PostTag {
+  postId    String   @map("post_id")
+  tagId     String   @map("tag_id")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([postId, tagId])
+  @@map("post_tags")
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  userId    String   @map("user_id")
+  postId    String   @map("post_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  replies Reply[]
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@index([userId])
+  @@map("comments")
+}
+
+model Reply {
+  id        String   @id @default(cuid())
+  content   String
+  userId    String   @map("user_id")
+  postId    String   @map("post_id")
+  commentId String   @map("comment_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  post    Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@map("replies")
+}
+
+model Like {
+  id        String     @id @default(cuid())
+  userId    String     @map("user_id")
+  targetId  String
+  target    LikeTarget
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, targetId, target])
+  @@map("likes")
+}
+
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String   @map("follower_id")
+  followingId String   @map("following_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  follower  User @relation("user_followers", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("user_followings", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@map("follows")
+}
+
+model SavedPost {
+  id        String   @id @default(cuid()) // Unique identifier for the saved post
+  userId    String   @map("user_id") // ID of the user who saved the post
+  postId    String   @map("post_id") // ID of the post that was saved
+  createdAt DateTime @default(now()) // Date when the post was saved
+  updatedAt DateTime @updatedAt // Date when the saved post was last updated
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId]) // A user can only save a post once in a collection
+  @@map("save_posts") // This is the table name
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String // ID of the user who requested the password reset
+  email     String // Email of the user who requested the password reset
+  tokenHash String // hashed using bcrypt or SHA-256
+  expiresAt DateTime // Expiration date of the token
+  createdAt DateTime @default(now())
+  used      Boolean  @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
