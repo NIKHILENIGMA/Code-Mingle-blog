@@ -7,7 +7,7 @@ import eslintConfigPrettier from 'eslint-config-prettier'
 export default tseslint.config({
     languageOptions: {
         parserOptions: {
-            project: true,
+            project: ['./tsconfig.json', './tsconfig.prisma.json'],
             tsconfigRootDir: import.meta.dirname
         }
     },
