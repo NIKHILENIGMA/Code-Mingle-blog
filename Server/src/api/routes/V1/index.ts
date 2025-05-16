@@ -1,7 +1,6 @@
 import { Router } from 'express'
 import aiRoutes from './ai.routes'
 import authRoutes from './auth.routes'
-import categoryRoutes from './category.routes'
 import collectionRoutes from './collection.routes'
 import commentRoutes from './comment.routes'
 import draftRoutes from './draft.routes'
@@ -47,8 +46,6 @@ router.use('/mail/newletter', newLetterRoutes)
 /**
  * @name Admin Routes
  */
-// Category routes
-router.use('/category', categoryRoutes)
 // Report routes
 router.use('/report', reportRoutes)
 
