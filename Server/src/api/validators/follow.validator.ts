@@ -6,7 +6,7 @@ import { z } from 'zod'
  * @property {string} followingId - The ID of the user to be followed.
  */
 export const followSchema = z.object({
-    followingId: z.string().cuid()
+    id: z.string().cuid()
 })
 
 /**
@@ -15,7 +15,7 @@ export const followSchema = z.object({
  * @property {string} followingId - The ID of the user to be unfollowed.
  */
 export const unfollowSchema = z.object({
-    followingId: z.string().cuid()
+    id: z.string().cuid()
 })
 
 /**
