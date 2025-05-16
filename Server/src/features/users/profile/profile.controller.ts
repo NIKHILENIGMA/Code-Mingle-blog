@@ -1,190 +1,121 @@
-import { NextFunction, Response } from 'express'
-import { AsyncHandler } from '../../../utils/AsyncHandler'
-import { ApiError } from '../../../utils/ApiError'
-import responseMessage from '../../../constant/responseMessage'
-import { ApiResponse } from '../../../utils/ApiResponse'
-import { ProtectedRequest } from '../../../types/extended/app-request'
-import { UpdateUserDTO, User } from '../../../Lib/Models/User'
-import ProfileService from './profile.service'
+import { Request, Response } from 'express'
+import { ApiResponse, AsyncHandler, entitiesValidation } from '@/utils'
+import profileServices from './profile.service'
 import { CloundinaryOption } from '@/types/common/base.types'
 import { uploadService } from '../../common/upload.service'
+import { DatabaseError, InternalServerError, UnauthorizedError } from '@/utils/Errors'
+import { ProfileChangePasswordCredentials, UpdateProfileCredentials } from './profile.types'
+import { ProfileChangePasswordSchema, ProfileUpdateBodySchema } from '@/api'
 
-const profileServices = new ProfileService()
-const { INTERNAL_SERVICE, SUCCESS, UNAUTHORIZED, NOT_FOUND, METHOD_FAILED } = responseMessage
 
-/**
- ** Controller to get the current authenticated user.
- *
- * @param req - The request object, extended to include the authenticated user.
- * @param res - The response object.
- * @param next - The next middleware function.
- *
- * @returns A response with the current user details or an error if the user is not found.
- *
- * @throws Will throw an error if there is an issue retrieving the current user.
- */
-export const currentUser = async (req: ProtectedRequest, res: Response, next: NextFunction) => {
-    try {
-        const user = req.user as User
 
-        if (!user) {
-            return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
-        }
-
-        const userDetails = await profileServices.trimUserDetailsService(user)
-
-        if (!userDetails) {
-            return ApiError(new Error(NOT_FOUND('current user').message), req, next, NOT_FOUND().code)
-        }
-
-        return ApiResponse(req, res, SUCCESS().code, SUCCESS('Current user').message, {
-            userDetails
-        })
-    } catch (error) {
-        return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('current user').message), req, next, METHOD_FAILED().code)
+export const currentUser = (req: Request, res: Response) => {
+    const user = req.user
+    if (!user) {
+        throw new UnauthorizedError('User is not logged in')
     }
+
+    ApiResponse(req, res, 200, 'Current user', { user })
 }
 
-/**
- * @description Update user profile
- * @param req ProtectedRequest
- * @param res Response
- * @param next NextFunction
- * @returns Promise<Response> - The response object containing the user data.
- */
-export const updateUserDetails = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
-    const userId = (req.user as User)?.id
-
-    if (!userId) {
-        return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
+export const updateUserDetails = AsyncHandler(async (req: Request, res: Response) => {
+    const userId: string | undefined = req.user?.id
+    if (!userId || userId === undefined) {
+        throw new UnauthorizedError('User is not logged in')
     }
 
-    const userDetails = req.body as UpdateUserDTO
+    // Validate the request body
+    const body = req.body as UpdateProfileCredentials
 
-    if (!userDetails) {
-        return ApiError(new Error(NOT_FOUND('update user details').message), req, next, NOT_FOUND().code)
-    }
+    // Check if the request body is empty
+    const validateData = entitiesValidation<UpdateProfileCredentials>(ProfileUpdateBodySchema, body)
 
-    try {
-        const updatedProfile = await profileServices.updateUserProfileService(req, next, { id: userId }, userDetails)
+    // save the updated user details
+    await profileServices.updateUserProfileService(userId, validateData)
 
-        if (!updatedProfile) {
-            return ApiError(new Error(INTERNAL_SERVICE('update user details').message), req, next, INTERNAL_SERVICE().code)
-        }
-
-        return ApiResponse(req, res, SUCCESS().code, SUCCESS('Profile updated successfully').message)
-    } catch (error) {
-        return ApiError(error instanceof Error ? error : new Error(INTERNAL_SERVICE('login service').message), req, next, INTERNAL_SERVICE().code)
-    }
+    ApiResponse(req, res, 200, 'Profile updated successfully', {})
 })
 
-/**
- * Change user password controller
- *
- * @param req ProtectedRequest
- * @param res Response
- * @param next NextFunction
- * @returns Promise<Response> - The response object containing the user data.
- */
-export const changeUserPassword = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
-    const userId: string = (req.user as User)?.id
-    if (!userId) {
-        return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
+export const changeUserPassword = AsyncHandler(async (req: Request, res: Response) => {
+    const userId: string | undefined = req.user?.id
+    if (!userId || userId === undefined) {
+        throw new UnauthorizedError('User is not logged in')
     }
 
-    const { oldPassword, newPassword } = req.body as { oldPassword: string; newPassword: string }
+    const body = req.body as ProfileChangePasswordCredentials
 
-    const where = { id: userId }
+    const validateData = entitiesValidation<ProfileChangePasswordCredentials>(ProfileChangePasswordSchema, body)
 
-    try {
-        const updatedPassword = await profileServices.changePasswordService(req, next, where, { oldPassword, newPassword })
+    await profileServices.changePasswordService(userId, validateData)
 
-        if (!updatedPassword) {
-            return ApiError(new Error(METHOD_FAILED('change password').message), req, next, METHOD_FAILED().code)
-        }
-
-        return ApiResponse(req, res, SUCCESS().code, SUCCESS('Password changed successfully').message)
-    } catch (error) {
-        return ApiError(new Error(INTERNAL_SERVICE((error as Error)?.message).message), req, next, INTERNAL_SERVICE().code)
-    }
+    ApiResponse(req, res, 200, 'Password changed successfully')
 })
 
-/**
- * Delete user account controller
- *
- * @param req ProtectedRequest
- * @param res Response
- * @param next NextFunction
- * @returns Promise<Response> - The response object containing the user data.
- */
-export const deleteUserAccount = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
+export const deleteUserAccount = AsyncHandler(async (req: Request, res: Response) => {
     // Get the user id from the request object
-    const userId: string = (req.user as User)?.id
-    if (!userId) {
-        return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
+    const userId: string | undefined = req.user?.id
+    if (!userId || userId === undefined) {
+        throw new UnauthorizedError('User is not logged in')
     }
-
-    // Where clause for the user id
-    const where = { id: userId }
 
     // Delete the user account
-    try {
-        const deletedUserAccount = await profileServices.deleteUserAccountService(req, next, where)
+    const deletedUserAccount = await profileServices.deleteAccountService(userId)
 
-        if (!deletedUserAccount) {
-            return ApiError(new Error(METHOD_FAILED('delete user account').message), req, next, METHOD_FAILED().code)
-        }
-
-        return ApiResponse(req, res, SUCCESS().code, SUCCESS('User deleted successfully').message)
-    } catch (error) {
-        return ApiError(new Error(INTERNAL_SERVICE((error as Error)?.message).message), req, next, INTERNAL_SERVICE().code)
+    if (!deletedUserAccount) {
+        throw new DatabaseError('User account not found')
     }
+
+    ApiResponse(req, res, 200, 'User deleted successfully')
 })
 
-/**
- *! Fetch user dashboard controller
- *
- * @param req ProtectedRequest
- * @param res Response
- * @param next NextFunction
- * @returns Promise<Response> - The response object containing the user data.
- */
-export const userDashboard = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
+export const userDashboard = AsyncHandler(async (req: Request, res: Response) => {
     // Get the user id from the request object
-    const userId: string = (req.user as User)?.id
-    if (!userId) {
-        return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
+    const userId: string | undefined = req.user?.id
+    if (!userId || userId === undefined) {
+        throw new UnauthorizedError('User is not logged in')
     }
-
-    // Where clause for the user id
-    const where = { id: userId }
 
     // Fetch the user dashboard
-    try {
-        const dashboard = await profileServices.getUserDashboardService(req, next, where)
-        return ApiResponse(req, res, SUCCESS().code, SUCCESS('User dashboard fetched successfully').message, { dashboard })
-    } catch (error) {
-        return ApiError(new Error(INTERNAL_SERVICE((error as Error)?.message).message), req, next, INTERNAL_SERVICE().code)
+    const dashboard = await profileServices.getProfileDetailsService(userId)
+    if (!dashboard) {
+        throw new DatabaseError('User dashboard details not found')
     }
+
+    ApiResponse(req, res, 200, 'User dashboard fetched successfully', { dashboard })
 })
 
-/**
- *! Upload user avatar controller
- *
- * @param req ProtectedRequest
- * @param res Response
- * @param next NextFunction
- * @returns Promise<Response> - The response object containing the user data.
- *
- * @throws Will throw an error if the user id is not found.
- */
-export const uploadAvatar = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
+export const getUserProfile = AsyncHandler(async (req: Request, res: Response) => {
+    // Get the user id from the request object
+    const userId: string | undefined = req.user?.id
+    if (!userId || userId === undefined) {
+        throw new UnauthorizedError('User is not logged in')
+    }
+
+    const dashboardDetails = await profileServices.getProfileDetailsService(userId)
+    if (!dashboardDetails) {
+        throw new DatabaseError('User dashboard details not found')
+    }
+
+    const isFollowStatus = await profileServices.getFollowingStatus(userId, dashboardDetails.id) 
+    if (isFollowStatus === undefined) {
+        throw new DatabaseError('User follow status not found')
+    }
+
+    const userProfile = {
+        ...dashboardDetails,
+        isFollowing: isFollowStatus
+    }
+
+    ApiResponse(req, res, 200, 'User profile fetched successfully', { userProfile })
+})
+
+export const uploadAvatar = AsyncHandler(async (req: Request, res: Response) => {
     // Get the user id from the request object
     const avatarPath = (req.file as Express.Multer.File)?.path
-    // Where clause for the user id
-    const userId = (req.user as User)?.id
-    if (!userId) {
-        return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
+    // Get the user id from the request object
+    const userId: string | undefined = req.user?.id
+    if (!userId || userId === undefined) {
+        throw new UnauthorizedError('User is not logged in')
     }
 
     // Cloudinary options for uploading the avatar
@@ -196,49 +127,27 @@ export const uploadAvatar = AsyncHandler(async (req: ProtectedRequest, res: Resp
         altName: 'User avatar'
     }
 
-    //  Where clause for the user id
-    const where = { id: userId }
-
     //  Upload the avatar
-    try {
-        const avatarURL = await uploadService.uploadFile(req, next, where, avatarPath, cloudinaryOption)
-        if (!avatarURL) {
-            return ApiError(new Error(METHOD_FAILED('upload avatar').message), req, next, METHOD_FAILED().code)
-        }
-
-        // Update the user profile with the avatar URL
-        await profileServices.updateUserProfileService(req, next, where, { avatarImg: avatarURL })
-
-        return ApiResponse(req, res, SUCCESS().code, SUCCESS('Avatar uploaded successfully').message)
-    } catch (error) {
-        return ApiError(new Error(INTERNAL_SERVICE((error as Error)?.message).message), req, next, INTERNAL_SERVICE().code)
+    const avatarURL = await uploadService.uploadFile(userId, avatarPath, cloudinaryOption)
+    if (!avatarURL) {
+        throw new DatabaseError('Cloudinary avatar safe url missing')
     }
+    // Update the user profile with the avatar URL
+    await profileServices.updateUserProfileService(userId, { profileImage: avatarURL })
+
+    ApiResponse(req, res, 200, 'Avatar uploaded successfully')
 })
 
-/**
- *! Change user avatar controller
- *
- * @param req Request
- * @param res Response
- * @param next NextFunction
- * @returns Promise<Response> - The response object containing the user data.
- *
- * @throws Will throw an error if the user id is not found.
- *
- */
-export const changeAvatar = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
+export const changeAvatar = AsyncHandler(async (req: Request, res: Response) => {
     // Get the user id from the request object
-    const userId = (req.user as User)?.id
-    if (!userId) {
-        return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
+    const userId: string | undefined = req.user?.id
+    if (!userId || userId === undefined) {
+        throw new UnauthorizedError('User is not logged in')
     }
 
     //  Get the new avatar path
     const newAvatarPath = (req.file as Express.Multer.File)?.path
 
-    // Where clause for the user id
-    const where = { id: userId }
-
     // Cloudinary options for uploading the avatar
     const cloudinaryOption: CloundinaryOption = {
         folder: 'avatars',
@@ -247,77 +156,46 @@ export const changeAvatar = AsyncHandler(async (req: ProtectedRequest, res: Resp
         resource: 'image',
         altName: 'User avatar'
     }
-    try {
-        const newAvatarURL = await uploadService.uploadFile(req, next, where, newAvatarPath, cloudinaryOption)
-        if (!newAvatarURL) {
-            return ApiError(new Error(METHOD_FAILED('change avatar').message), req, next, METHOD_FAILED().code)
-        }
-
-        await profileServices.updateUserProfileService(req, next, where, { avatarImg: newAvatarURL })
-        return ApiResponse(req, res, SUCCESS().code, SUCCESS('Avatar changed successfully').message)
-    } catch (error) {
-        return ApiError(new Error(INTERNAL_SERVICE((error as Error)?.message).message), req, next, INTERNAL_SERVICE().code)
+    const newAvatarURL = await uploadService.uploadFile(userId, newAvatarPath, cloudinaryOption)
+    if (!newAvatarURL) {
+        throw new DatabaseError('Cloudinary avatar safe url is missing')
     }
+
+    await profileServices.updateUserProfileService(userId, { profileImage: newAvatarURL })
+    return ApiResponse(req, res, 200, 'Avatar changed successfully')
 })
 
-/**
- *! Remove user avatar controller
- *
- * @param req ProtectedRequest
- * @param res Response
- * @param next NextFunction
- * @returns Promise<Response> - The response object containing the user data.
- *
- * @throws Will throw an error if the user id is not found.
- */
-export const removeAvatar = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
+export const removeAvatar = AsyncHandler(async (req: Request, res: Response) => {
     // Get the user id from the request object
-    const userId = (req.user as User)?.id
-    if (!userId) {
-        return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
+    const userId: string | undefined = req.user?.id
+    if (!userId || userId === undefined) {
+        throw new UnauthorizedError('User is not logged in')
     }
 
     // The public ID of the image to be deleted
     const public_id = `avatars/user_avatar-${userId}`
 
-    try {
-        // Remove the avatar from Cloudinary
-        await uploadService.removeImage(req, next, public_id)
+    // Remove the avatar from Cloudinary
+    await uploadService.removeImage(public_id)
 
-        //  Update the user profile with the avatar URL
-        await profileServices.updateUserProfileService(req, next, { id: userId }, { avatarImg: '' })
+    //  Update the user profile with the avatar URL
+    await profileServices.updateUserProfileService(userId, { profileImage: '' })
 
-        return ApiResponse(req, res, SUCCESS().code, SUCCESS('Avatar removed successfully').message)
-    } catch (error) {
-        return ApiError(new Error(INTERNAL_SERVICE((error as Error)?.message).message), req, next, INTERNAL_SERVICE().code)
-    }
+    return ApiResponse(req, res, 200, 'Avatar removed successfully')
 })
 
-/**
- *! Upload cover photo controller
- *
- * @param req ProtectedRequest
- * @param res Response
- *  @param next NextFunction
- * @returns Promise<Response> - The response object containing the user data.
- *
- * @throws Will throw an error if the user id is not found.
- */
-export const uploadCoverPhoto = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
+export const uploadCoverPhoto = AsyncHandler(async (req: Request, res: Response) => {
     // Get the user id from the request object
-    const userId = (req.user as User)?.id
-    if (!userId) {
-        return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
+    const userId: string | undefined = req.user?.id
+    if (!userId || userId === undefined) {
+        throw new UnauthorizedError('User is not logged in')
     }
 
     // Get the cover photo path
     const coverPhotoPath = (req.file as Express.Multer.File)?.path
     if (!coverPhotoPath) {
-        return ApiError(new Error(NOT_FOUND('cover photo').message), req, next, NOT_FOUND().code)
+        throw new InternalServerError('Cover photo path is missing')
     }
-
-    // Where clause for the user id
-    const where = { id: userId }
 
     // Cloudinary options for uploading the cover photo
     const cloudinaryOption: CloundinaryOption = {
@@ -327,47 +205,30 @@ export const uploadCoverPhoto = AsyncHandler(async (req: ProtectedRequest, res: 
         resource: 'image',
         altName: 'Cover photo'
     }
-    try {
-        // Upload the cover photo to Cloudinary
-        const coverImageURL = await uploadService.uploadFile(req, next, where, coverPhotoPath, cloudinaryOption)
-        if (!coverImageURL) {
-            return ApiError(new Error(METHOD_FAILED('upload cover photo url').message), req, next, METHOD_FAILED().code)
-        }
-
-        // Update the user profile with the cover photo URL
-        await profileServices.updateUserProfileService(req, next, where, { coverImg: coverImageURL })
-
-        return ApiResponse(req, res, SUCCESS().code, SUCCESS('Cover photo uploaded successfully').message)
-    } catch (error) {
-        return ApiError(new Error(INTERNAL_SERVICE((error as Error)?.message).message), req, next, INTERNAL_SERVICE().code)
+    // Upload the cover photo to Cloudinary
+    const coverImageURL = await uploadService.uploadFile(userId, coverPhotoPath, cloudinaryOption)
+    if (!coverImageURL) {
+        throw new DatabaseError('Cloudinary cover photo safe url is missing')
     }
+
+    // Update the user profile with the cover photo URL
+    await profileServices.updateUserProfileService(userId, { coverImage: coverImageURL })
+
+    ApiResponse(req, res, 200, 'Cover photo uploaded successfully')
 })
 
-/**
- *! Change cover photo controller
- *
- * @param req ProtectedRequest
- * @param res Response
- * @param next NextFunction
- * @returns Promise<Response> - The response object containing the user data.
- *
- * @throws Will throw an error if the user id is not found.
- */
-export const changeCoverPhoto = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
+export const changeCoverPhoto = AsyncHandler(async (req: Request, res: Response) => {
     // Get the user id from the request object
-    const userId = (req.user as User)?.id
-    if (!userId) {
-        return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
+    const userId: string | undefined = req.user?.id
+    if (!userId || userId === undefined) {
+        throw new UnauthorizedError('User is not logged in')
     }
 
     // Get the new cover photo path
     const newCoverPhotoPath = (req.file as Express.Multer.File)?.path
     if (!newCoverPhotoPath) {
-        return ApiError(new Error(NOT_FOUND('cover photo').message), req, next, NOT_FOUND().code)
+        throw new InternalServerError('New cover photo path is missing')
     }
-
-    // Where clause for the user id
-    const where = { id: userId }
 
     // Cloudinary options for uploading the cover photo
     const cloudinaryOption: CloundinaryOption = {
@@ -377,88 +238,31 @@ export const changeCoverPhoto = AsyncHandler(async (req: ProtectedRequest, res: 
         resource: 'image',
         altName: 'Cover photo'
     }
-    try {
-        // Upload the new cover photo to Cloudinary
-        const coverImgURL = await uploadService.uploadFile(req, next, where, newCoverPhotoPath, cloudinaryOption)
-        if (!coverImgURL) {
-            return ApiError(new Error(METHOD_FAILED('change cover photo').message), req, next, METHOD_FAILED().code)
-        }
-
-        // Update the user profile with the cover photo URL
-        await profileServices.updateUserProfileService(req, next, where, { coverImg: coverImgURL })
-
-        return ApiResponse(req, res, SUCCESS().code, SUCCESS('Cover photo changed successfully').message)
-    } catch (error) {
-        return ApiError(new Error(INTERNAL_SERVICE((error as Error)?.message).message), req, next, INTERNAL_SERVICE().code)
+    // Upload the new cover photo to Cloudinary
+    const coverImgURL = await uploadService.uploadFile(userId, newCoverPhotoPath, cloudinaryOption)
+    if (!coverImgURL) {
+        throw new DatabaseError('Cloudinary cover photo safe url is missing')
     }
+
+    // Update the user profile with the cover photo URL
+    await profileServices.updateUserProfileService(userId, { coverImage: coverImgURL })
+
+    return ApiResponse(req, res, 200, 'Cover photo changed successfully')
 })
 
-/**
- *! Remove cover photo controller
- *
- * @param req ProtectedRequest
- * @param res Response
- * @param next NextFunction
- * @returns Promise<Response> - The response object containing the user data.
- *
- * @throws Will throw an error if the user id is not found.
- */
-export const removeCoverPhoto = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
+export const removeCoverPhoto = AsyncHandler(async (req: Request, res: Response) => {
     // Get the user id from the request object
-    const userId = (req.user as User)?.id
-    if (!userId) {
-        return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
+    const userId: string | undefined = req.user?.id
+    if (!userId || userId === undefined) {
+        throw new UnauthorizedError('User is not logged in')
     }
-
-    // Where clause for the user id
-    const where = { id: userId }
 
     // The public ID of the image to be deleted
     const public_id = `cover-photos/cover_photo-${userId}`
-    try {
-        // Remove the cover photo from Cloudinary
-        await uploadService.removeImage(req, next, public_id)
+    // Remove the cover photo from Cloudinary
+    await uploadService.removeImage(public_id)
 
-        // Update the user profile with the cover photo URL
-        await profileServices.updateUserProfileService(req, next, where, { coverImg: '' })
-        return ApiResponse(req, res, SUCCESS().code, SUCCESS('Cover photo removed successfully').message)
-    } catch (error) {
-        return ApiError(new Error(INTERNAL_SERVICE((error as Error)?.message).message), req, next, INTERNAL_SERVICE().code)
-    }
-})
-
-/**
- *! Get user public profile controller
- *
- * @param req Request
- * @param res Response
- * @param next NextFunction
- * @returns Promise<Response> - The response object containing the user data.
- */
-export const userPublicProfile = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
-    // Get the username from the request parameters
-    const username = req.params.username
-    if (!username) {
-        return ApiError(new Error(NOT_FOUND('user').message), req, next, NOT_FOUND().code)
-    }
-
-    const userId = (req.user as User)?.id
-    if (!userId) {
-        return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
-    }
-
-    // Where clause for the username
-    const where = { username }
-
-    try {
-        // Fetch the user public profile
-        const publicProfile = await profileServices.getPublicProfileService(req, next, where, userId)
-        if (!publicProfile) {
-            return ApiError(new Error(NOT_FOUND('user profile').message), req, next, NOT_FOUND().code)
-        }
-
-        return ApiResponse(req, res, SUCCESS().code, SUCCESS('User profile fetched successfully').message, { publicProfile })
-    } catch (error) {
-        return ApiError(new Error(INTERNAL_SERVICE((error as Error)?.message).message), req, next, INTERNAL_SERVICE().code)
-    }
+    // Update the user profile with the cover photo URL
+    await profileServices.updateUserProfileService(userId, { coverImage: '' })
+    return ApiResponse(req, res, 200, 'Cover photo removed successfully')
 })
