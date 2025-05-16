@@ -27,6 +27,12 @@ export const tokenInfo = {
     reset_validity: process.env.RESET_TOKEN_VALIDITY_IN_SEC
 }
 
+export const ARGON_MEMORY_COST: number = Number(process.env.ARGON_MEMORY_COST) || 2 ** 16 // 64MB RAM usage
+export const ARGON_TIME_COST: number = Number(process.env.ARGON_TIME_COST) || 3 // 3 iterations
+export const ARGON_PARALLELISM: number = Number(process.env.ARGON_PARALLELISM) || 2 // Parallelism factor
+
+export const USER_ROLE_ID: string = 'cmamn2isn0002i1hs0sb0ba2j'
+
 export const JWT_ISSUER = String(process.env.JWT_ISSUER) || 'NodeDrafts'
 export const JWT_AUDIENCE = String(process.env.JWT_AUDIENCE) || 'NodeDrafts'
 export const JWT_ROLE = String(process.env.JWT_ROLE) || 'user'
