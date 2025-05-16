@@ -5,42 +5,33 @@ import { followSchema, getFollowersSchema, getFollowingSchema, getFollowStatusSc
 
 const router = Router()
 
-// Middleware to check if the user is authenticated
-// ----------------------------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------------------------
-
-router.use(isAuthenticated)
-
-//---------------------------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------------------------
-
 /**
  * Follow a user
  * @method POST
  * @route /api/v1/follow-user/follow/:userId
  */
-router.route('/follow/:followingId').post(validateParams(followSchema), followUser)
+router.route('/follow/:id').post(isAuthenticated, validateParams(followSchema), followUser)
 
 /**
  * Unfollow a user
  * @method DELETE
  * @route /api/v1/follow-user/unfollow/:userId
  */
-router.route('/unfollow/:followingId').delete(validateParams(unfollowSchema), unfollowUser)
+router.route('/unfollow/:id').delete(isAuthenticated, validateParams(unfollowSchema), unfollowUser)
 
 /**
  * Get followers
  * @method GET
  * @route /api/v1/follow-user/followers
  */
-router.route('/followers').get(validateQuery(getFollowersSchema), getFollowers)
+router.route('/followers').get(isAuthenticated, validateQuery(getFollowersSchema), getFollowers)
 
 /**
  * Get following
  * @method GET
  * @route /api/v1/follow-user/following
  */
-router.route('/following').get(validateQuery(getFollowingSchema), getFollowing)
+router.route('/following').get(isAuthenticated, validateQuery(getFollowingSchema), getFollowing)
 
 /**
  * Get follow status
