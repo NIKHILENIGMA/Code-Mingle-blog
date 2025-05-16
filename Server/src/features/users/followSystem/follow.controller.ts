@@ -1,193 +1,132 @@
-import { NextFunction, Response } from 'express'
+import { Request, Response } from 'express'
 import { AsyncHandler } from '@/utils/AsyncHandler'
-import { ApiError } from '@/utils/ApiError'
-import responseMessage from '@/constant/responseMessage'
 import { ApiResponse } from '@/utils/ApiResponse'
-import { ProtectedRequest } from '@/types/extended/app-request'
 import { User } from '@/Lib/Models/User'
-import FollowService from './follow.service'
+import followService from './follow.service'
+import { BadRequestError, DatabaseError, NotFoundError, UnauthorizedError } from '@/utils/Errors'
 
-// Follow service instance
-const followServices = new FollowService()
-// Response messages
-const { INTERNAL_SERVICE, SUCCESS, NOT_FOUND, UNAUTHORIZED, METHOD_FAILED } = responseMessage
+interface FollowStatus {
+    followStatus: boolean
+}
 
-/**
- * Follow a user by their user ID.
- *
- * @param req - The request object containing user information and parameters.
- * @param res - The response object used to send back the desired HTTP response.
- * @param next - The next middleware function in the stack.
- *
- * @throws {Error} If the user ID to follow is not provided or if the follower ID is not found.
- * @returns {Promise<Response>} A promise that resolves to the HTTP response indicating success or failure.
- */
-export const followUser = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction): Promise<void> => {
+export const followUser = AsyncHandler(async (req: Request, res: Response): Promise<void> => {
     // Get the user id to follow
-    const followringId: string = req.params.followingId
-    if (!followringId) {
-        return ApiError(new Error(NOT_FOUND('User id is required').message), req, next, NOT_FOUND().code)
+    const followerId: string | undefined = req.user?.id
+    if (!followerId || followerId === undefined) {
+        throw new UnauthorizedError('User is not loggedin ')
     }
 
-    // Get the follower id
-    const followerId: string = (req.user as User)?.id
-    if (!followerId) {
-        return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
+    // Get the user id to follow
+    const followingId: string = req.params.id
+    if (!followingId) {
+        throw new NotFoundError('The user ID to follow is required.')
     }
 
-    // Payload to follow a user
-    const payload = {
-        followerId: followerId,
-        followingId: followringId
+    // Check userid is not same
+    if (followerId === followingId) {
+        throw new BadRequestError('You cannot follow yourself.')
+    }
+
+    const status = req.body as FollowStatus
+    if (!status || status.followStatus === undefined) {
+        throw new NotFoundError('Follow status is required.')
+    }
+
+    // Check if the user is already following
+    if (status.followStatus === true) {
+        throw new BadRequestError('User is already following.')
     }
 
     // Follow the user
-    try {
-        const following = await followServices.followUser(req, next, payload)
-        return ApiResponse(req, res, SUCCESS().code, SUCCESS('Current user get successfully').message, following?.followingId)
-    } catch (error) {
-        return ApiError(new Error(INTERNAL_SERVICE((error as Error)?.message).message), req, next, INTERNAL_SERVICE().code)
-    }
+    await followService.followUser({ followerId, followingId })
+
+    ApiResponse(req, res, 200, 'Follow user successfully', {})
 })
 
-/**
- * Unfollow a user by their user ID.
- *
- * @param req - The request object containing user information and parameters.
- * @param res - The response object used to send back the desired HTTP response.
- * @param next - The next middleware function in the stack.
- *
- * @throws {Error} If the user ID to unfollow is not provided or if the follower ID is not found.
- * @returns {Promise<Response>} A promise that resolves to the HTTP response indicating success or failure.
- */
-export const unfollowUser = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction): Promise<void> => {
+export const unfollowUser = AsyncHandler(async (req: Request, res: Response): Promise<void> => {
     const followerId = (req.user as User)?.id
     if (!followerId) {
-        return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
+        throw new UnauthorizedError('User is not loggedin')
     }
 
     // Get the user id to unfollow
     const followingId: string = req.params.followingId
     if (!followingId) {
-        return ApiError(new Error(NOT_FOUND('User id is required').message), req, next, NOT_FOUND().code)
+        throw new NotFoundError('The user ID to unfollow is required.')
     }
 
-    const where = {
-        followerId,
-        followingId
+    // Check status
+    const status = req.body as FollowStatus
+    if (!status || status.followStatus === undefined) {
+        throw new NotFoundError('Follow status is required.')
+    }
+
+    // Check if the user is not following
+    if (status.followStatus === false) {
+        throw new BadRequestError('User is not following.')
     }
 
     // Unfollow the user
-    try {
-        const unfollowUser = await followServices.unfollowUser(req, next, where)
+    await followService.unfollowUser({ followerId, followingId })
 
-        if (!unfollowUser) {
-            return ApiError(new Error(METHOD_FAILED('User not found').message), req, next, METHOD_FAILED().code)
-        }
-
-        return ApiResponse(req, res, SUCCESS().code, SUCCESS('User preference updated successfully').message)
-    } catch (error) {
-        return ApiError(new Error(INTERNAL_SERVICE((error as Error)?.message).message), req, next, INTERNAL_SERVICE().code)
-    }
+    // Return the unfollowed user
+    ApiResponse(req, res, 200, 'Unfollow user successfully', {})
 })
 
-/**
- * Get the followers of the current user.
- *
- * @param req - The request object containing user information and parameters.
- * @param res - The response object used to send back the desired HTTP response.
- * @param next - The next middleware function in the stack.
- *
- * @throws {Error} If the user ID is not found.
- * @returns {Promise<Response>} A promise that resolves to the HTTP response indicating success or failure.
- */
-export const getFollowers = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction): Promise<void> => {
-    // Get the user id to get followers
-    const userId = (req.user as User)?.id
+export const getFollowers = AsyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const userId = req.user?.id
     if (!userId) {
-        return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
+        throw new UnauthorizedError('User is not loggedin')
     }
 
     // Get the followers of the user
-    try {
-        const followers = await followServices.getUserFollowers(req, next, userId)
-        return ApiResponse(req, res, SUCCESS().code, SUCCESS('Current user theme preference get successfully').message, { followers })
-    } catch (error) {
-        return ApiError(new Error(INTERNAL_SERVICE((error as Error)?.message).message), req, next, INTERNAL_SERVICE().code)
+    const followers = await followService.getUserFollowers(userId)
+    if (!followers) {
+        throw new DatabaseError('User followers not found')
     }
+
+    // Return the followers of the user
+    ApiResponse(req, res, 200, 'User followers fetch successfully', { followers })
 })
 
-/**
- * Get the following of the current user.
- *
- * @param req - The request object containing user information and parameters.
- * @param res - The response object used to send back the desired HTTP response.
- * @param next - The next middleware function in the stack.
- *
- * @throws {Error} If the user ID is not found.
- * @returns {Promise<Response>} A promise that resolves to the HTTP response indicating success or failure.
- */
-export const getFollowing = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
+export const getFollowing = AsyncHandler(async (req: Request, res: Response) => {
     // Get the user id to get following
-    const userId = (req.user as User)?.id
+    const userId = req.user?.id
     if (!userId) {
-        return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
+        throw new UnauthorizedError('User is not loggedin')
     }
 
     // Get the following of the user
-    try {
-        // Get the following of the user
-        const following = await followServices.getUserFollowing(req, next, userId)
-        if (!following) {
-            return ApiError(new Error(METHOD_FAILED('Fetch following failed').message), req, next, METHOD_FAILED().code)
-        }
-
-        // Return the following of the user
-        return ApiResponse(req, res, SUCCESS().code, SUCCESS('User following fetch successfully').message, { following })
-    } catch (error) {
-        return ApiError(new Error(INTERNAL_SERVICE((error as Error)?.message).message), req, next, INTERNAL_SERVICE().code)
+    const following = await followService.getUserFollowing(userId)
+    if (!following) {
+        throw new DatabaseError('User following not found')
     }
+
+    // Return the following of the user
+    ApiResponse(req, res, 200, 'User following fetch successfully', { following })
 })
 
-/**
- * Get the follow status of the current user.
- *
- * @param req - The request object containing user information and parameters.
- * @param res - The response object used to send back the desired HTTP response.
- * @param next - The next middleware function in the stack.
- *
- * @throws {Error} If the user ID is not found.
- * @returns {Promise<Response>} A promise that resolves to the HTTP response indicating success or failure.
- */
-
-export const getFollowStatus = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction): Promise<void> => {
+export const getFollowStatus = AsyncHandler(async (req: Request, res: Response): Promise<void> => {
     // Get the user id to get following
     const followerId = (req.user as User)?.id
     if (!followerId) {
-        return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
+        throw new UnauthorizedError('User is not loggedin')
     }
 
     // Get the following of the user
-    const followingId: string = req.params.userId
+    const followingId: string = req.params.id
     if (!followingId) {
-        return ApiError(new Error(NOT_FOUND('User id is required').message), req, next, NOT_FOUND().code)
-    }
-
-    // Payload to get the follow status
-    const where = {
-        followerId,
-        followingId
+        throw new NotFoundError('The user ID to get follow status is required.')
     }
 
     // Get the follow status
-    try {
-        const status = await followServices.getFollowStatus(req, next, where)
-        if (!status) {
-            return ApiResponse(req, res, SUCCESS().code, SUCCESS('User theme preference updated successfully').message, false)
-        }
-
-        return ApiResponse(req, res, SUCCESS().code, SUCCESS('User theme preference updated successfully').message, true)
-    } catch (error) {
-        return ApiError(new Error(INTERNAL_SERVICE((error as Error)?.message).message), req, next, INTERNAL_SERVICE().code)
+    const status = await followService.getFollowStatus({
+        followerId,
+        followingId
+    })
+    if (!status) {
+        throw new DatabaseError('User follow status not found')
     }
+
+    ApiResponse(req, res, 200, 'User theme preference updated successfully', { followStatus: status })
 })
