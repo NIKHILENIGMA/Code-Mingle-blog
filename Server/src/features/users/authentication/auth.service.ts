@@ -1,225 +1,309 @@
-import { NextFunction, Request } from 'express'
-import { LoginCredentials, SignupCredentials } from './auth.types'
-import { User } from '../../../Lib/Models/User'
-import responseMessage from '../../../constant/responseMessage'
-import { ApiError } from '../../../utils/ApiError'
-import { RepositoryFactory } from '../../../Lib/Repositories'
-import { IUserRepository } from '../../../Lib/Repositories/Interfaces/IUserRepository'
-import { UserDTO } from '@/types/common/base.types'
-import argon2 from 'argon2'
-import bcrypt from 'bcrypt'
-import prisma from '../../../config/prisma.config'
+import { User } from '@prisma/client'
+import { tokenManagement } from '@/utils'
+import { StandardError } from '@/utils/Errors/StandardError'
+import { logger } from '@/utils/logger/index'
+import { BadRequestError, ConflictError, DatabaseError, InternalServerError, NotFoundError, UnauthorizedError } from '@/utils/Errors'
+import { USER_ROLE_ID } from '@/config/app.config'
+import { SignupCredientials, LoginCredientials, Permission } from './auth.types'
+import { PrismaUserRepository } from '../repository/PrismaUserRepository'
+import { PrismaSessionRepository } from '../repository/PrismaSessionRepository'
+import { PrismaResetPasswordRepository } from '../repository/PrismaResetPasswordRepository'
+import sendResetEmail from '@/utils/resend'
+import { comparePassword, hashedPassword } from '@/utils/HashPassword'
 
-const { METHOD_FAILED, ALREADY_EXIST, NOT_FOUND, INVALID_PASSWORD } = responseMessage
-export default class AuthService {
-    private UserRepository: IUserRepository
+class AuthService {
+    private userRepository: PrismaUserRepository
+    private sessionRepository: PrismaSessionRepository
+    private resetPasswordRepository: PrismaResetPasswordRepository
 
     constructor() {
-        this.UserRepository = RepositoryFactory.UserRepository()
+        this.userRepository = new PrismaUserRepository()
+        this.sessionRepository = new PrismaSessionRepository()
+        this.resetPasswordRepository = new PrismaResetPasswordRepository()
     }
-    /**
-     * Creates a new user.
-     *
-     * @param {ISignupUserBody} user - The user data for signup.
-     * @returns {Promise<User>} - A promise that resolves to the created user.
-     * @throws {ApiError} - Throws an error if the email already exists, if there is an error hashing the password, or if there is an error creating the user.
-     */
-    public async userRegisterService(req: Request, next: NextFunction, user: SignupCredentials): Promise<UserDTO | void> {
+
+    public async registerUser(credentials: SignupCredientials): Promise<void> {
         try {
             // Check if email exists
-            const existedUser = await this.checkEmailExists(user.email)
-            if (existedUser) {
-                return ApiError(new Error(ALREADY_EXIST('email').message), req, next, ALREADY_EXIST().code)
-            }
+            const existedUser = await this.userRepository.getUserByEmail(credentials?.email)
+            if (existedUser) throw new ConflictError('User with this email already exists')
+
+            // Check if username exists
+            const existedUsername = await this.userRepository.getUserByUsername(credentials?.username)
+            if (existedUsername) throw new ConflictError('User with this username already exists')
 
             // Hash password
-            const hashPassword = await this.hashedPassword(user?.password)
+            const hashPassword = await hashedPassword(credentials?.password)
+            if (!hashPassword) throw new BadRequestError('Error hashing password')
 
-            if (!hashPassword) {
-                return ApiError(new Error(METHOD_FAILED('hashing password').message), req, next, METHOD_FAILED().code)
-            }
-
-            user.password = hashPassword
+            // Set password to hashed password
+            credentials.password = hashPassword
 
             // Create user
-            const newUser = await this.UserRepository.create(user)
+            const newUser = await this.userRepository.create({
+                firstName: credentials?.firstName,
+                lastName: credentials?.lastName,
+                username: credentials?.username,
+                email: credentials?.email,
+                hashPassword: credentials?.password,
+                roleId: USER_ROLE_ID,
+                lastLoginAt: new Date()
+            })
             if (!newUser) {
-                return ApiError(new Error(METHOD_FAILED('new user').message), req, next, METHOD_FAILED().code)
+                throw new DatabaseError('Database error occurred while creating user')
             }
-
-            return this.removePassword(newUser)
         } catch (error) {
-            return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('register service').message), req, next, METHOD_FAILED().code)
+            if (error instanceof StandardError) {
+                throw error
+            }
+            throw new InternalServerError('An unexpected error occurred during registration')
         }
     }
 
-    /**
-     * Logs in a user.
-     *
-     * This function verifies the user by email, then compares the password.
-     * If the user is found and the password is correct, the user ID is returned.
-     *
-     * @param {Request} req - The request object.
-     * @param {NextFunction} next - The next function.
-     * @param {LoginCredentials} credientials - The login credentials.
-     * @returns {Promise<string | void>} - A promise that resolves to the user ID if successful.
-     * @throws {ApiError} - Throws an error if the user does not exist, if the password is invalid, or if there is an error during the login process.
-     */
-    public async userLoginService(req: Request, next: NextFunction, credientials: LoginCredentials): Promise<string | void> {
+    public async loginUser(
+        credientials: LoginCredientials,
+        options: { userAgent: string; ipAddress: string }
+    ): Promise<{ accessToken: string; refreshToken: string }> {
         try {
+            // Check if user exists
             const user = await this.verifyUserByEmail(credientials.email)
+            if (!user) throw new NotFoundError('User name or password is invalid')
 
-            if (!user) {
-                return ApiError(new Error(NOT_FOUND('user with email').message), req, next, 404)
-            }
             // Compare passwords
-            const passwordMatch = await this.comparePassword(credientials.password, user.password, user?.id)
+            const passwordMatch = await comparePassword(credientials.password, user.password!)
+            if (!passwordMatch) throw new BadRequestError('User name or password is invalid')
 
-            if (!passwordMatch) {
-                return ApiError(new Error(INVALID_PASSWORD.message), req, next, INVALID_PASSWORD.code)
+            // Check if user has a valid roleId
+            if (!user.roleId) {
+                throw new DatabaseError('User does not have a valid roleId')
             }
 
-            return user.id
+            // Take User Permissions
+            const userPermissions = await this.userRepository.getUserPermissions(user.roleId)
+
+            if (!userPermissions) {
+                throw new DatabaseError('Database error occurred while fetching user permissions')
+            }
+            logger.info(`User permissions: ${JSON.stringify(userPermissions)}`)
+            // Generate access and refresh tokens
+            //todo Remember to add user permissions to the token payload
+            const tokens = await this.getTokens(user, userPermissions)
+            if (!tokens) {
+                throw new InternalServerError('Error generating tokens')
+            }
+
+            // Create session
+            const sessionPayload = {
+                userId: user.id,
+                accessToken: tokens.accessToken,
+                refreshToken: tokens.refreshToken,
+                userAgent: options.userAgent,
+                ipAddress: options.ipAddress
+            }
+
+            // Create session in the database
+            await this.sessionRepository.createSession(sessionPayload)
+
+            // Update user lastLoginAt
+            return tokens
         } catch (error) {
-            return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('login service').message), req, next, METHOD_FAILED().code)
+            if (error instanceof StandardError) {
+                throw error
+            }
+            throw new Error('An unexpected error occurred during login')
         }
     }
 
-    /**
-     * Sends a password reset email to the user.
-     *
-     * This function verifies the user by email, then sends a password reset email.
-     *
-     * @param {Request} req - The request object.
-     * @param {NextFunction} next - The next function.
-     * @param {string} email - The email of the user.
-     * @returns {Promise<UserDTO | void>} - A promise that resolves to the user if successful.
-     * @throws {ApiError} - Throws an error if the user does not exist with the provided email.
-     */
-    public async userForgotPasswordService(req: Request, next: NextFunction, email: string): Promise<UserDTO | void> {
-        const user = await this.verifyUserByEmail(email)
-
-        if (user === null) {
-            return ApiError(new Error(NOT_FOUND('user with email').message), req, next, NOT_FOUND().code)
-        }
-
-        return user
-    }
-
-    /**
-     * Changes the password of a user.
-     *
-     * This function hashes the new password, then updates the user's password.
-     *
-     * @param {Request} req - The request object.
-     * @param {NextFunction} next - The next function.
-     * @param {string} userId - The ID of the user.
-     * @param {string} newPassword - The new password.
-     * @returns {Promise<void>} - A promise that resolves if successful.
-     * @throws {ApiError} - Throws an error if there is an error hashing the password or updating the user's password.
-     */
-    public async changePasswordService(req: Request, next: NextFunction, userId: string, newPassword: string): Promise<void> {
+    public async logoutUser(sessionId: string): Promise<void> {
         try {
-            const hashedPassword = await this.hashedPassword(newPassword)
-
-            if (!hashedPassword) {
-                return ApiError(new Error(METHOD_FAILED('hashing password').message), req, next, METHOD_FAILED().code)
-            }
-
-            const changePassword = await this.UserRepository.updatePassword({ id: userId }, hashedPassword)
-
-            if (!changePassword) {
-                return ApiError(new Error(METHOD_FAILED('changing password').message), req, next, METHOD_FAILED().code)
-            }
+            // Invalidate the session
+            await this.sessionRepository.deleteSession(sessionId)
         } catch (error) {
-            return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('login service').message), req, next, METHOD_FAILED().code)
+            if (error instanceof StandardError) {
+                throw error
+            }
+            throw new InternalServerError('An unexpected error occurred during logout')
         }
     }
-    /**
-     * Checks if a user exists by email or ID.
-     *
-     * @param {string} [email] - The email of the user to check.
-     * @param {string} [id] - The ID of the user to check.
-     * @returns {Promise<IUser>} A promise that resolves to the user if found.
-     * @throws {ApiError} Throws an error if the user does not exist with the provided email or ID.
-     */
 
-    private async checkEmailExists(email: string): Promise<User | null> {
-        return await this.UserRepository.findUserByEmail({ email })
-    }
+    public async forgotPasswordService(email: string): Promise<{ link: string; userId: string }> {
+        try {
+            const user = await this.verifyUserByEmail(email)
 
-    /**
-     * Hashes a plain text password using bcrypt.
-     *
-     * @param {Request} req - The request object.
-     * @param {NextFunction} next - The next function.
-     * @param {string} password - The plain text password to hash.
-     * @returns {Promise<string | void>} - A promise that resolves to the hashed password if successful.
-     *
-     * @throws {ApiError} - Throws an error if there is an error hashing the password.
-     */
-    private async hashedPassword(password: string): Promise<string | void> {
-        // Hash password
-        const hashOptions = {
-            type: argon2.argon2id, // Use Argon2id (recommended)
-            memoryCost: 2 ** 16, // 64MB RAM usage
-            timeCost: 3, // 3 iterations
-            parallelism: 2 // Parallelism factor
-        }
+            if (user === null) {
+                throw new NotFoundError('User not found')
+            }
+            const rawResetToken = tokenManagement.generateResetToken()
 
-        return await argon2.hash(password, hashOptions)
-    }
+            if (!rawResetToken) {
+                throw new InternalServerError('Error generating reset token')
+            }
 
-    /**
-     * Removes the password from a user object.
-     *
-     * @param user  - User object
-     * @returns  UserDTO - User object without password
-     */
-    private removePassword(user: User): UserDTO {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { password, ...userDetails } = user
+            // Hash the reset token
+            const hashedResetToken = await hashedPassword(rawResetToken)
+            if (!hashedResetToken) {
+                throw new InternalServerError('Error hashing reset token')
+            }
 
-        return userDetails
-    }
-
-    /**
-     * Compares a plain text password with a hashed password.
-     *
-     * @param {string} password - Plain text password.
-     * @param {string} hashedPassword - Hashed password.
-     * @returns Promise<boolean> - True if passwords match, else false.
-     */
-    private async comparePassword(password: string, hashedPassword: string, userId: string): Promise<boolean> {
-        // Compare password
-        const match = await bcrypt.compare(password, hashedPassword)
-
-        if (match) {
-            const argonHashed = (await this.hashedPassword(password)) as string
-
-            await prisma.user.update({
-                where: {
-                    id: userId
-                },
-                data: {
-                    password: argonHashed
-                }
+            // Update user with reset token
+            await this.resetPasswordRepository.createResetPasswordToken({
+                userId: user.id,
+                email: user.email,
+                tokenHash: hashedResetToken,
+                expiresAt: new Date(Date.now() + 3600000) // 1 hour expiration
             })
 
-            return match
-        }
+            const resetLink = `http://localhost:3000/reset-password?token=${rawResetToken}`
 
-        return await argon2.verify(hashedPassword, password)
+            // Send the reset link to the user's email
+            await sendResetEmail(user.email, resetLink)
+
+            return { link: resetLink, userId: user.id }
+        } catch (error) {
+            if (error instanceof StandardError) {
+                throw error
+            }
+            throw new InternalServerError('An unexpected error occurred during password reset')
+        }
     }
 
-    /**
-     * Verifies if a user exists by email.
-     *
-     * @param email  - Email of the user
-     * @returns  User | null - User object if found, else null
-     */
+    public async resetPasswordService(payload: { userId: string; token: string; newPassword: string }): Promise<void> {
+        try {
+            const hashedToken: string | null = await this.resetPasswordRepository.verifyResetPasswordToken(payload.userId)
+            if (!hashedToken) {
+                throw new NotFoundError('Reset password token not found or expired')
+            }
+
+            // Compare the hashed token with the raw token
+            const isTokenValid: boolean = await comparePassword(payload.token, hashedToken)
+            if (!isTokenValid) {
+                throw new BadRequestError('Token which is already expired or invalid')
+            }
+
+            if (isTokenValid) {
+                const hashPassword = await hashedPassword(payload.newPassword)
+                await this.userRepository.updatePassword(payload.userId, hashPassword)
+            }
+        } catch (error) {
+            if (error instanceof StandardError) {
+                throw error
+            }
+            throw new InternalServerError('An unexpected error occurred during password reset')
+        }
+    }
+
+    public async changePasswordService(userId: string, newPassword: string): Promise<void> {
+        try {
+            
+            const hashPassword: string = await hashedPassword(newPassword)
+            if (!hashPassword) {
+                throw new InternalServerError('Error hashing password')
+            }
+
+            const changePassword: boolean = await this.userRepository.updatePassword(userId, hashPassword)
+
+            if (!changePassword) {
+                throw new DatabaseError('Database error occurred while updating password')
+            }
+        } catch (error) {
+            if (error instanceof StandardError) {
+                throw error
+            }
+            throw new InternalServerError('An unexpected error occurred during password change')
+        }
+    }
+
+    public async verifyRefreshToken(refreshToken: string): Promise<{ accessToken: string; refreshToken: string }> {
+        try {
+            // Check if the refresh token is valid
+            const session = await this.sessionRepository.getSessionByRefreshToken(refreshToken)
+            if (!session) {
+                throw new UnauthorizedError('User is not logged in')
+            }
+
+            if (session.refreshToken !== refreshToken) {
+                throw new BadRequestError('Invalid refresh token')
+            }
+
+            // Create a new access token and refresh token
+            const user = await this.userRepository.getUserById(session.userId)
+            if (!user) {
+                throw new NotFoundError('User not found')
+            }
+
+            // Take User Permissions
+            const userPermissions = await this.userRepository.getUserPermissions(user.roleId!)
+            if (!userPermissions) {
+                throw new DatabaseError('Database error occurred while fetching user permissions')
+            }
+
+            // Generate new tokens
+            const tokens = await this.getTokens(user, userPermissions)
+            if (!tokens) {
+                throw new InternalServerError('Error generating tokens')
+            }
+
+            // Update the session with the new tokens
+            await this.sessionRepository.updateSession(session.id, {
+                accessToken: tokens.accessToken,
+                refreshToken: tokens.refreshToken
+            })
+
+            return tokens
+        } catch (error) {
+            if (error instanceof StandardError) {
+                throw error
+            }
+            throw new InternalServerError('An unexpected error occurred while verifying refresh token')
+        }
+    }
+
+    // ------------------------------ PRIVATE METHODS ------------------------------------------------- //
+    // This method is private and is used to generate access and refresh tokens
+    private async getTokens(user: User, rolePermissions: Permission[]): Promise<{ accessToken: string; refreshToken: string }> {
+        // Generate tokens
+        const payload = {
+            id: user.id,
+            email: user.email,
+            username: user.username,
+            roleId: user.roleId!,
+            lastLoginAt: user.lastLoginAt!,
+            emailVerified: user.verifiedEmail,
+            permissions: rolePermissions.map((permission) => ({
+                id: permission.id,
+                name: permission.name,
+                resource: permission.resource,
+                actions: Array.isArray(permission.actions) ? permission.actions : [permission.actions]
+            }))
+        }
+        // Generate access and refresh tokens
+        // permission
+        try {
+            const accessToken = await tokenManagement.generateToken({
+                type: 'ACCESS',
+                subject: payload
+            })
+
+            const refreshToken = await tokenManagement.generateToken({
+                type: 'REFRESH',
+                subject: payload
+            })
+
+            return {
+                accessToken,
+                refreshToken
+            }
+        } catch (error) {
+            if (error instanceof StandardError) {
+                throw error
+            }
+            throw new InternalServerError('An unexpected error occurred while generating tokens')
+        }
+    }
 
     private async verifyUserByEmail(email: string): Promise<User | null> {
-        return await this.UserRepository.findUserByEmail({ email })
+        return await this.userRepository.getUserByEmail(email)
     }
 }
+
+export const authServices = new AuthService()
