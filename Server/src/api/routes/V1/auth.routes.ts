@@ -1,9 +1,7 @@
 // Auth routes for handling user authentication and authorization.
 import { Router } from 'express'
 import { forgotPassword, login, logout, refreshAccessToken, resetPassword, signup } from '@/features/users/authentication/auth.controller'
-import { isAuthenticated, validateBody } from '@/api/middlewares'
-import {  loginSchema, forgotPasswordSchema, resetPasswordSchema } from '../../validators/auth.validator'
-
+import { isAuthenticated } from '@/api/middlewares'
 const router = Router()
 
 /**
@@ -26,7 +24,7 @@ router.route('/signup').post(signup)
  * @param {function} validateBody - Middleware to validate request body against loginSchema.
  * @param {function} login - Controller function to handle user login.
  */
-router.route('/login').post(validateBody(loginSchema), login)
+router.route('/login').post(login)
 
 /**
  * Route for user logout.
@@ -47,7 +45,7 @@ router.route('/logout').delete(isAuthenticated, logout)
  * @inner
  * @param {function} forgotPassword - Controller function to handle password recovery.
  */
-router.route('/password-recovery').post(validateBody(forgotPasswordSchema), forgotPassword)
+router.route('/password-recovery').post(forgotPassword)
 
 /**
  * Route for resetting password.
@@ -57,7 +55,7 @@ router.route('/password-recovery').post(validateBody(forgotPasswordSchema), forg
  * @inner
  * @param {function} resetPassword - Controller function to handle password reset.
  */
-router.route('/reset-password').post(validateBody(resetPasswordSchema), resetPassword)
+router.route('/reset-password').post(resetPassword)
 
 /**
  * Route for refreshing token.
