@@ -1,7 +1,7 @@
 import { signupSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema, refreshTokenSchema } from './auth.validator'
 import { CollectionParamsSchema, PostParamsSchema, CollectionQuerySchema, CollectionBodySchema } from './collection.validator'
 import { addCommentSchema, queryCommentSchema, replyId, commentId } from './comment.validator'
-import { UpdateDraftBodySchema, DraftParamsSchema, QueryDraftSchema } from './draft.validator'
+import { UpdateDraftBodySchema, DraftParamsSchema } from './draft.validator'
 import { followSchema, unfollowSchema, getFollowersSchema, getFollowingSchema, getFollowStatusSchema } from './follow.validator'
 import { ProfileChangePasswordSchema, ProfileUpdateBodySchema, ProfileImageSchema } from './profile.validator'
 import {
@@ -28,7 +28,6 @@ export {
     commentId,
     UpdateDraftBodySchema,
     DraftParamsSchema,
-    QueryDraftSchema,
     followSchema,
     unfollowSchema,
     getFollowersSchema,
