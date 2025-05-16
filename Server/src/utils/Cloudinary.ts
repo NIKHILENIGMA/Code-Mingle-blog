@@ -1,12 +1,10 @@
 import { v2 as cloudinary, UploadApiResponse } from 'cloudinary'
 import { cloudinaryConfig } from '@/config'
-import { ApiError } from './ApiError'
-import { NextFunction, Request } from 'express'
-import { responseMessage } from '../constant'
 import { unlinkSync } from 'node:fs'
 import { UploadOptions } from '@/types/common/base.types'
+import { StandardError } from './Errors/StandardError'
+import { InternalServerError } from './Errors'
 
-const { INTERNAL_SERVICE, BAD_REQUEST } = responseMessage
 
 /**
  * Configures Cloudinary with the Cloudinary API key, API secret, and cloud name.
@@ -31,15 +29,10 @@ cloudinary.config({
  *
  * @throws Will throw an error if the local file path is not provided or if the upload fails.
  */
-export const uploadOnCloudinary = async (
-    req: Request,
-    next: NextFunction,
-    uploadOptions: UploadOptions,
-    localFilePath: string
-): Promise<UploadApiResponse | void> => {
+export const uploadOnCloudinary = async (uploadOptions: UploadOptions, localFilePath: string): Promise<UploadApiResponse | void> => {
     try {
         if (!localFilePath) {
-            return ApiError(new Error(BAD_REQUEST('Local file path is required').message), req, next, BAD_REQUEST().code)
+            throw new InternalServerError('File local-path does not provided. Can not upload file on cloudinary without local-path')
         }
 
         // Upload image on cloudinary
@@ -65,36 +58,25 @@ export const uploadOnCloudinary = async (
     } catch (error) {
         unlinkSync(localFilePath)
 
-        return ApiError(
-            error instanceof Error ? error : new Error(INTERNAL_SERVICE('Failed to upload image on cloudinary').message),
-            req,
-            next,
-            INTERNAL_SERVICE().code
-        )
+        if (error instanceof StandardError) {
+            throw error
+        }
+
+        throw new InternalServerError('An error occurred while upload on cloudinary method')
     }
 }
 
-/**
- * Deletes an image from Cloudinary.
- *
- * @param req - The Express request object.
- * @param next - The Express next function for error handling.
- * @param public_id - The public ID of the image to delete from Cloudinary.
- * @returns A promise that resolves to void if the image is successfully deleted or an error if the deletion fails.
- */
-export const deleteFromCloudinary = async (req: Request, next: NextFunction, publicId: string) => {
+export const deleteFromCloudinary = async (publicId: string) => {
     try {
         await cloudinary.uploader.destroy(publicId)
     } catch (error) {
-        return ApiError(
-            error instanceof Error ? error : new Error(INTERNAL_SERVICE('Failed to delete image from cloudinary').message),
-            req,
-            next,
-            INTERNAL_SERVICE().code
-        )
+        if (error instanceof StandardError) {
+            throw error
+        }
+
+        throw new InternalServerError('An error occurred deleting file method')
     }
 }
-
 
 export const cloundinaryUtil = {
     uploadOnCloudinary,
