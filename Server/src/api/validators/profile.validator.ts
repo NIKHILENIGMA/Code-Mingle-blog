@@ -14,8 +14,11 @@ export const ProfileUpdateBodySchema = z.object({
     username: z.string().optional(),
     email: z.string().email().optional(),
     dob: z.date().optional().optional(),
-    bio: z.string().min(1).max(160).optional()
+    bio: z.string().min(1).max(160).optional(),
+    profileImage: z.string().optional(),
+    coverImage: z.string().optional(),
 })
+
 
 export const ProfileImageSchema = z.object({
     mimetype: z.string().refine((type) => ACCEPTED_IMAGE_TYPES.includes(type), { message: 'Invalid image file type' }),
