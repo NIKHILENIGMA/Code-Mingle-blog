@@ -1,75 +1,62 @@
 // This file contains the types for the authentication feature
+import { z } from 'zod'
+import { forgotPasswordSchema, loginSchema, resetPasswordSchema, signupSchema } from '@/api'
+import { ActionType, Resource } from '@prisma/client'
+/**
+ * Type definition for signup credentials
+ * Inferred from the signupSchema Zod schema
+ * Used for validating and typing user registration data
+ */
+export type SignupCredientials = z.infer<typeof signupSchema>
 
 /**
- * Interface representing the sign-up credentials for a user.
- * This interface is used to structure the data required for user registration.
+ * Type definition for login credentials
+ * Inferred from the loginSchema Zod schema
+ * Used for validating and typing user login data
  *
- * @interface SignupCredentials
- *
- * @property {string} firstName - The first name of the user.
- * @property {string} lastName - The last name of the user.
- * @property {string} email - The email address of the user.
- * @property {string} password - The password chosen by the user.
  */
-export interface SignupCredentials {
-    firstName: string
-    lastName: string
-    email: string
-    password: string
-}
+
+export type LoginCredientials = z.infer<typeof loginSchema>
 
 /**
- * Interface representing the login credentials for a user.
- * This interface is used to structure the data required for user login.
+ * Type definition for forgot password credentials
+ * Inferred from the forgotPasswordSchema Zod schema
+ * Used for validating and typing forgot password data
  *
- * @interface LoginCredentials
- *
- * @property {string} email - The email address of the user.
- * @property {string} password - The password chosen by the user.
  */
-export interface LoginCredentials {
-    email: string
-    password: string
-}
+export type ForgotPasswordCredientials = z.infer<typeof forgotPasswordSchema>
 
 /**
- * Interface representing the reset password credentials for a user.
- * This interface is used to structure the data required for resetting a user's password.
+ * Type definition for reset password credentials
+ * Inferred from the resetPasswordSchema Zod schema
+ * Used for validating and typing reset password data
  *
- * @interface ResetCredentials
- *
- * @property {string} token - The token used to verify the user.
- * @property {string} newPassword - The new password chosen by the user.
  */
-export interface ResetCredentials {
-    token: string
-    newPassword: string
-}
-
-/**
- * Interface representing the forgot password credentials for a user.
- * This interface is used to structure the data required for resetting a user's password.
- * 
- * @interface ForgotPasswordCredentials
- * 
- * @property {string} email - The email address of the user.
- * 
- */
-export interface ForgotPasswordCredentials {
-    email: string
-}
-
-/**
- * Interface representing the authentication response.
- * This interface is used to structure the data returned after a user is authenticated.
- * 
- * @interface AuthResponse
- * 
- * @property {string} access_token - The access token for the user.
- * @property {string} refresh_token - The refresh token for the user.
- */
+export type ResetPasswordCredentials = z.infer<typeof resetPasswordSchema>
 
 export interface AuthResponse {
     access_token: string
     refresh_token: string
+}
+
+export interface Permission {
+    id: string
+    name: string
+    resource: Resource
+    actions: ActionType
+}
+
+export interface UserDTO {
+    id: string
+    firstName: string | null
+    lastName: string | null
+    email: string
+    username: string
+    bio: string | null
+    profileImage: string | null
+    coverImage: string | null
+    lastLoginAt: Date | null
+    roleId: string | null
+    createdAt: Date
+    updatedAt: Date
 }
