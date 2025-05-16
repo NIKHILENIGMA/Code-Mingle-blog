@@ -1,4 +1,4 @@
-import { isProduction, tokenInfo, keyPath, appConfig } from './app.config'
+import { isProduction, tokenInfo, appConfig } from './app.config'
 import {
     fileUploadConfig,
     cloudinaryConfig,
@@ -11,13 +11,13 @@ import {
     INVALIDATE
 } from './cloudinary.config'
 import { openAIConfig } from './openai.config'
-import { resendConfig } from './resend.config'
+import { resendApiKey } from './resend.config'
 
 export {
     appConfig,
     isProduction,
     tokenInfo,
-    keyPath,
+    // keyPath,
     fileUploadConfig,
     cloudinaryConfig,
     ALLOWED_FORMATS,
@@ -28,5 +28,5 @@ export {
     OVERWRITE,
     INVALIDATE,
     openAIConfig,
-    resendConfig
+    resendApiKey
 }
