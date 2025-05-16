@@ -30,6 +30,7 @@ export const forgotPasswordSchema = z.object({
 })
 
 export const resetPasswordSchema = z.object({
+    id: z.string().uuid(),
     newPassword: z.string().min(6, 'Password must be at least 6 characters long'),
     token: z.string()
 })
