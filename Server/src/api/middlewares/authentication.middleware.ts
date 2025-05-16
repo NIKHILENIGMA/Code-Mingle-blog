@@ -74,6 +74,9 @@ export const isAuthenticated = AsyncHandler(async (req: Request, _: Response, ne
             valid: session?.valid,
         }
 
+
+        // todo add permissions to request object
+        // const permissions = await permissionRepository.getPermissionsByRoleId(user.roleId)
         // req.perms = decodedToken.permission
 
         next()
