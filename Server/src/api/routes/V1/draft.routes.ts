@@ -3,8 +3,7 @@ import { validateParams, isAuthenticated, validateBody, validateQuery } from '@/
 import * as draftController from '@/features/post/drafts/draft.controller'
 import { DraftParamsSchema, DraftQuerySchema, UpdateDraftBodySchema } from '../../validators/draft.validator'
 import { upload } from '@/api/middlewares/multer.middleware'
-import { checkPermission } from '@/api/middlewares/checkPermission.middleware'
-import { ENUMS } from '@/types'
+
 
 const router = express.Router({ mergeParams: true })
 
@@ -31,14 +30,7 @@ router.route('/new').post(draftController.createDraft)
  * @route /api/v1/drafts/:id
  * @access Private
  */
-router
-    .route('/:id')
-    .patch(
-        validateParams(DraftParamsSchema),
-        validateBody(UpdateDraftBodySchema),
-        checkPermission(ENUMS.ACTION.UPDATE, ENUMS.RESOURCE.POST),
-        draftController.saveDraft
-    )
+router.route('/:id').patch(validateParams(DraftParamsSchema), validateBody(UpdateDraftBodySchema), draftController.saveDraft)
 
 /**
  * !Routes for removing a draft.
@@ -46,7 +38,7 @@ router
  * @route /api/v1/drafts/:id
  * @access Private
  */
-router.route('/:id').delete(validateParams(DraftParamsSchema), checkPermission(ENUMS.ACTION.DELETE, ENUMS.RESOURCE.POST), draftController.removeDraft)
+router.route('/:id').delete(validateParams(DraftParamsSchema), draftController.removeDraft)
 
 /**
  * !Routes for getting a draft.
@@ -54,14 +46,7 @@ router.route('/:id').delete(validateParams(DraftParamsSchema), checkPermission(E
  * @route /api/v1/drafts/:id
  * @access Private
  */
-router
-    .route('/:id')
-    .get(
-        validateParams(DraftParamsSchema),
-        validateQuery(DraftQuerySchema),
-        checkPermission(ENUMS.ACTION.READ, ENUMS.RESOURCE.POST),
-        draftController.getUserDraft
-    )
+router.route('/:id').get(validateParams(DraftParamsSchema), validateQuery(DraftQuerySchema), draftController.getUserDraft)
 
 /**
  * !Routes for getting all drafts of a user.
@@ -69,7 +54,7 @@ router
  * @route /api/v1/drafts/
  * @access Private
  */
-router.route('/').get(checkPermission(ENUMS.ACTION.READ, ENUMS.RESOURCE.POST), draftController.getUserDrafts)
+router.route('/').get(draftController.getCurrentUserDrafts)
 
 /**
  * !Routes for uploading a draft cover image.
@@ -77,9 +62,7 @@ router.route('/').get(checkPermission(ENUMS.ACTION.READ, ENUMS.RESOURCE.POST), d
  * @route /api/v1/drafts/upload/cover-image
  * @access Private
  */
-router
-    .route('/:id/cover-image/upload/')
-    .post(checkPermission(ENUMS.ACTION.UPDATE, ENUMS.RESOURCE.POST), upload.single('draftCoverImg'), draftController.uploadDraftCoverImage)
+router.route('/:id/cover-image/upload/').post(upload.single('draftCoverImg'), draftController.uploadDraftCoverImage)
 
 /**
  * !Routes for removing a draft cover image.
@@ -87,9 +70,7 @@ router
  * @route /api/v1/drafts/:id/remove/cover-image
  * @access Private
  */
-router
-    .route('/:id/cover-image/remove/')
-    .delete(validateParams(DraftParamsSchema), checkPermission(ENUMS.ACTION.DELETE, ENUMS.RESOURCE.POST), draftController.removeDraftCoverImage)
+router.route('/:id/cover-image/remove/').delete(validateParams(DraftParamsSchema), draftController.removeDraftCoverImage)
 
 /**
  * !Routes for uploading a draft thumbnail.
@@ -101,7 +82,6 @@ router
     .route('/:id/thumbnail/upload')
     .post(
         validateParams(DraftParamsSchema),
-        checkPermission(ENUMS.ACTION.UPDATE, ENUMS.RESOURCE.POST),
         upload.single('thumnailImage'),
         draftController.uploadThumbnail
     )
@@ -114,7 +94,7 @@ router
  */
 router
     .route('/:id/thumbnail/remove')
-    .delete(validateParams(DraftParamsSchema), checkPermission(ENUMS.ACTION.DELETE, ENUMS.RESOURCE.POST), draftController.removeDraftThumbnail)
+    .delete(validateParams(DraftParamsSchema), draftController.removeDraftThumbnail)
 
 /**
  * !Routes for getting a draft preview.
