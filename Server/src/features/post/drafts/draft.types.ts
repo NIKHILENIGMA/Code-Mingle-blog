@@ -1,4 +1,6 @@
+import { UpdateDraftBodySchema } from '@/api'
 import { ENUMS } from '@/types'
+import { z } from 'zod'
 
 /**
  * Interface representing the payload to create a new draft.
@@ -12,26 +14,7 @@ export interface CreateDraft {
     authorId: string
 }
 
-/**
- * Interface representing the payload to update a draft.
- *
- * @interface
- * @property {string} title - The title of the draft.
- * @property {string} content - The content of the draft.
- * @property {string} image - The image of the draft.
- * @property {string} thumbnail - The thumbnail of the draft {optional}.
- * @property {string} categoryId - The category ID of the draft {optional}.
- * @property {string} slug - The slug of the draft {optional}.
- */
-export interface UpdateDraft {
-    title: string
-    content: string
-    image?: string
-    thumbnail?: string
-    categoryId?: string
-    slug?: string
-}
-
+export type DraftUpdateFields = z.infer<typeof UpdateDraftBodySchema>
 /**
  * Interface representing the response of a draft. DTO stands for Data Transfer Object.
  *
@@ -64,16 +47,13 @@ export interface DraftPreview {
     id: string
     title: string | null
     content: string | null
-    slug: string | null
-    image: string | null
+    slug: string
+    postCoverImage: string | null
     readTime: number | null
-    category: {
-        name: string
-    } | null
     author: {
         id: string
-        username: string | null
-        avatarImg: string | null
+        username: string
+        profileImage: string
     }
 }
 
