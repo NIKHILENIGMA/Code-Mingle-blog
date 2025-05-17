@@ -37,9 +37,7 @@ export const publishPost = AsyncHandler(async (req: ProtectedRequest, res: Respo
 
     // Get the user id from the request object
     const userId = (req.user as User)?.id
-    if (!userId) {
-        return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
-    }
+    
 
     const postId: string = req.params.id
     if (!postId) {
