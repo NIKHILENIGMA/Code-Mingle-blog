@@ -1,261 +1,161 @@
-import { Request, NextFunction } from 'express'
-import { ApiError } from '@/utils/ApiError'
-import responseMessage from '@/constant/responseMessage'
-import { IDraftRepository } from '@/Lib/Repositories/Interfaces/IDraftRepository'
-import { RepositoryFactory } from '@/Lib/Repositories'
-import { DraftContent, DraftSelectFields, DraftUpdatePayload, DraftWhere, DraftWhereStatus, GenerateDraft } from '@/types/draft'
 import { Post } from '@prisma/client'
-
-const { METHOD_FAILED, NOT_FOUND } = responseMessage
+import PrismaDraftRepository, { IDraftRepository } from '@/features/post/repository/PrismaDraftRepository'
+import { ENUMS } from '@/types'
+import { DraftPreview, DraftUpdateFields } from './draft.types'
+import { DatabaseError, InternalServerError } from '@/utils/Errors'
+import { StandardError } from '@/utils/Errors/StandardError'
 
 class DraftService {
-    private DraftRepository: IDraftRepository
-    constructor() {
-        this.DraftRepository = RepositoryFactory.DraftRepository()
+    constructor(private repo: IDraftRepository) {
+        this.repo = repo
     }
 
-    public async newDraftService(req: Request, next: NextFunction, payload: GenerateDraft): Promise<string | void> {
+    public async createDraftService(payload: { status: ENUMS.DRAFT_STATUS; userId: string; slug: string }): Promise<string> {
         try {
-            const draft = await this.DraftRepository.create(payload)
+            const draft = await this.repo.createDraft(payload)
 
             if (!draft) {
-                return ApiError(new Error(METHOD_FAILED('draft generation').message), req, next, METHOD_FAILED().code)
+                throw new DatabaseError('Draft not created', 'createDraftService')
             }
 
             return draft.id
         } catch (error) {
-            return ApiError(
-                error instanceof Error ? error : new Error(METHOD_FAILED('create draft service').message),
-                req,
-                next,
-                METHOD_FAILED().code
-            )
-        }
-    }
-
-    public async saveDraftService(
-        req: Request,
-        next: NextFunction,
-        options: {
-            where: DraftWhere
-            draftContent: DraftContent
-        }
-    ): Promise<string | void> {
-        /// Generate payload for update
-        const payload: DraftUpdatePayload = {
-            title: options.draftContent.title,
-            content: options.draftContent.content
-            // image: options.draftContent.image
-        }
-
-        try {
-            /// Find draft by ID and author ID
-            const existedDraft = await this.DraftRepository.findDraftById(options.where)
-
-            if (!existedDraft) {
-                return ApiError(new Error(NOT_FOUND('draft not found or draft might be deleted already').message), req, next, NOT_FOUND().code)
+            if (error instanceof StandardError) {
+                throw error
             }
 
-            /// If draft is found, update the draft
-            await this.DraftRepository.update(options.where, payload)
-
-            /// Return success message
-            const successMessage = 'Draft saved successfully'
-            return successMessage
-        } catch (error) {
-            return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('save draft service').message), req, next, METHOD_FAILED().code)
+            throw new InternalServerError('An unexpected error occurred while creating the draft', 'createDraftService')
         }
     }
 
-    public async removeDraftService(
-        req: Request,
-        next: NextFunction,
-        options: {
-            where: DraftWhere
-        }
-    ): Promise<string | void> {
+    public async saveDraftService(id: string, userId: string, payload: DraftUpdateFields): Promise<string> {
         try {
-            const existedDraft = await this.DraftRepository.findDraftById(options.where)
+            await this.repo.updateDraft(id, userId, payload)
 
-            if (!existedDraft) {
-                return ApiError(new Error(NOT_FOUND('draft or draft might be deleted already').message), req, next, NOT_FOUND().code)
+            return 'Draft saved successfully'
+        } catch (error) {
+            if (error instanceof StandardError) {
+                throw error
             }
-
-            await this.DraftRepository.delete({ id: existedDraft.id })
-
-            const successMessage = 'Draft removed successfully'
-            return successMessage
-        } catch (error) {
-            return ApiError(
-                error instanceof Error ? error : new Error(METHOD_FAILED('remove draft service').message),
-                req,
-                next,
-                METHOD_FAILED().code
-            )
+            throw new InternalServerError('An unexpected error occurred while saving the draft', 'saveDraftService')
         }
     }
 
-    public async getDraftService(
-        req: Request,
-        next: NextFunction,
-        options: {
-            where: DraftWhere
-            selectedFields: DraftSelectFields
-        }
-    ): Promise<Partial<Post> | void> {
+    public async removeDraftService(id: string, userId: string): Promise<string | void> {
         try {
-            /// Find draft
-            const currentDraft = await this.DraftRepository.findDraft(options.where, options.selectedFields)
-            if (!currentDraft) {
-                return ApiError(new Error(NOT_FOUND('draft').message), req, next, NOT_FOUND().code)
+            await this.repo.deleteDraft(id, userId, ENUMS.DRAFT_STATUS.DRAFT)
+
+            return 'Draft removed successfully'
+        } catch (error) {
+            if (error instanceof StandardError) {
+                throw error
             }
-
-            /// Return draft
-            return currentDraft
-        } catch (error) {
-            return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('get draft service').message), req, next, METHOD_FAILED().code)
+            throw new InternalServerError('An unexpected error occurred while removing the draft', 'removeDraftService')
         }
     }
 
-    public async listDraftService(req: Request, next: NextFunction) {
+    public async getDraftService(id: string, authorId: string, status: ENUMS.DRAFT_STATUS): Promise<Partial<Post> | null> {
         try {
-            const drafts = await this.DraftRepository.findDrafts()
+            const draft = await this.repo.getDraft(id, authorId, status)
 
-            if (!drafts || drafts.length === 0) {
-                return ApiError(new Error(NOT_FOUND('drafts').message), req, next, NOT_FOUND().code)
+            return draft
+        } catch (error) {
+            if (error instanceof StandardError) {
+                throw error
             }
-
-            return drafts
-        } catch (error) {
-            return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('list draft service').message), req, next, METHOD_FAILED().code)
+            throw new InternalServerError('An unexpected error occurred while fetching the draft', 'getDraftService')
         }
     }
 
-    public async getUserDraftsService(req: Request, next: NextFunction, options: { where: DraftWhereStatus }): Promise<Post[] | void> {
+    public async getUserDraftsService(authorId: string, status: ENUMS.DRAFT_STATUS.DRAFT): Promise<Post[] | null> {
         try {
-            const drafts: Post[] | null = await this.DraftRepository.findDraftsByAuthorId(options.where, { createdAt: 'desc' })
+            const drafts = await this.repo.getDraftsByUserId(authorId, status)
 
             if (!drafts) {
-                return ApiError(new Error(NOT_FOUND('drafts').message), req, next, NOT_FOUND().code)
+                throw new DatabaseError('Drafts not found', 'getUserDraftsService')
             }
 
             return drafts
         } catch (error) {
-            return ApiError(
-                error instanceof Error ? error : new Error(METHOD_FAILED('get user draft service').message),
-                req,
-                next,
-                METHOD_FAILED().code
-            )
+            if (error instanceof StandardError) {
+                throw error
+            }
+            throw new InternalServerError('An unexpected error occurred while fetching the drafts', 'getUserDraftsService')
         }
     }
 
-    public async updateDraftCoverImage(req: Request, next: NextFunction, where: { image: string }, draftId: string): Promise<string | void> {
+    public async updateDraftCoverImageService(draftId: string, userId: string, postCoverImage: string): Promise<string> {
         try {
-            const draft = await this.DraftRepository.findDraftById({ id: draftId })
-
-            if (!draft) {
-                return ApiError(new Error(NOT_FOUND('draft').message), req, next, NOT_FOUND().code)
-            }
-
-            await this.DraftRepository.update({ id: draftId }, where)
+            await this.repo.updateDraft(draftId, userId, { postCoverImage })
 
             return 'Draft cover image updated successfully'
         } catch (error) {
-            return ApiError(
-                error instanceof Error ? error : new Error(METHOD_FAILED('update draft cover image').message),
-                req,
-                next,
-                METHOD_FAILED().code
-            )
+            if (error instanceof StandardError) {
+                throw error
+            }
+
+            throw new InternalServerError('An unexpected error occurred while updating the draft cover image', 'updateDraftCoverImageService')
         }
     }
 
-    public async removeDraftCoverImage(req: Request, next: NextFunction, draftId: string): Promise<string | void> {
+    public async removeDraftCoverImageService(draftId: string, authorId: string): Promise<string | void> {
         try {
-            const draft = await this.DraftRepository.findDraftById({ id: draftId })
-
-            if (!draft) {
-                return ApiError(new Error(NOT_FOUND('draft').message), req, next, NOT_FOUND().code)
-            }
-
-            await this.DraftRepository.update({ id: draftId }, { image: '' })
+            await this.repo.updateDraft(draftId, authorId, { postCoverImage: '' })
 
             return 'Draft cover image removed successfully'
         } catch (error) {
-            return ApiError(
-                error instanceof Error ? error : new Error(METHOD_FAILED('remove draft cover image').message),
-                req,
-                next,
-                METHOD_FAILED().code
-            )
+            if (error instanceof StandardError) {
+                throw error
+            }
+
+            throw new InternalServerError('An unexpected error occurred while removing the draft cover image', 'removeDraftCoverImageService')
         }
     }
 
-    public async updateDraftThumbnail(req: Request, next: NextFunction, image: { thumbnailImage: string }, draftId: string): Promise<string | void> {
+    public async updateDraftThumbnailService(draftId: string, authorId: string, thumbnailImage: string): Promise<string | void> {
         try {
-            const draft = await this.DraftRepository.findDraftById({ id: draftId })
-
-            if (!draft) {
-                return ApiError(new Error(NOT_FOUND('draft').message), req, next, NOT_FOUND().code)
-            }
-
-            await this.DraftRepository.update(
-                { id: draftId },
-                {
-                    thumbnailImage: image.thumbnailImage
-                }
-            )
+            await this.repo.updateDraft(draftId, authorId, { thumbnailImage })
 
             return 'Draft thumbnail updated successfully'
         } catch (error) {
-            return ApiError(
-                error instanceof Error ? error : new Error(METHOD_FAILED('update draft thumbnail').message),
-                req,
-                next,
-                METHOD_FAILED().code
-            )
+            if (error instanceof StandardError) {
+                throw error
+            }
+            throw new InternalServerError('An unexpected error occurred while updating the draft thumbnail', 'updateDraftThumbnailService')
         }
     }
 
-    public async removeDraftThumbnail(req: Request, next: NextFunction, draftId: string): Promise<string | void> {
+    public async removeDraftThumbnailService(draftId: string, authorId: string): Promise<string | void> {
         try {
-            const draft = await this.DraftRepository.findDraftById({ id: draftId })
-
-            if (!draft) {
-                return ApiError(new Error(NOT_FOUND('draft').message), req, next, NOT_FOUND().code)
-            }
-
-            await this.DraftRepository.update({ id: draftId }, { thumbnailImage: '' })
+            await this.repo.updateDraft(draftId, authorId, { thumbnailImage: '' })
 
             return 'Draft thumbnail removed successfully'
         } catch (error) {
-            return ApiError(
-                error instanceof Error ? error : new Error(METHOD_FAILED('remove draft thumbnail').message),
-                req,
-                next,
-                METHOD_FAILED().code
-            )
+            if (error instanceof StandardError) {
+                throw error
+            }
+            throw new InternalServerError('An unexpected error occurred while removing the draft thumbnail', 'removeDraftThumbnailService')
         }
     }
 
-    public async previewDraftService(req: Request, next: NextFunction, where: DraftWhere) {
+    public async previewDraftService(id: string, authorId: string, status: ENUMS.DRAFT_STATUS): Promise<DraftPreview> {
         try {
-            const preview = await this.DraftRepository.draftPreviewById(where)
+            const preview = await this.repo.draftPreviewById(id, authorId, status)
 
             if (!preview) {
-                return ApiError(new Error(NOT_FOUND('draft').message), req, next, NOT_FOUND().code)
+                throw new DatabaseError('Draft preview not found', 'previewDraftService')
             }
 
             return preview
         } catch (error) {
-            return ApiError(
-                error instanceof Error ? error : new Error(METHOD_FAILED('preview draft service').message),
-                req,
-                next,
-                METHOD_FAILED().code
-            )
+            if (error instanceof StandardError) {
+                throw error
+            }
+
+            throw new InternalServerError('An unexpected error occurred while previewing the draft', 'previewDraftService')
         }
     }
 }
-export default DraftService
+
+const draftService = new DraftService(new PrismaDraftRepository())
+export default draftService
