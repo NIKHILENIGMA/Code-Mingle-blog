@@ -1,259 +1,144 @@
-import { NextFunction, Request, Response } from 'express'
-import { AsyncHandler } from '@/utils/AsyncHandler'
-import { ProtectedRequest } from '@/types/extended/app-request'
-import { User } from '@/Lib/Models/User'
+import { Request, Response } from 'express'
+import { AsyncHandler, ApiResponse, entitiesValidation } from '@/utils'
 import { Post } from '@prisma/client'
-import { ApiResponse } from '@/utils/ApiResponse'
-import { ApiError } from '@/utils/ApiError'
-import responseMessage from '@/constant/responseMessage'
-import DraftService from './draft.service'
-import { GenerateDraft, DraftContent, DraftWhere, DraftSelectFields, DraftWhereStatus } from '@/types/draft'
-import { ENUMS } from '@/types'
 import { uploadService } from '@/features/common/upload.service'
 import { CloundinaryOption } from '@/types/common/base.types'
-
-const draftService = new DraftService()
-
-const { MISSING_ID, MISSING_BODY, MISSING_USER, METHOD_FAILED, BAD_REQUEST, SUCCESS, NOT_FOUND, UNAUTHORIZED, INTERNAL_SERVICE } = responseMessage
-
-/**
- ** Creates a new draft.
- *
- ** This function is an asynchronous handler that processes the request to create a new draft.
- ** It retrieves the user from the request, validates the user, and then calls the draft service
- ** to create a new draft. The response is sent back with the draft ID if successful.
- *
- */
-export const createDraft = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction): Promise<void> => {
+import { ENUMS } from '@/types'
+import { BadRequestError, DatabaseError, InternalServerError, NotFoundError, UnauthorizedError } from '@/utils/Errors'
+import draftService from './draft.service'
+import { DraftUpdateFields } from './draft.types'
+import { UpdateDraftBodySchema } from '@/api'
+export const createDraft = AsyncHandler(async (req: Request, res: Response): Promise<void> => {
     // Get draft
-    const userId: string = (req.user as User)?.id
+    const userId: string | undefined = req.user?.id
     if (!userId) {
-        return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
+        throw new UnauthorizedError('User is not logged in')
     }
 
-    try {
-        // Get user
+    const draftId = await draftService.createDraftService({
+        status: ENUMS.DRAFT_STATUS.DRAFT,
+        userId,
+        slug: ''
+    })
 
-        const payload: GenerateDraft = {
-            status: ENUMS.DRAFT_STATUS.DRAFT,
-            authorId: userId
-        }
-
-        const draftId = await draftService.newDraftService(req, next, payload)
-
-        return ApiResponse(req, res, SUCCESS().code, SUCCESS('Draft created successfully').message, { draftId })
-    } catch (error) {
-        return ApiError(error instanceof Error ? error : new Error(INTERNAL_SERVICE('generate draft').message), req, next, INTERNAL_SERVICE().code)
-    }
+    ApiResponse(req, res, 201, 'Draft created successfully', { draftId })
 })
 
-/**
- ** Saves a draft with the provided details.
- * 
- ** This function is an asynchronous handler that processes the request to save a draft.
- ** It retrieves the user from the request, validates the user, and then calls the draft service
- ** to save the draft. The response is sent back with the draft details if successful.
-
- */
-export const saveDraft = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
+export const saveDraft = AsyncHandler(async (req: Request, res: Response) => {
     /// Get draft ID
     const draftId: string = req.params.id
     if (!draftId) {
-        return ApiError(new Error(MISSING_ID('draft').message), req, next, MISSING_ID().code)
+        throw new NotFoundError('Draft ID is missing')
     }
 
     /// Get user
-    const userId: string = (req.user as User)?.id
-    if (!userId) {
-        return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
+    const userId: string | undefined = req.user?.id
+    if (!userId || userId === undefined) {
+        throw new UnauthorizedError('User is not logged in')
     }
 
-    /// Get draft content
-    const draftContent: DraftContent = req.body as DraftContent
-    if (!draftContent) {
-        return ApiError(new Error(MISSING_BODY.message), req, next, MISSING_BODY.code)
+    /// Get the draft content from the request body
+    const body = req.body as DraftUpdateFields
+    if (!body) {
+        throw new BadRequestError('Draft content is missing')
+    }
+    // Validate the request body against the UpdateDraftBodySchema
+    const validateData: DraftUpdateFields = entitiesValidation<DraftUpdateFields>(UpdateDraftBodySchema, body)
+
+    // Save draft
+    const successMessage: string = await draftService.saveDraftService(draftId, userId, validateData)
+    if (!successMessage) {
+        throw new DatabaseError('Draft not found')
     }
 
-    const where = {
-        id: draftId,
-        authorId: userId
-    }
-
-    try {
-        // Save draft
-        const successMessage = await draftService.saveDraftService(req, next, {
-            where,
-            draftContent
-        })
-
-        if (!successMessage) {
-            return ApiError(new Error(BAD_REQUEST('draft not saved').message), req, next, BAD_REQUEST().code)
-        }
-
-        return ApiResponse(req, res, SUCCESS().code, SUCCESS(successMessage).message)
-    } catch (error) {
-        return ApiError(error instanceof Error ? error : new Error(INTERNAL_SERVICE('save draft').message), req, next, INTERNAL_SERVICE().code)
-    }
+    /// Return success message
+    ApiResponse(req, res, 200, successMessage, { draftId })
 })
 
-/**
- ** Removes a draft with the provided ID.
- 
- ** This function is an asynchronous handler that processes the request to remove a draft.
- ** It retrieves the user from the request, validates the user, and then calls the draft service
- ** to remove the draft. The response is sent back with the draft details if successful.
- *
- */
-
-export const removeDraft = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
+export const removeDraft = AsyncHandler(async (req: Request, res: Response) => {
     /// Get draft ID
     const draftId = req.params?.id
     if (!draftId) {
-        return ApiError(new Error(MISSING_ID('draft').message), req, next, MISSING_ID().code)
+        throw new NotFoundError('Draft ID is missing')
     }
 
-    /// Get user ID
-    const userId: string = (req.user as User)?.id
-    if (!userId) {
-        return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
+     // Get logged in user
+    const userId: string | undefined = req.user?.id
+    if (!userId || userId === undefined) {
+        throw new UnauthorizedError('User is not logged in')
     }
 
-    /// Where clause
-    const where: DraftWhere = {
-        id: draftId,
-        authorId: userId
+    /// Remove draft
+    const successMessage: string | void = await draftService.removeDraftService(draftId, userId)
+    if (!successMessage) {
+        throw new DatabaseError('Draft not found')
     }
 
-    try {
-        /// Remove draft
-        const successMessage = await draftService.removeDraftService(req, next, { where })
-
-        if (!successMessage) {
-            return ApiError(new Error(BAD_REQUEST('draft not removed').message), req, next, BAD_REQUEST().code)
-        }
-
-        /// Return success message
-        return ApiResponse(req, res, SUCCESS().code, SUCCESS(successMessage).message)
-    } catch (error) {
-        return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('remove draft').message), req, next, METHOD_FAILED().code)
-    }
+    /// Return success message
+    ApiResponse(req, res, 200, 'Draft removed successfully', { draftId })
 })
 
-/**
- ** Retrieves a draft with the provided ID.
-
- ** This function is an asynchronous handler that processes the request to retrieve a draft.
- ** It retrieves the user from the request, validates the user, and then calls the draft service
- ** to retrieve the draft. The response is sent back with the draft details if successful
- */
-
-export const getDraft = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
+export const getUserDraft = AsyncHandler(async (req: Request, res: Response) => {
     /// Get draft ID
-    const id = req.params?.id
-    if (!id) {
-        return ApiError(new Error(MISSING_ID('draft').message), req, next, MISSING_ID().code)
+    const draftId = req.params?.id
+    if (!draftId) {
+        throw new NotFoundError('Draft ID is missing')
     }
 
-    /// Get user
-    const userId: string = (req.user as User)?.id
-    if (!userId) {
-        return ApiError(new Error(MISSING_USER.message), req, next, MISSING_USER.code)
+    // Get logged in user
+    const userId: string | undefined = req.user?.id
+    if (!userId || userId === undefined) {
+        throw new UnauthorizedError('User is not logged in')
     }
 
-    /// Where clause
-    const where: DraftWhere = {
-        id,
-        authorId: userId
+    /// Get draft
+    const draft: Partial<Post> | null = await draftService.getDraftService(draftId, userId, ENUMS.DRAFT_STATUS.DRAFT)
+    if (!draft) {
+        throw new DatabaseError('Draft not found')
     }
 
-    /// Select fields
-    const selectedFields: DraftSelectFields = {
-        id: true,
-        title: true,
-        content: true,
-        thumbnailImage: true,
-        image: true,
-        createdAt: true
-    }
-
-    try {
-        /// Get draft
-        const draft: Partial<Post> | void = await draftService.getDraftService(req, next, { where, selectedFields })
-
-        if (!draft || draft === undefined) {
-            return ApiError(new Error(NOT_FOUND('draft').message), req, next, NOT_FOUND().code)
-        }
-
-        /// Return draft
-        return ApiResponse(req, res, SUCCESS().code, SUCCESS('Draft fetched successfully').message, { draft })
-    } catch (error) {
-        return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('get draft').message), req, next, METHOD_FAILED().code)
-    }
+    /// Return draft
+    ApiResponse(req, res, 200, 'Draft fetched successfully', { draft })
 })
 
-/**
- * Retrieves all drafts for a specific user.
- *
- ** This function is an asynchronous handler that processes the request to retrieve all drafts for a specific user.
- ** It retrieves the user from the request, validates the user, and then calls the draft service to retrieve all drafts.
- */
-
-export const getUserDrafts = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
-    /// Get user Id
-    const userId: string = (req.user as User)?.id
-    if (!userId) {
-        return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
+export const getCurrentUserDrafts = AsyncHandler(async (req: Request, res: Response) => {
+    // Get logged in user
+    const userId: string | undefined = req.user?.id
+    if (!userId || userId === undefined) {
+        throw new UnauthorizedError('User is not logged in')
     }
 
-    /// Where clause for draft status
-    const where: DraftWhereStatus = {
-        authorId: userId,
-        status: ENUMS.DRAFT_STATUS.DRAFT
+    const drafts: Post[] | null = await draftService.getUserDraftsService(userId, ENUMS.DRAFT_STATUS.DRAFT)
+    if (!drafts) {
+        throw new DatabaseError('Drafts not found')
     }
 
-    try {
-        const drafts = await draftService.getUserDraftsService(req, next, { where })
-
-        return ApiResponse(req, res, SUCCESS().code, SUCCESS('Drafts fetched successfully').message, drafts)
-    } catch (error) {
-        return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('get user drafts').message), req, next, METHOD_FAILED().code)
-    }
+    return ApiResponse(req, res, 200, 'Drafts fetched successfully', drafts)
 })
 
-/**
- ** Retrieves all drafts.
- *
- ** This function is an asynchronous handler that processes the request to retrieve all drafts.
- ** It calls the draft service to retrieve all drafts.
- */
-
-export const listDraft = AsyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    /// List drafts
-    try {
-        const getAllDrafts: Post[] | void = await draftService.listDraftService(req, next)
-
-        return ApiResponse(req, res, SUCCESS().code, SUCCESS('All Drafts fetched successfully').message, getAllDrafts)
-    } catch (error) {
-        return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('list draft').message), req, next, METHOD_FAILED('list draft').code)
-    }
-})
-
-export const uploadDraftCoverImage = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
+export const uploadDraftCoverImage = AsyncHandler(async (req: Request, res: Response) => {
     // Get the draft id from the request object
     const draftId = req.params.id
+    if (!draftId) {
+        throw new NotFoundError('Draft ID is missing')
+    }
+
     // Get the user id from the request object
     const draftCoverImagePath = (req.file as Express.Multer.File)?.path || ''
+    if (!draftCoverImagePath) {
+        throw new NotFoundError('Draft cover image is missing')
+    }
     // Get the avatar URL from the request body
     const { unsplashUrl } = req.body as { unsplashUrl: string }
 
-    // Where clause for the user id
-    const userId = (req.user as User)?.id
-    if (!userId) {
-        return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
+    // Get logged in user
+    const userId: string | undefined = req.user?.id
+    if (!userId || userId === undefined) {
+        throw new UnauthorizedError('User is not logged in')
     }
 
     if (!unsplashUrl && !draftCoverImagePath) {
-        return ApiError(new Error(BAD_REQUEST('No cover image provided').message), req, next, BAD_REQUEST().code)
+        throw new BadRequestError('No draft cover image provided or unsplash URL')
     }
 
     // Cloudinary options for uploading the avatar
@@ -265,131 +150,137 @@ export const uploadDraftCoverImage = AsyncHandler(async (req: ProtectedRequest, 
         altName: 'draft cover image'
     }
 
-    //  Where clause for the user id
-    const where = { id: userId }
-
     //  Upload the avatar
-    try {
-        if (unsplashUrl) {
-            await draftService.updateDraftCoverImage(req, next, { image: unsplashUrl }, draftId)
-            return ApiResponse(req, res, SUCCESS().code, SUCCESS('Draft Cover image uploaded successfully').message, { image: unsplashUrl })
-        } else {
-            const draftCoverImageURL = await uploadService.uploadFile(req, next, where, draftCoverImagePath, cloudinaryOption)
-            if (!draftCoverImageURL) {
-                return ApiError(new Error(METHOD_FAILED('upload avatar').message), req, next, METHOD_FAILED().code)
-            }
-
-            await draftService.updateDraftCoverImage(req, next, { image: draftCoverImageURL }, draftId)
-            return ApiResponse(req, res, SUCCESS().code, SUCCESS('Draft Cover image uploaded successfully').message, { image: draftCoverImageURL })
+    if (unsplashUrl) {
+        await draftService.updateDraftCoverImageService(draftId, userId, unsplashUrl)
+        return ApiResponse(req, res, 200, 'Draft Cover image uploaded successfully', { image: unsplashUrl })
+    } else {
+        const draftCoverImageURL = await uploadService.uploadFile(userId, draftCoverImagePath, cloudinaryOption)
+        if (!draftCoverImageURL) {
+            throw new BadRequestError('Draft cover image upload failed')
         }
-    } catch (error) {
-        return ApiError(new Error(INTERNAL_SERVICE((error as Error)?.message).message), req, next, INTERNAL_SERVICE().code)
+
+        await draftService.updateDraftCoverImageService(draftId, userId, draftCoverImageURL)
+        ApiResponse(req, res, 200, 'Draft Cover image uploaded successfully', { image: draftCoverImageURL })
     }
 })
 
-export const removeDraftCoverImage = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
+export const removeDraftCoverImage = AsyncHandler(async (req: Request, res: Response) => {
     // Get the draft id from the request object
     const draftId = req.params.id
-    // Get the user id from the request object
-    const userId = (req.user as User)?.id
-    if (!userId) {
-        return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
+    if (!draftId) {
+        throw new NotFoundError('Draft ID is missing')
+    }
+    // Get logged in user
+    const userId: string | undefined = req.user?.id
+    if (!userId || userId === undefined) {
+        throw new UnauthorizedError('User is not logged in')
     }
 
+    // Create the public id for the draft cover image
     const public_id = `posts/cover_image-${draftId}-${userId}`
-    //  Remove the draft cover image
-    try {
-        // Remove the draft cover image from Cloudinary
-        await uploadService.removeImage(req, next, public_id)
 
-        // Remove the draft cover image from the database
-        await draftService.removeDraftCoverImage(req, next, draftId)
+    // Remove the draft cover image from Cloudinary
+    await uploadService.removeImage(public_id)
 
-        return ApiResponse(req, res, SUCCESS().code, SUCCESS('Draft Cover image removed successfully').message)
-    } catch (error) {
-        return ApiError(new Error(INTERNAL_SERVICE((error as Error)?.message).message), req, next, INTERNAL_SERVICE().code)
+    // Remove the draft cover image from the database
+    const successMessage = await draftService.removeDraftCoverImageService(draftId, userId)
+
+    if (!successMessage) {
+        throw new BadRequestError('Draft cover image removal failed')
     }
+
+    ApiResponse(req, res, 200, successMessage)
 })
 
-export const uploadThumbnail = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
+export const uploadThumbnail = AsyncHandler(async (req: Request, res: Response) => {
+    // Check if the request contains a file
     const thumbnailImage = req.file as Express.Multer.File
     if (!thumbnailImage) {
-        return ApiError(new Error(BAD_REQUEST('No thumbnail provided').message), req, next, BAD_REQUEST().code)
+        throw new NotFoundError('Thumbnail image is missing')
     }
 
-    const userId = (req.user as User)?.id
-    if (!userId) {
-        return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
+    // Get logged in user
+    const userId: string | undefined = req.user?.id
+    if (!userId || userId === undefined) {
+        throw new UnauthorizedError('User is not logged in')
     }
 
+    // Get the draft id from the request object
     const draftId = req.params.id
     if (!draftId) {
-        return ApiError(new Error(MISSING_ID('draft').message), req, next, MISSING_ID().code)
+        throw new NotFoundError('Draft ID is missing')
     }
 
-    try {
-        const cloudinaryOption: CloundinaryOption = {
-            folder: 'thumbnails',
-            public_name: `thumbnail-${draftId}`,
-            quality: 50,
-            resource: 'image',
-            altName: `thumbnail-${userId}`
-        }
-
-        const where = { id: userId }
-        const uploadThumbnail = await uploadService.uploadFile(req, next, where, thumbnailImage.path, cloudinaryOption)
-
-        if (!uploadThumbnail) {
-            return ApiError(new Error(METHOD_FAILED('upload thumbnail').message), req, next, METHOD_FAILED().code)
-        }
-
-        await draftService.updateDraftThumbnail(req, next, { thumbnailImage: uploadThumbnail }, draftId)
-
-        return ApiResponse(req, res, SUCCESS().code, SUCCESS('Thumbnail uploaded successfully').message, { thumbnail: uploadThumbnail })
-    } catch (error) {
-        return ApiError(new Error(INTERNAL_SERVICE((error as Error)?.message).message), req, next, INTERNAL_SERVICE().code)
+    // Set the Cloudinary options for uploading the thumbnail
+    const cloudinaryOption: CloundinaryOption = {
+        folder: 'thumbnails',
+        public_name: `thumbnail-${draftId}`,
+        quality: 50,
+        resource: 'image',
+        altName: `thumbnail-${userId}`
     }
+
+    // Upload the thumbnail image to Cloudinary
+    const uploadThumbnail = await uploadService.uploadFile(userId, thumbnailImage.path, cloudinaryOption)
+    if (!uploadThumbnail) {
+        throw new InternalServerError('Thumbnail upload failed')
+    }
+
+    // Update the draft thumbnail in the database
+    const successMessage: string | void = await draftService.updateDraftThumbnailService(draftId, userId, uploadThumbnail)
+    if (!successMessage) {
+        throw new DatabaseError('Draft thumbnail update failed')
+    }
+
+    // Return the success message
+    ApiResponse(req, res, 200, successMessage, { thumbnail: uploadThumbnail })
 })
 
-export const removeDraftThumbnail = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
+export const removeDraftThumbnail = AsyncHandler(async (req: Request, res: Response) => {
     const draftId = req.params.id
     if (!draftId) {
-        return ApiError(new Error(MISSING_ID('draft').message), req, next, MISSING_ID().code)
+        throw new NotFoundError('Draft ID is missing')
     }
 
-    const userId = (req.user as User)?.id
-    if (!userId) {
-        return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
+    // Get logged in user
+    const userId: string | undefined = req.user?.id
+    if (!userId || userId === undefined) {
+        throw new UnauthorizedError('User is not logged in')
     }
 
-    try {
-        const public_id = `thumbnails/thumbnail-${draftId}-${userId}`
-        await uploadService.removeImage(req, next, public_id)
+    // Create the public id for the draft thumbnail
+    const public_id = `thumbnails/thumbnail-${draftId}-${userId}`
+    // Remove the draft thumbnail from Cloudinary
+    await uploadService.removeImage(public_id)
 
-        await draftService.removeDraftThumbnail(req, next, draftId)
+    const successMessage: string | void = await draftService.removeDraftThumbnailService(draftId, userId)
 
-        return ApiResponse(req, res, SUCCESS().code, SUCCESS('Thumbnail removed successfully').message)
-    } catch (error) {
-        return ApiError(new Error(INTERNAL_SERVICE((error as Error)?.message).message), req, next, INTERNAL_SERVICE().code)
+    if (!successMessage) {
+        throw new DatabaseError('Draft thumbnail removal failed')
     }
+
+    ApiResponse(req, res, 200, successMessage)
 })
 
-export const draftPreview = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
+export const draftPreview = AsyncHandler(async (req: Request, res: Response) => {
+    // Get the draft id from the request object
     const draftId = req.params.id
     if (!draftId) {
-        return ApiError(new Error(MISSING_ID('draft').message), req, next, MISSING_ID().code)
+        throw new NotFoundError('Draft ID is missing')
     }
 
-    const userId = (req.user as User)?.id
-    if (!userId) {
-        return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
+    // Get logged in user
+    const userId: string | undefined = req.user?.id
+    if (!userId || userId === undefined) {
+        throw new UnauthorizedError('User is not logged in')
     }
 
-    try {
-        const preview = await draftService.previewDraftService(req, next, { id: draftId, authorId: userId })
+    const preview = await draftService.previewDraftService(draftId, userId, ENUMS.DRAFT_STATUS.DRAFT)
 
-        return ApiResponse(req, res, SUCCESS().code, SUCCESS('Draft fetched successfully').message, { preview })
-    } catch (error) {
-        return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('get draft').message), req, next, METHOD_FAILED().code)
+    if (!preview) {
+        throw new DatabaseError('Draft preview not found')
     }
+
+    ApiResponse(req, res, 200, 'Draft fetched successfully', { preview })
 })
