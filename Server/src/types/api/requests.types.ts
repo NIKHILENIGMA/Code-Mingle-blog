@@ -28,7 +28,6 @@ export type THttpError = {
     stack?: string | null
 }
 
-
 // Request Body Types
 /**
  * Interface for the request body when signing up a user
@@ -41,5 +40,3 @@ export interface ILoginUser {
     email: string
     password: string
 }
-
-

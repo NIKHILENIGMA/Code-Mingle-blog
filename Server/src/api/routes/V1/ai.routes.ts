@@ -1,5 +1,12 @@
 import { Router } from 'express'
-import { changeTone, generateAiContent, makeTextLong, makeTextShort, simplifiedTheText, translateText } from '@/features/artficialIntelligence/ai.controller'
+import {
+    changeTone,
+    generateAiContent,
+    makeTextLong,
+    makeTextShort,
+    simplifiedTheText,
+    translateText
+} from '@/features/artficialIntelligence/ai.controller'
 
 const router = Router()
 

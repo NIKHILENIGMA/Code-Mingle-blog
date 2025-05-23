@@ -91,9 +91,7 @@ export class ConflictError extends StandardError {
  */
 export class ValidationError extends StandardError {
     public StatusCode = 422
-    constructor(
-        private errors: { message: string; field?: string }[],
-    ) {
+    constructor(private errors: { message: string; field?: string }[]) {
         super('Validation Error')
     }
     public serialize() {
@@ -134,7 +132,6 @@ export class InternalServerError extends StandardError {
         return [{ message: this.message, field: this.field }]
     }
 }
-
 
 export class DatabaseError extends StandardError {
     public StatusCode = 500

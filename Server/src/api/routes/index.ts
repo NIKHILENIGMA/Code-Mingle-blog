@@ -7,4 +7,3 @@ const router = Router()
 router.use('/v1', V1Routes)
 
 export default router
-

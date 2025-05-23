@@ -209,14 +209,14 @@ export const getUserCollection = AsyncHandler(async (req: ProtectedRequest, res:
 
 /**
  * ! Controller to get a post from a collection.
- * 
+ *
  * @description - This controller handles the fetching of a post from a collection for a user. It extracts the user ID from the request, calls the collection service to get the post from the collection, and then sends the post back to the client. If there are any errors during the process, it handles them appropriately and sends an error response.
- * 
+ *
  * @param {ProtectedRequest} req - The request object containing the user ID.
  * @param {Response} res - The response object used to send the response back to the client.
  * @param {NextFunction} next - The next middleware function in the stack.
  * @returns {Promise<void>} A promise that resolves to void.
- * 
+ *
  * @throws {Error} Will throw an error if there is an issue with fetching the post.
  */
 export const getPostFromCollection = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction): Promise<void> => {
@@ -248,14 +248,14 @@ export const getPostFromCollection = AsyncHandler(async (req: ProtectedRequest, 
 
 /**
  * ! Controller to get a list of posts in a collection.
- * 
+ *
  * @description - This controller handles the fetching of a list of posts in a collection for a user. It extracts the user ID from the request, calls the collection service to get the list of posts in the collection, and then sends the posts back to the client. If there are any errors during the process, it handles them appropriately and sends an error response.
- * 
+ *
  * @param {ProtectedRequest} req - The request object containing the user ID.
  * @param {Response} res - The response object used to send the response back to the client.
  * @param {NextFunction} next - The next middleware function in the stack.
  * @returns {Promise<void>} A promise that resolves to void.
- * 
+ *
  * @throws {Error} Will throw an error if there is an issue with fetching the posts.
  */
 export const listPostsInCollection = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction): Promise<void> => {
@@ -286,14 +286,14 @@ export const listPostsInCollection = AsyncHandler(async (req: ProtectedRequest, 
 
 /**
  * ! Controller to get a list of collections.
- * 
+ *
  * @description - This controller handles the fetching of a list of collections for a user. It extracts the user ID from the request, calls the collection service to get the list of collections, and then sends the collections back to the client. If there are any errors during the process, it handles them appropriately and sends an error response.
- * 
+ *
  * @param {ProtectedRequest} req - The request object containing the user ID.
  * @param {Response} res - The response object used to send the response back to the client.
  * @param {NextFunction} next - The next middleware function in the stack.
  * @returns {Promise<void>} A promise that resolves to void.
- * 
+ *
  * @throws {Error} Will throw an error if there is an issue with fetching the collections.
  */
 export const listCollection = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction): Promise<void> => {

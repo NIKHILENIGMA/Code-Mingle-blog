@@ -7,8 +7,6 @@ import { DatabaseError, InternalServerError, UnauthorizedError } from '@/utils/E
 import { ProfileChangePasswordCredentials, UpdateProfileCredentials } from './profile.types'
 import { ProfileChangePasswordSchema, ProfileUpdateBodySchema } from '@/api'
 
-
-
 export const currentUser = (req: Request, res: Response) => {
     const user = req.user
     if (!user) {
@@ -96,7 +94,7 @@ export const getUserProfile = AsyncHandler(async (req: Request, res: Response) =
         throw new DatabaseError('User dashboard details not found')
     }
 
-    const isFollowStatus = await profileServices.getFollowingStatus(userId, dashboardDetails.id) 
+    const isFollowStatus = await profileServices.getFollowingStatus(userId, dashboardDetails.id)
     if (isFollowStatus === undefined) {
         throw new DatabaseError('User follow status not found')
     }

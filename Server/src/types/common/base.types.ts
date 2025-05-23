@@ -1,5 +1,3 @@
-
-
 export interface UserDTO {
     id: string
     email: string
@@ -14,7 +12,7 @@ export interface UserDTO {
 
 export interface Context {
     alt: string
-    user: string 
+    user: string
 }
 
 export interface UploadOptions {
@@ -25,7 +23,7 @@ export interface UploadOptions {
     public_id: string
     allowed_formats: string[]
     format: 'webp'
-    quality: number 
+    quality: number
     max_bytes: number
     context: Context
 }

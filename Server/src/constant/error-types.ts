@@ -2,7 +2,7 @@
  * Error types for the application.
  * These are used to standardize error handling and responses.
  * Each error type has a status code and a message.
- * 
+ *
  * @module error-types
  * @property {number} status - The HTTP status code for the error.
  * @property {string} message - The error message to be returned.

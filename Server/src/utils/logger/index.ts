@@ -9,7 +9,7 @@ import { isProduction } from '@/config'
  */
 class Logger {
     /** Static instance of winston Logger */
-    static instance: winston.Logger 
+    static instance: winston.Logger
 
     /**
      * Gets the singleton instance of the winston logger
@@ -25,21 +25,15 @@ class Logger {
                 level: process.env.LOG_LEVEL || 'info',
                 levels: LOG_LEVELS,
                 format: isProduction ? logFormats.productionFormat : logFormats.developmentFormat,
-                transports: [
-                    transports.console,
-                    transports.developmentFile, 
-                    transports.errorFile,
-                    transports.combinedFile
-                ],
+                transports: [transports.console, transports.developmentFile, transports.errorFile, transports.combinedFile],
                 exceptionHandlers: [transports.exceptionFile],
                 rejectionHandlers: [transports.exceptionFile],
-                exitOnError: false,
+                exitOnError: false
             })
         }
 
-        return Logger.instance;
+        return Logger.instance
     }
 }
-
 
 export const logger = Logger.getInstance()

@@ -5,7 +5,6 @@ import { UploadOptions } from '@/types/common/base.types'
 import { StandardError } from './Errors/StandardError'
 import { InternalServerError } from './Errors'
 
-
 /**
  * Configures Cloudinary with the Cloudinary API key, API secret, and cloud name.
  *

@@ -12,9 +12,8 @@ const commentServices = new CommentService()
 
 export const addComment = AsyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const postId: string = req.params?.postId
-    
-    const user = (req as ProtectedRequest)?.user as User | undefined
 
+    const user = (req as ProtectedRequest)?.user as User | undefined
 
     if (!user || typeof user === 'undefined') {
         return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
@@ -22,7 +21,6 @@ export const addComment = AsyncHandler(async (req: Request, res: Response, next:
 
     const userId: string = (user as unknown as User)?.id
     const { body } = req as { body: { content: string } }
-    
 
     if (!body) {
         return ApiError(new Error(MISSING_BODY.message), req, next, MISSING_BODY.code)
@@ -42,7 +40,7 @@ export const editComment = AsyncHandler(async (req: ProtectedRequest, res: Respo
     const commentId: string = req.params?.commentId
     // console.log('comment-id',commentId);
     // console.log('post-id',postId);
-    
+
     const user = req.user as User | undefined
 
     if (!user || user === undefined) {
@@ -107,7 +105,7 @@ export const getCommentById = AsyncHandler(async (req: Request, res: Response, n
     const commentId: string = req.params?.commentId
 
     try {
-        const comment = await commentServices.getCommentByIdService(req, next, postId, commentId) as unknown as Comment
+        const comment = (await commentServices.getCommentByIdService(req, next, postId, commentId)) as unknown as Comment
 
         if (!comment) {
             return ApiError(new Error(NOT_FOUND('comment').message), req, next, NOT_FOUND().code)
@@ -150,7 +148,7 @@ export const getRepliesByCommentId = AsyncHandler(async (req: Request, res: Resp
     const limit: number = parseInt(req.query?.limit as string) || 5
 
     try {
-        const commentReply = await commentServices.getRepliesByCommentIdService(req, next, commentId, pageNumber, limit) 
+        const commentReply = await commentServices.getRepliesByCommentIdService(req, next, commentId, pageNumber, limit)
 
         if (!commentReply) {
             return ApiError(new Error(NOT_FOUND('replies').message), req, next, NOT_FOUND().code)

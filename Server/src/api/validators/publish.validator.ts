@@ -6,10 +6,19 @@ export const PublishParamsSchema = z.object({
 })
 
 export const PublishBodySchema = z.object({
-    title: z.string().min(1).max(100),
-    content: z.string().min(1).max(1000),
-    slug: z.string().min(1).max(100).optional(),
-    publishedAt: z.date().optional()
+    slug: z
+        .string()
+        .min(1, { message: 'Slug must be at least 1 character long.' })
+        .max(100, { message: 'Slug must not exceed 100 characters.' })
+        .optional(),
+    status: z.enum(Object.values(ENUMS.DRAFT_STATUS) as [string, ...string[]]),
+    tags: z
+        .array(
+            z.object({
+                id: z.string().cuid()
+            })
+        )
+        .optional()
 })
 
 export const ListPublishedPostsBodySchema = z.object({

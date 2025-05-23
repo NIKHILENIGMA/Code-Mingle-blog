@@ -5,7 +5,7 @@ import prisma from '@/config/prisma.config'
  * @type {Object.<string, Function>}
  */
 export const resourceResolvers = {
-    /** 
+    /**
      * Resolver for Post resources
      * @param {string} id - The unique identifier of the post
      * @returns {Promise<Post|null>} The found post or null if not found
@@ -13,7 +13,7 @@ export const resourceResolvers = {
     POST: async (id: string) => await prisma.post.findUnique({ where: { id } }),
 
     /**
-     * Resolver for Comment resources  
+     * Resolver for Comment resources
      * @param {string} id - The unique identifier of the comment
      * @returns {Promise<Comment|null>} The found comment or null if not found
      */

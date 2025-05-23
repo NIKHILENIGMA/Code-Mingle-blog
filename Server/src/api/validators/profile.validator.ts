@@ -16,13 +16,10 @@ export const ProfileUpdateBodySchema = z.object({
     dob: z.date().optional().optional(),
     bio: z.string().min(1).max(160).optional(),
     profileImage: z.string().optional(),
-    coverImage: z.string().optional(),
+    coverImage: z.string().optional()
 })
-
 
 export const ProfileImageSchema = z.object({
     mimetype: z.string().refine((type) => ACCEPTED_IMAGE_TYPES.includes(type), { message: 'Invalid image file type' }),
     size: z.number().refine((size) => size <= fileUploadConfig.FILE_SIZE_LIMIT, { message: 'Image file size is too large' })
 })
-
-

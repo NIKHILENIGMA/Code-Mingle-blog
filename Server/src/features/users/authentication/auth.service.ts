@@ -194,7 +194,6 @@ class AuthService {
 
     public async changePasswordService(userId: string, newPassword: string): Promise<void> {
         try {
-            
             const hashPassword: string = await hashedPassword(newPassword)
             if (!hashPassword) {
                 throw new InternalServerError('Error hashing password')

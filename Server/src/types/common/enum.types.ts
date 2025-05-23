@@ -37,5 +37,5 @@ export enum RESOURCE {
 
 export enum EApplicationEnvironment {
     DEVELOPMENT = 'development',
-    PRODUCTION = 'production',
+    PRODUCTION = 'production'
 }

@@ -1,7 +1,6 @@
 import { UpdateDraftBodySchema } from '@/api'
 import { z } from 'zod'
 
-
 export type DraftUpdateFields = z.infer<typeof UpdateDraftBodySchema>
 
 export interface DraftPreview {
@@ -17,4 +16,3 @@ export interface DraftPreview {
         profileImage: string
     }
 }
-

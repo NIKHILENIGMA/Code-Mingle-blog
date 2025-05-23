@@ -15,6 +15,4 @@ export class AuthorizationService {
         }
         return AuthorizationService.instance
     }
-    
-    
 }

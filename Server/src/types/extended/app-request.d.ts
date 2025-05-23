@@ -9,7 +9,6 @@ declare global {
                 email?: string
                 roleId?: string
                 lastLoginAt?: Date
-                
             }
             session?: {
                 id?: string

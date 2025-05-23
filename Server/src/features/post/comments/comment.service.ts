@@ -65,7 +65,7 @@ export default class CommentService {
 
             const payload = { content }
 
-            await this.commentRepository.update({id: commentId}, payload)
+            await this.commentRepository.update({ id: commentId }, payload)
         } catch (error) {
             return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('edit comment').message), req, next, METHOD_FAILED().code)
         }
@@ -157,7 +157,12 @@ export default class CommentService {
                 data: payload
             })
         } catch (error) {
-            return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('add reply to comment').message), req, next, METHOD_FAILED().code)
+            return ApiError(
+                error instanceof Error ? error : new Error(METHOD_FAILED('add reply to comment').message),
+                req,
+                next,
+                METHOD_FAILED().code
+            )
         }
     }
 
@@ -173,7 +178,12 @@ export default class CommentService {
 
             return replies
         } catch (error) {
-            return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('get replies by comment').message), req, next, METHOD_FAILED().code)
+            return ApiError(
+                error instanceof Error ? error : new Error(METHOD_FAILED('get replies by comment').message),
+                req,
+                next,
+                METHOD_FAILED().code
+            )
         }
     }
 
@@ -212,7 +222,12 @@ export default class CommentService {
 
             return existedComment
         } catch (error) {
-            return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('check comment existence').message), req, next, METHOD_FAILED().code)
+            return ApiError(
+                error instanceof Error ? error : new Error(METHOD_FAILED('check comment existence').message),
+                req,
+                next,
+                METHOD_FAILED().code
+            )
         }
     }
 
@@ -223,8 +238,12 @@ export default class CommentService {
 
             return parentComment
         } catch (error) {
-            return ApiError(error instanceof Error ? error : new Error(METHOD_FAILED('check comment existence').message), req, next, METHOD_FAILED().code)
+            return ApiError(
+                error instanceof Error ? error : new Error(METHOD_FAILED('check comment existence').message),
+                req,
+                next,
+                METHOD_FAILED().code
+            )
         }
     }
-
 }

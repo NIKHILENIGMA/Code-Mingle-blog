@@ -11,7 +11,6 @@ interface IResetPasswordRepository {
     createResetPasswordToken(payload: ResetTokenPayload): Promise<void>
     verifyResetPasswordToken(token: string): Promise<string | null>
     deleteResetPasswordToken(userId: string, token: string): Promise<void>
-
 }
 
 export class PrismaResetPasswordRepository implements IResetPasswordRepository {
@@ -46,5 +45,4 @@ export class PrismaResetPasswordRepository implements IResetPasswordRepository {
             }
         })
     }
-
 }

@@ -7,7 +7,6 @@
 * This setup allows you to interact with a Prisma client for database operations in your TypeScript project. 
 */
 
-
 import { logger } from '@/utils/logger/index'
 import { PrismaClient } from '@prisma/client'
 

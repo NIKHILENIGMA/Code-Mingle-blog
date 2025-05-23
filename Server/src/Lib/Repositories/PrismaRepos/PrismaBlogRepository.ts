@@ -15,7 +15,7 @@
 //                 slug: data.slug as string || '',
 //                 image: data.image as string || '',
 //                 metaDescription: data.metaDescription as string || '',
-//                 author: data.author as User 
+//                 author: data.author as User
 
 //             }
 //         })

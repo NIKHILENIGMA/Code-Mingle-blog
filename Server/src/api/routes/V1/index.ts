@@ -11,12 +11,11 @@ import profileRoutes from './profile.routes'
 import publishRoutes from './publish.route'
 import reportRoutes from './report.routes'
 
-
 const router = Router()
 
 /**
- * @name User Routes 
- * 
+ * @name User Routes
+ *
  */
 router.use('/users/authentication', authRoutes)
 // Follow routes
@@ -25,9 +24,9 @@ router.use('/users/follow-user', followRoutes)
 router.use('/users/profile', profileRoutes)
 
 /**
- * @name Post Routes 
- * 
- */  
+ * @name Post Routes
+ *
+ */
 // Like routes
 router.use('/posts/:postId/likes', likeRoutes)
 // Collection routes
@@ -48,7 +47,5 @@ router.use('/mail/newletter', newLetterRoutes)
  */
 // Report routes
 router.use('/report', reportRoutes)
-
-
 
 export default router

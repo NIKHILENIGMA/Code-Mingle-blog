@@ -11,7 +11,6 @@ export function validateBody<T>(schema: Schema, body: T): T {
     return schema.parse(body) as T
 }
 
-
 /**
  * Validates and parses URL parameters against a Zod schema
  * @param schema - The Zod schema to validate against

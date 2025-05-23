@@ -31,7 +31,6 @@ import { NextFunction, Request, Response } from 'express'
  */
 
 export const errorHandler = (err: Error | StandardError, req: Request, res: Response, next: NextFunction) => {
-    
     // Error Response Object
     const errorResponse = {
         success: false,
@@ -82,7 +81,6 @@ export const errorHandler = (err: Error | StandardError, req: Request, res: Resp
 
     if (res.headersSent) {
         return next(err) // If headers are already sent, delegate to the default Express error handler
-        
     }
 
     // Send the error response

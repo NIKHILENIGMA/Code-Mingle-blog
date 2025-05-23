@@ -20,7 +20,7 @@ export const successResponse = <T>({
     res,
     statusCode = 200,
     message,
-    data,
+    data
 }: {
     res: Response
     message: string

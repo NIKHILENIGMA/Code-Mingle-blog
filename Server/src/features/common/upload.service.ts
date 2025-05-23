@@ -5,7 +5,6 @@ import { ALLOWED_FORMATS, FORMAT, INVALIDATE, MAX_BYTES, OVERWRITE } from '@/con
 import { StandardError } from '@/utils/Errors/StandardError'
 import { InternalServerError } from '@/utils/Errors'
 
-
 class UploadService {
     constructor() {}
 

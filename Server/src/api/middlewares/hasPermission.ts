@@ -10,7 +10,7 @@ export const hasPermission = AsyncHandler(async (req: Request, _: Response, next
         await Promise.resolve(userId)
         next()
     } catch (error) {
-        if(error instanceof StandardError){
+        if (error instanceof StandardError) {
             throw error
         }
 

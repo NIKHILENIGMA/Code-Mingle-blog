@@ -10,4 +10,3 @@ export abstract class StandardError extends Error {
     public abstract StatusCode: number
     public abstract serialize(): { message: string; field?: string }[]
 }
-

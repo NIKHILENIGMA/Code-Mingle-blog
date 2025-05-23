@@ -24,9 +24,7 @@ const globalErrorHandler = (error: REQUESTS.THttpError, req: Request, res: Respo
             trace: !isProduction ? { error: error.stack } : null
         })
         return
-        
     }
-
 
     if (!error.statusCode) {
         const defaultError = {

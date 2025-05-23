@@ -138,7 +138,13 @@ export default class CollectionService {
         }
     }
 
-    public async getPostFromCollectionService(req: Request, next: NextFunction, userId: string, collectionId: string, postId: string): Promise<SavedPosts | void> {
+    public async getPostFromCollectionService(
+        req: Request,
+        next: NextFunction,
+        userId: string,
+        collectionId: string,
+        postId: string
+    ): Promise<SavedPosts | void> {
         try {
             const post = await prisma.savedPost.findFirst({
                 where: {

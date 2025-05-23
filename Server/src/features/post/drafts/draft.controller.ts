@@ -33,7 +33,7 @@ export const saveDraft = AsyncHandler(async (req: Request, res: Response) => {
 
     /// Get user
     const userId: string | undefined = req.user?.id
-    if (!userId || userId === undefined) {
+    if (!userId || typeof userId !== 'string') {
         throw new UnauthorizedError('User is not logged in')
     }
 
@@ -62,7 +62,7 @@ export const removeDraft = AsyncHandler(async (req: Request, res: Response) => {
         throw new NotFoundError('Draft ID is missing')
     }
 
-     // Get logged in user
+    // Get logged in user
     const userId: string | undefined = req.user?.id
     if (!userId || userId === undefined) {
         throw new UnauthorizedError('User is not logged in')

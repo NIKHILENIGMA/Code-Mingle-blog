@@ -12,7 +12,7 @@ const fileStorage = multer.diskStorage({
     filename: (_: Request, file: Express.Multer.File, cb: FileFilterCallback) => {
         const uniqueSuffix: string = Date.now() + '-' + Math.round(Math.random() * 1e9)
         cb(null, file.filename + '-' + uniqueSuffix + path.extname(file.originalname))
-    },
+    }
 })
 
 export const upload = multer({
