@@ -11,7 +11,7 @@ type AsyncRequestHandler = (req: Request, res: Response, next: NextFunction) => 
  *
  * @param fn - The asynchronous request handler function to be wrapped. It should be a function
  *             that takes `req`, `res`, and `next` as parameters and returns a Promise.
- * 
+ *
  * @returns A new asynchronous function that wraps the provided handler and catches any errors
  *          that occur during its execution. If an error is thrown:
  *          - If the error is an instance of `StandardError`, it is passed directly to `next`.
