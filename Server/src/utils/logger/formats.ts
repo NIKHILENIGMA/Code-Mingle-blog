@@ -45,7 +45,7 @@ export const logFormats = {
     /**
      * Development format for logging in development environments.
      * Combines timestamp, colorization, and custom formatting for console output.
-     * 
+     *
      * @example
      * [2023-01-01 00:00:00.000] [INFO] Server started { "port": 3000 }
      */
