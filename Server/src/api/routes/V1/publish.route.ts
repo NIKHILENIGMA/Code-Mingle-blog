@@ -1,26 +1,23 @@
 import { Router } from 'express'
-import { isAuthenticated, validateParams } from '@/api/middlewares'
-import {
-    checkIsSlugAvailable,
-    deletePublishedPost,
-    fetchPublishedPost,
-    getPublishedPosts,
-    publishPost
-} from '@/features/post/published/publish.controller'
-import { PublishParamsSchema } from '../../validators/publish.validator'
+import { isAuthenticated } from '@/api/middlewares'
+import { checkIsSlugAvailable, deletePublishedPost, getAllPublishedPosts, publishPost } from '@/features/post/published/publish.controller'
 
 const router = Router()
 
-// Public routes
-router.route('/').get(getPublishedPosts)
-router.route('/:id').get(validateParams(PublishParamsSchema), fetchPublishedPost)
+/**
+ * Public routes
+ * - Get all the posts of other writers
+ * - Check custom slug is avaliable or not
+ */
+router.route('/').get(getAllPublishedPosts)
 router.route('/check-slug').get(checkIsSlugAvailable)
 
 /**
  * Private routes
  * - Get the published post by id
- *
+ * - Change current status of the post
  */
 router.route('/:id').post(isAuthenticated, publishPost).delete(isAuthenticated, deletePublishedPost)
+router.route('/change-current-status').patch(isAuthenticated)
 
 export default router
