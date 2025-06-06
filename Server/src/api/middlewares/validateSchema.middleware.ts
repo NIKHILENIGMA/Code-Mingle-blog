@@ -1,7 +1,7 @@
-import { Request, Response, NextFunction } from 'express'
 import { z, AnyZodObject } from 'zod'
-import { ApiError } from '@/utils/ApiError'
-import { ProfileImageSchema } from '../validators/profile.validator'
+import { Request, Response, NextFunction } from 'express'
+import { BadRequestError, ValidationError } from '@/utils/Errors'
+import { StandardError } from '@/utils/Errors/StandardError'
 
 /**
  * Middleware to validate the request body against a schema
@@ -16,7 +16,7 @@ export const validateBody = <T extends AnyZodObject>(schema: T) => {
             next()
         } catch (error) {
             if (error instanceof z.ZodError) {
-                return ApiError(new Error(`Schema Error: ${error.errors[0].message}`), req, next, 400)
+                throw new ValidationError(error.errors.map((err) => ({ message: err.message, field: err.path.join('.') })))
             }
             next(error)
         }
@@ -36,7 +36,7 @@ export const validateParams = <T extends AnyZodObject>(schema: T) => {
             next()
         } catch (error) {
             if (error instanceof z.ZodError) {
-                return ApiError(new Error(`Schema Invalid Param type: ${error.errors[0].message}`), req, next, 400)
+                throw new ValidationError(error.errors.map((err) => ({ message: err.message, field: err.path.join('.') })))
             }
             next(error)
         }
@@ -56,23 +56,34 @@ export const validateQuery = <T extends AnyZodObject>(schema: T) => {
             next()
         } catch (error) {
             if (error instanceof z.ZodError) {
-                return ApiError(new Error(`Schema Error: ${error.errors[0].message}`), req, next, 400)
+                throw new ValidationError(error.errors.map((err) => ({ message: err.message, field: err.path.join('.') })))
             }
             next(error)
         }
     }
 }
 
-export const validateFile = (req: Request, __: Response, next: NextFunction) => {
-    if (!req.file) {
-        return ApiError(new Error('No file uploaded'), req, next, 400)
+export const validateFile = <T extends AnyZodObject>(schema: T, file: File) => {
+    return (_: Request, __: Response, next: NextFunction) => {
+        if (file) {
+            throw new BadRequestError('File does not provided')
+        }
+
+        try {
+            schema.parse(file) // Validate file using the schema
+            next()
+        } catch (error) {
+            if (error instanceof z.ZodError) {
+                throw new ValidationError(error.errors.map((err) => ({ message: err.message, field: err.path.join('.') })))
+            }
+            if (error instanceof StandardError) {
+                throw error // Re-throw other unexpected errors
+            }
+
+            next(error) 
+            
+        }
+
+        next() // Proceed if validation is successful
     }
-
-    const result = ProfileImageSchema.safeParse(req.file) // Validate file using the schema
-
-    if (!result.success) {
-        return ApiError(new Error(`Schema Error: ${result.error.errors[0].message}`), req, next, 400)
-    }
-
-    next() // Proceed if validation is successful
 }
