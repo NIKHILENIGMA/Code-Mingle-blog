@@ -1,402 +1,138 @@
-import { ApiError } from '@/utils/ApiError'
-import { AsyncHandler } from '@/utils/AsyncHandler'
-import { NextFunction, Response } from 'express'
-import { responseMessage } from '@/constant'
-import { ApiResponse } from '@/utils/ApiResponse'
-import { ProtectedRequest } from '@/types/extended/app-request'
-import { User } from '@/Lib/Models/User'
-import PublishService from './publish.service'
-import { PublishPostBody, UpdatePublishedPost, PublishWhere, PublishedWhere, QueryParameter } from './publish.types'
+import { Request, Response } from 'express'
+import { ApiResponse, AsyncHandler, entitiesValidation } from '@/utils'
+import { publishService } from './publish.service'
+import { OrderBy, PublishPayload, ThumbnailFile } from './publish.types'
+import { BadRequestError, DatabaseError, NotFoundError, UnauthorizedError } from '@/utils/Errors'
+import { PublishBodySchema } from '@/api'
 import { ENUMS } from '@/types'
+import { fileValidation } from '@/utils/entitiesValidation'
+import { ThumbnailFileSchema } from '@/api/validators/publish.validator'
 
-// Create an instance of the PublishService class
-const publishService = new PublishService()
-// Destructure the responseMessage object
-const { INTERNAL_SERVICE, SUCCESS, UNAUTHORIZED, METHOD_FAILED, BAD_REQUEST, NOT_FOUND } = responseMessage
-
-/**
- *! Handles user publishing a post
- *
- * This function is an asynchronous request handler that is responsible for handling a user publishing a post.
- * It expects a request body containing the post content and the user's id from the request object.
- *
- * @param {Request} req - The request object containing the user's id and the post content.
- * @param {Response} res - The response object used to send the response back to the client.
- * @param {NextFunction} next - The next middleware function in the stack.
- * @returns {Promise<void>} A promise that resolves to void.
- *
- * @throws {Error} Will throw an error if there is an issue saving the post.
- */
-export const publishPost = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
-    /**
-     * Input Field will be:
-     * - slug: string
-     * - category: string
-     * - status: DRAFT_STATUS
-     */
-
+export const publishPost = AsyncHandler(async (req: Request, res: Response) => {
     // Get the user id from the request object
-    const userId = (req.user as User)?.id
-    
-
+    const userId = req.user?.id
+    if (!userId) {
+        throw new UnauthorizedError('User not logged in')
+    }
     const postId: string = req.params.id
     if (!postId) {
-        return ApiError(new Error(NOT_FOUND('Missing post id').message), req, next, NOT_FOUND().code)
+        throw new NotFoundError('Post not found')
     }
 
     // Get the post content from the request body
-    const { slug, categoryId, status, tags } = req.body as PublishPostBody
+    const body = req.body as PublishPayload
 
-    // Validate the request body
-    if (status !== ENUMS.DRAFT_STATUS.PUBLISHED) {
-        return ApiError(new Error(BAD_REQUEST('Invalid status').message), req, next, BAD_REQUEST().code)
-    }
-
-    // Create the payload to be saved
-    const payload: PublishPostBody = {
-        slug,
-        categoryId,
-        status,
-        tags
-    }
+    const validateData = entitiesValidation<PublishPayload>(PublishBodySchema, body)
 
     // Save the post
-    try {
-        const publishedPost = await publishService.publishPost(userId, postId, payload)
-        if (!publishedPost) {
-            return ApiError(new Error(METHOD_FAILED('Failed publishing post').message), req, next, METHOD_FAILED().code)
-        }
-        return ApiResponse(req, res, SUCCESS().code, SUCCESS('Post published successfully').message)
-    } catch (error) {
-        const message = error instanceof Error ? error.message : INTERNAL_SERVICE('publish post')?.message
+    await publishService.publishPost(userId, postId, validateData)
 
-        if (message.includes('not found')) {
-            return ApiError(new Error(message), req, next, NOT_FOUND().code)
-        } else if (message.includes('permission')) {
-            return ApiError(new Error(message), req, next, UNAUTHORIZED.code)
-        }
+    ApiResponse(req, res, 201, 'Post published successfully')
+})
 
-        return ApiError(new Error(message), req, next, INTERNAL_SERVICE().code)
+export const addThumbnailToPost = AsyncHandler(async (req: Request, res: Response) => {
+    const thumbnailFile = req?.file as ThumbnailFile
+    if (thumbnailFile === undefined) {
+        throw new BadRequestError('Thumbnail file is required')
+    }
+
+    const validatedFile: ThumbnailFile = fileValidation<ThumbnailFile>(ThumbnailFileSchema, thumbnailFile)
+
+    const userId: string | undefined = req.user?.id
+    if (!userId || typeof userId !== 'string') {
+        throw new UnauthorizedError('User is not logged in')
+    }
+
+    await Promise.resolve({ userId, validatedFile })
+
+    ApiResponse(req, res, 200, 'Thumbnail file uploaded successfully')
+})
+
+export const getSearchTags = AsyncHandler(async (req: Request, res: Response) => {
+    const searchQuery = req.query.search as string
+    if (!searchQuery || searchQuery.length < 3) {
+        throw new BadRequestError('Search query must be at least 3 characters long')
+    }
+
+    const tags = await publishService.getSearchTags(searchQuery)
+    if (!tags) {
+        throw new NotFoundError('No tags found for the given search query')
+    }
+
+    ApiResponse(req, res, 200, 'Tags fetched successfully', { tags })
+})
+
+export const checkIsSlugAvailable = AsyncHandler(async (req: Request, res: Response) => {
+    const customSlug = req.query.isSlug as string
+
+    if (!customSlug || customSlug.length < 3) {
+        throw new BadRequestError('Slug is required')
+    }
+
+    const isAvailable = await publishService.isSlugAvailable(customSlug)
+
+    if (isAvailable === undefined) {
+        throw new DatabaseError('Slug not found')
+    }
+
+    if (isAvailable) {
+        ApiResponse(req, res, 200, 'Slug is available', { isAvailable })
+    } else {
+        ApiResponse(req, res, 200, 'Slug is not available', { isAvailable })
     }
 })
 
-/**
- * ! Handles user checking if a slug is available
- *
- * This function is an asynchronous request handler that is responsible for handling a user checking if a slug is available.
- * It expects a request body containing the slug to check.
- *
- * @param {Request} req - The request object containing the slug to check.
- * @param {Response} res - The response object used to send the response back to the client.
- * @param {NextFunction} next - The next middleware function in the stack.
- * @returns {Promise<void>} A promise that resolves to void.
- *
- *  @throws {Error} Will throw an error if there is an issue checking the slug.
- */
-export const checkIsSlugAvailable = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
-    const { customSlug } = req.body as { customSlug: string }
-
-    if (!customSlug) {
-        return ApiError(new Error(BAD_REQUEST('slug needed to check').message), req, next, BAD_REQUEST().code)
-    }
-
-    try {
-        const isAvailable = await publishService.isSlugAvailable(customSlug)
-        if (!isAvailable) {
-            return ApiError(new Error(INTERNAL_SERVICE('check slug availability').message), req, next, INTERNAL_SERVICE().code)
-        }
-
-        return ApiResponse(req, res, SUCCESS().code, SUCCESS('Slug is available').message, { isAvailable })
-    } catch (error) {
-        return ApiError(
-            error instanceof Error ? error : new Error(INTERNAL_SERVICE('check slug availability').message),
-            req,
-            next,
-            INTERNAL_SERVICE().code
-        )
-    }
-})
-
-/**
- * ! Handles user updating a published post
- *
- * This function is an asynchronous request handler that is responsible for handling a user updating a published post.
- * It expects a request body containing the updated post content and the user's id from the request object.
- *
- * @param {Request} req - The request object containing the user's id and the updated post content.
- * @param {Response} res - The response object used to send the response back to the client.
- * @param {NextFunction} next - The next middleware function in the stack.
- * @returns {Promise<void>} A promise that resolves to void.
- *
- * @throws {Error} Will throw an error if there is an issue updating the post.
- */
-export const updatePublishedPost = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
+export const deletePublishedPost = AsyncHandler(async (req: Request, res: Response) => {
     // Get the user id from the request object
-    const userId = (req.user as User)?.id
-    if (!userId) {
-        return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
+    const userId = req.user?.id
+    if (!userId && typeof userId !== 'string') {
+        throw new UnauthorizedError('User not logged in')
+    }
+    // Get the post id from the request params
+    const postId = req.params.id
+    if (!postId) {
+        throw new NotFoundError('Post id not found')
     }
 
-    // Get the post id from the request params
+    await publishService.deletePublishedPost(userId, postId)
+
+    ApiResponse(req, res, 200, `Post: ${postId} deleted successfully`)
+})
+
+export const changeCurrentPostStatus = AsyncHandler(async (req: Request, res: Response) => {
+    const userId: string | undefined = req.user?.id
+    if (!userId) {
+        throw new UnauthorizedError('User not logged in')
+    }
+
     const postId: string = req.params.id
     if (!postId) {
-        return ApiError(new Error(NOT_FOUND('Missing post id').message), req, next, NOT_FOUND().code)
+        throw new NotFoundError('Post id not found')
     }
 
-    // Get the updated post content from the request body
-    const updatePublishContent = req.body as UpdatePublishedPost
-
-    try {
-        const publishedPost = await publishService.updatePublishedPost(postId, userId, updatePublishContent)
-        if (!publishedPost) {
-            return ApiError(new Error(METHOD_FAILED('Failed updating published post').message), req, next, METHOD_FAILED().code)
-        }
-        return ApiResponse(req, res, SUCCESS().code, SUCCESS('Post updated successfully').message)
-    } catch (error) {
-        return ApiError(
-            error instanceof Error ? error : new Error(INTERNAL_SERVICE('update published post').message),
-            req,
-            next,
-            INTERNAL_SERVICE().code
-        )
+    const status = req.query.status as ENUMS.DRAFT_STATUS
+    if (!status) {
+        throw new BadRequestError('Status is required')
     }
+
+    await publishService.changePublishedPostStatus(postId, status)
+
+    ApiResponse(req, res, 200, `Post with id ${postId} status change to ${status}`)
 })
 
-/**
- * ! Handles user deleting a published post
- *
- * This function is an asynchronous request handler that is responsible for handling a user deleting a published post.
- * It expects the user's id from the request object and the post id from the request params.
- *
- * @param {Request} req - The request object containing the user's id and the post id.
- * @param {Response} res - The response object used to send the response back to the client.
- * @param {NextFunction} next - The next middleware function in the stack.
- * @returns {Promise<void>} A promise that resolves to void.
- *
- * @throws {Error} Will throw an error if there is an issue deleting the post.
- */
-export const deletePublishedPost = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
-    // Get the user id from the request object
-    const userId = (req.user as User)?.id
-    if (!userId) {
-        return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
+export const getAllPublishedPosts = AsyncHandler(async (req: Request, res: Response) => {
+    const { limit, page, order } = req.query as { limit: string; page: string; order: string }
+    const pageNumber = parseInt(page) || 1
+    const limitNumber = parseInt(limit) || 10
+    const orderBy: OrderBy = order === 'asc' ? 'asc' : 'desc'
+
+    if (pageNumber < 1 || limitNumber < 1) {
+        throw new BadRequestError('Page and limit must be greater than 0')
     }
 
-    // Get the post id from the request params
-    const postId = req.params.id
+    const skip = (pageNumber - 1) * limitNumber
 
-    const where: PublishWhere = {
-        id: postId,
-        authorId: userId
-    }
-    try {
-        const deletedPost = await publishService.deletePublishedPost(req, next, where)
-        if (!deletedPost) {
-            return ApiError(new Error(METHOD_FAILED('Failed deleting published post').message), req, next, METHOD_FAILED().code)
-        }
+    const allPosts = await publishService.getCommunityPublishedPost(limitNumber, skip, orderBy)
 
-        return ApiResponse(req, res, SUCCESS().code, SUCCESS('Post deleted successfully').message)
-    } catch (error) {
-        return ApiError(
-            error instanceof Error ? error : new Error(INTERNAL_SERVICE('delete published post').message),
-            req,
-            next,
-            INTERNAL_SERVICE().code
-        )
-    }
-})
-
-/**
- * ! Handles user archiving a published post
- *
- * This function is an asynchronous request handler that is responsible for handling a user archiving a published post.
- * It expects the user's id from the request object and the post id from the request params.
- *
- * @param {Request} req - The request object containing the user's id and the post id.
- * @param {Response} res - The response object used to send the response back to the client.
- * @param {NextFunction} next - The next middleware function in the stack.
- * @returns {Promise<void>} A promise that resolves to void.
- *
- * @throws {Error} Will throw an error if there is an issue archiving the post.
- */
-export const archivePublishedPost = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
-    // Get the user id from the request object
-    const userId = (req.user as User)?.id
-    if (!userId) {
-        return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
-    }
-
-    // Get the post id from the request params
-    const postId = req.params.id
-
-    // Create the where object to find the post
-    const where: PublishWhere = {
-        id: postId,
-        authorId: userId
-    }
-
-    // Set the status of the post to archived
-    const status = req.body as ENUMS.DRAFT_STATUS
-    try {
-        const changedStatus = await publishService.changePublishedPostStatus(req, next, where, status)
-        if (!changedStatus) {
-            return ApiError(new Error(METHOD_FAILED('Failed archiving published post').message), req, next, METHOD_FAILED().code)
-        }
-
-        return ApiResponse(req, res, SUCCESS().code, SUCCESS('Post archived successfully').message)
-    } catch (error) {
-        return ApiError(
-            error instanceof Error ? error : new Error(INTERNAL_SERVICE('archive published post').message),
-            req,
-            next,
-            INTERNAL_SERVICE().code
-        )
-    }
-})
-
-/**
- * ! Handles user unarchiving a published post
- *
- * This function is an asynchronous request handler that is responsible for handling a user unarchiving a published post.
- * It expects the user's id from the request object and the post id from the request params.
- *
- * @param {Request} req - The request object containing the user's id and the post id.
- * @param {Response} res - The response object used to send the response back to the client.
- * @param {NextFunction} next - The next middleware function in the stack.
- * @returns {Promise<void>} A promise that resolves to void.
- *
- *  @throws {Error} Will throw an error if there is an issue unarchiving the post.
- */
-export const unarchivePublishedPost = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
-    // Get the user id from the request object
-    const userId = (req.user as User)?.id
-    if (!userId) {
-        return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
-    }
-
-    // Get the post id from the request params
-    const postId = req.params.id
-
-    // Create the where object to find the post
-    const where: PublishWhere = {
-        id: postId,
-        authorId: userId
-    }
-
-    // Set the status of the post to published
-    const status = ENUMS.DRAFT_STATUS.PUBLISHED
-    try {
-        const changedStatus = await publishService.changePublishedPostStatus(req, next, where, status)
-        if (!changedStatus) {
-            return ApiError(new Error(METHOD_FAILED('Failed unarchiving published post').message), req, next, METHOD_FAILED().code)
-        }
-
-        return ApiResponse(req, res, SUCCESS().code, SUCCESS('Post unarchived successfully').message)
-    } catch (error) {
-        return ApiError(
-            error instanceof Error ? error : new Error(INTERNAL_SERVICE('unarchive published post').message),
-            req,
-            next,
-            INTERNAL_SERVICE().code
-        )
-    }
-})
-
-/**
- * ! Handles user fetching all published posts
- *
- * This function is an asynchronous request handler that is responsible for handling a user fetching all published or achieve posts.
- * It expects the user's id from the request object.
- *
- * @param {Request} req - The request object containing the user's id.
- * @param {Response} res - The response object used to send the response back to the client.
- * @param {NextFunction} next - The next middleware function in the stack.
- * @returns {Promise<void>} A promise that resolves to void.
- *
- * @throws {Error} Will throw an error if there is an issue fetching the posts.
- */
-export const fetchPublishedPosts = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
-    // Get the limit and page query parameters
-    const { limit, page } = req.query as { limit: string; page: string }
-
-    // Validate the limit and page query parameters
-    if (limit && isNaN(Number(limit))) {
-        return ApiError(new Error(BAD_REQUEST('limit must be a number').message), req, next, BAD_REQUEST().code)
-    }
-
-    // Calculate the number of posts to skip
-    const skip = limit && page ? (+page - 1) * +limit : 0
-
-    // Create the query object
-    const query: QueryParameter = { limit: +limit, skip }
-
-    // Create the payload to find the posts
-    const status = req.body as ENUMS.DRAFT_STATUS
-
-    if (!Object.values(ENUMS.DRAFT_STATUS).includes(status)) {
-        return ApiError(new Error(BAD_REQUEST('Invalid status').message), req, next, BAD_REQUEST().code)
-    }
-
-    // Create the payload to find the posts
-    const payload: PublishedWhere = {
-        // authorId: userId,
-        status
-    }
-    try {
-        const publishedPosts = await publishService.listUserPosts(req, next, payload, query)
-        return ApiResponse(req, res, SUCCESS().code, SUCCESS('Published posts fetched successfully').message, publishedPosts)
-    } catch (error) {
-        return ApiError(
-            error instanceof Error ? error : new Error(INTERNAL_SERVICE('fetch published posts').message),
-            req,
-            next,
-            INTERNAL_SERVICE().code
-        )
-    }
-})
-
-/**
- * ! Handles user fetching a published post
- *
- * This function is an asynchronous request handler that is responsible for handling a user fetching a published post.
- * It expects the user's id from the request object and the post id from the request params.
- *
- * @param {Request} req - The request object containing the user's id and the post id.
- * @param {Response} res - The response object used to send the response back to the client.
- * @param {NextFunction} next - The next middleware function in the stack.
- * @returns {Promise<void>} A promise that resolves to void.
- *
- * @throws {Error} Will throw an error if there is an issue fetching the post.
- */
-export const fetchPublishedPost = AsyncHandler(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
-    // Get the user id from the request object
-    const userId = (req.user as User)?.id
-    if (!userId) {
-        return ApiError(new Error(UNAUTHORIZED.message), req, next, UNAUTHORIZED.code)
-    }
-
-    // Get the post id from the request params
-    const postId = req.params.id
-
-    // Create the where object to find the post
-    const where: PublishWhere = {
-        id: postId,
-        authorId: userId
-    }
-
-    try {
-        const publishedPost = await publishService.getPublishedPost(req, next, where)
-        if (!publishedPost) {
-            return ApiError(new Error(METHOD_FAILED('Failed fetching published post').message), req, next, METHOD_FAILED().code)
-        }
-
-        return ApiResponse(req, res, SUCCESS().code, SUCCESS('Published post fetched successfully').message, publishedPost)
-    } catch (error) {
-        return ApiError(
-            error instanceof Error ? error : new Error(INTERNAL_SERVICE('fetch published post').message),
-            req,
-            next,
-            INTERNAL_SERVICE().code
-        )
-    }
+    ApiResponse(req, res, 200, 'Published posts fetched successfully', { communityPosts: allPosts })
 })
