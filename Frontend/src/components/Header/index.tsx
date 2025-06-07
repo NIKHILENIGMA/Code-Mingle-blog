@@ -57,11 +57,11 @@ const Header: FC = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 w-full shadow-sm z-50 bg-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+    <header className="fixed top-0 left-0 z-50 w-full bg-transparent shadow-sm backdrop-blur-md dark:bg-background/50">
+      <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
           <div className="text-xl font-bold">NODEDRAFTS</div>
-          <nav className="hidden md:flex space-x-8">
+          <nav className="hidden space-x-8 md:flex">
             {NavItems.map((navOpt, index) => (
               <NavLink
                 key={index}
@@ -78,11 +78,11 @@ const Header: FC = () => {
             ))}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className=" border-none flex space-x-2 shadow-none items-center hover:text-primary">
+                <button className="flex items-center space-x-2 border-none shadow-none hover:text-primary">
                   <Pencil size={18} /> <span>Write</span>
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-48 relative">
+              <DropdownMenuContent className="relative w-48">
                 <DropdownMenuLabel>My Drafts</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
@@ -102,7 +102,7 @@ const Header: FC = () => {
           </nav>
           <div className="flex items-center space-x-4">
             <ModeToggle />
-            <div className="flex items-center space-x-4 pr-4">
+            <div className="flex items-center pr-4 space-x-4">
               <SearchBar size={18} />
               <div className="hidden space-x-4 lg:flex">
                 {authenticate ? <Authenticated /> : <NotAuthenticated />}
