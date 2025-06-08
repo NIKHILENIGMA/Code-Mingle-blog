@@ -9,8 +9,10 @@ interface IAppConfig {
     DATABASE_URL: string | undefined
 }
 
+// Check if the environment is production
 export const isProduction: boolean = process.env.NODE_ENV === 'production'
 
+// Check if the environment is development
 export const appConfig: IAppConfig = {
     ENV: process.env.ENV,
     PORT: process.env.PORT,
@@ -27,12 +29,15 @@ export const tokenInfo = {
     reset_validity: process.env.RESET_TOKEN_VALIDITY_IN_SEC
 }
 
+// Argon2 Configuration
 export const ARGON_MEMORY_COST: number = Number(process.env.ARGON_MEMORY_COST) || 2 ** 16 // 64MB RAM usage
 export const ARGON_TIME_COST: number = Number(process.env.ARGON_TIME_COST) || 3 // 3 iterations
 export const ARGON_PARALLELISM: number = Number(process.env.ARGON_PARALLELISM) || 2 // Parallelism factor
 
+// User Role ID
 export const USER_ROLE_ID: string = 'cmamn2isn0002i1hs0sb0ba2j'
 
+// JWT Configuration
 export const JWT_ISSUER = String(process.env.JWT_ISSUER) || 'NodeDrafts'
 export const JWT_AUDIENCE = String(process.env.JWT_AUDIENCE) || 'NodeDrafts'
 export const JWT_ROLE = String(process.env.JWT_ROLE) || 'user'
@@ -42,5 +47,6 @@ export const ACCESS_TOKEN_VALIDITY_IN_SEC = Number(process.env.ACCESS_TOKEN_VALI
 export const REFRESH_TOKEN_VALIDITY_IN_SEC = Number(process.env.REFRESH_TOKEN_VALIDITY_IN_SEC) || 86400 // 24 hours
 export const RESET_TOKEN_VALIDITY_IN_SEC = Number(process.env.RESET_TOKEN_VALIDITY_IN_SEC) || 3600 // 1 hour
 
+// Paths to Key Files
 export const PUBLIC_KEY_PATH = String(process.env.PUBLIC_KEY_PATH) || '../../keys/public_key.pem' // Path to your public key file
 export const PRIVATE_KEY_PATH = String(process.env.PRIVATE_KEY_PATH) || '../../keys/private_key.pem' // Path to your private key file
