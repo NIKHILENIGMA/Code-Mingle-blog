@@ -5,7 +5,8 @@ import AboutPage from "../pages/Public/AboutPage";
 import Main from "@/Layout/Main";
 import DraftLayout from "@/features/drafts/Layout/DraftLayout";
 import PreviewPostPage from "@/features/drafts/pages/PreviewPostPage";
-import PrivateRoute from "@/components/common/PrivateRoute";
+// import PrivateRoute from "@/components/common/PrivateRoute";
+import ProtectedRoute from "@/components/common/ProtectedRoute";
 import ProfileSettings from "@/features/Profile/pages/ProfileSetting";
 import PersonalSettings from "@/features/Profile/pages/PersonalSettings";
 import ProfileSecurity from "@/features/Profile/pages/ProfileSecurity";
@@ -24,6 +25,8 @@ import {
   AdminReports,
 } from "@/features/admin";
 import PreviewPage from "@/features/drafts/pages/PreviewPage";
+import Login from "@/features/auth/pages/Login";
+import Signup from "@/features/auth/pages/Signup";
 
 const router = createBrowserRouter([
   {
@@ -49,9 +52,9 @@ const router = createBrowserRouter([
       {
         path: "/profile/me",
         element: (
-          <PrivateRoute>
+          <ProtectedRoute>
             <UserDashboard />
-          </PrivateRoute>
+          </ProtectedRoute>
         ),
         children: [],
       },
@@ -83,13 +86,13 @@ const router = createBrowserRouter([
       },
     ],
   },
-  
+
   {
     path: "/draft",
     element: (
-      <PrivateRoute>
+      <ProtectedRoute>
         <DraftLayout />
-      </PrivateRoute>
+      </ProtectedRoute>
     ),
     children: [
       {
@@ -118,12 +121,7 @@ const router = createBrowserRouter([
 
   {
     path: "/login",
-    lazy: async () => {
-      const LoginPage = (await import("@/pages/Auth/LoginPage")).default;
-      return {
-        element: <LoginPage />,
-      };
-    },
+    element: <Login />,
   },
   {
     path: "/forgot-password",
@@ -148,12 +146,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/signup",
-    lazy: async () => {
-      const SignupPage = (await import("@/pages/Auth/SignupPage")).default;
-      return {
-        element: <SignupPage />,
-      };
-    },
+    element: <Signup />,
   },
   {
     path: "/admin",
