@@ -4,4 +4,4 @@ dotenvFlow.config()
 
 // configMailService
 
-export const resendApiKey = process.env.RESEND_MAIL_SERVICE_API_KEY
+export const RESEND_API_KEY = process.env.RESEND_MAIL_SERVICE_API_KEY // resendApiKey
