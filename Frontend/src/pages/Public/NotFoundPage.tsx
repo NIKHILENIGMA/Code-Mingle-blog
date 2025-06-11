@@ -1,29 +1,27 @@
+import { Button } from "@/components";
 import { FC } from "react";
 import { useNavigate } from "react-router-dom";
 
 const NotFoundPage: FC = () => {
   const navigate = useNavigate();
   return (
-    <div className="flex items-center justify-center min-h-screen bg-white px-4">
+    <div className="flex items-center justify-center min-h-screen px-4 bg-background text-secondary-foreground">
       <div className="flex flex-col items-center space-y-6 text-center">
         {/* Error Code */}
-        <h1 className="text-7xl font-bold text-black">404</h1>
+        <h1 className="text-[10rem] font-bold text-secondary-foreground">404</h1>
 
         {/* Error Message */}
-        <h2 className="text-2xl font-semibold text-black">PAGE NOT FOUND</h2>
+        <h2 className="text-2xl font-semibold">PAGE NOT FOUND</h2>
 
         {/* Additional Info */}
-        <p className="text-gray-500">
+        <p className="text-secondary-foreground/70">
           Your search has ventured beyond the known universe
         </p>
 
         {/* Back to Home Button */}
-        <button
-          onClick={() => navigate("/")}
-          className="mt-4 px-6 py-3 bg-purple-600 text-white rounded-md shadow hover:bg-purple-700 transition"
-        >
+        <Button onClick={() => navigate("/")} className="hover:bg-primary/80">
           Back to Home
-        </button>
+        </Button>
       </div>
 
       {/* Left Illustration */}
