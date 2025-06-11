@@ -51,7 +51,7 @@ model User {
   bio                  String?          @map("bio_data")
   profileImage         String?          @map("profile_image")
   coverImage           String?          @map("cover_image") // Cover image URL
-  isActive             Boolean         @default(true) @map("is_active") // Is the user active?
+  isActive             Boolean          @default(true) @map("is_active") // Is the user active?
   lastLoginAt          DateTime?        @map("last_login_at") // Last login date
   authProvider         String?          @map("auth_provider") // local, google, facebook, etc.
   providerId           String?          @map("auth_provider_id") // ID from the auth provider
@@ -171,9 +171,10 @@ model Post {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index(status)
-  @@index([userId]) 
+  @@index([userId])
   @@map("posts")
 }
+
 // Can you show the improvements in the chat ??
 model Tag {
   id        String   @id @default(cuid())
