@@ -11,32 +11,34 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { useLogout } from "@/features/auth/hooks/useLogout";
-import { useUserLoggedIn } from "@/hooks/useUserLoggedIn";
+import { useAuthContext } from "@/hooks/useAuthContext";
+// import { useUserLoggedIn } from "@/hooks/useUserLoggedIn";
 
 const Authenticated: FC = () => {
   const { handleLogout } = useLogout();
-  const { user } = useUserLoggedIn();
+  // const { user } = useUserLoggedIn();
+  const { user } = useAuthContext();
 
   return (
-    <div className=" flex justify-start w-full">
+    <div className="flex justify-start w-full ">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Avatar>
             <AvatarImage
-              src={user?.avatarImg || "/no-avatar-user.png"}
+              src={user.avatar || "/no-avatar-user.png"}
               className="border-[0.2rem] border-primary/70 rounded-full object-cover"
             />
             <AvatarFallback>
               <AvatarImage
                 src="/no-avatar-user.png"
-                className="border border-primary/70 rounded-full object-cover"
+                className="object-cover border rounded-full border-primary/70"
               />
             </AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56">
-          <DropdownMenuLabel>{`${user?.firstName} ${user?.lastName}`}</DropdownMenuLabel>
-          
+          <DropdownMenuLabel>{`${user.firstName} ${user.lastName}`}</DropdownMenuLabel>
+
           <DropdownMenuSeparator />
 
           <DropdownMenuGroup>
