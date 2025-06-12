@@ -1,4 +1,6 @@
+import { ROLE } from '@/types/common/enum.types'
 import dotenvFlow from 'dotenv-flow'
+import path from 'path'
 
 dotenvFlow.config()
 
@@ -35,18 +37,17 @@ export const ARGON_TIME_COST: number = Number(process.env.ARGON_TIME_COST) || 3 
 export const ARGON_PARALLELISM: number = Number(process.env.ARGON_PARALLELISM) || 2 // Parallelism factor
 
 // User Role ID
-export const USER_ROLE_ID: string = 'cmamn2isn0002i1hs0sb0ba2j'
+// export const USER_ROLE_ID: string = 'cmamn2isn0002i1hs0sb0ba2j'
 
 // JWT Configuration
 export const JWT_ISSUER = String(process.env.JWT_ISSUER) || 'NodeDrafts'
 export const JWT_AUDIENCE = String(process.env.JWT_AUDIENCE) || 'NodeDrafts'
-export const JWT_ROLE = String(process.env.JWT_ROLE) || 'user'
-export const JWT_SECRET = String(process.env.JWT_SECRET) || 'your-secret-key'
+export const JWT_ROLE = String(process.env.JWT_ROLE) || ROLE.USER 
 export const JWT_ALGORITHM = String(process.env.JWT_ALGORITHM) || 'RS256'
 export const ACCESS_TOKEN_VALIDITY_IN_SEC = Number(process.env.ACCESS_TOKEN_VALIDITY_IN_SEC) || 3600 // 1 hour
 export const REFRESH_TOKEN_VALIDITY_IN_SEC = Number(process.env.REFRESH_TOKEN_VALIDITY_IN_SEC) || 86400 // 24 hours
 export const RESET_TOKEN_VALIDITY_IN_SEC = Number(process.env.RESET_TOKEN_VALIDITY_IN_SEC) || 3600 // 1 hour
 
 // Paths to Key Files
-export const PUBLIC_KEY_PATH = String(process.env.PUBLIC_KEY_PATH) || '../../keys/public_key.pem' // Path to your public key file
-export const PRIVATE_KEY_PATH = String(process.env.PRIVATE_KEY_PATH) || '../../keys/private_key.pem' // Path to your private key file
+export const PRIVATE_KEY_PATH = path.resolve(process.cwd(), process.env.PRIVATE_KEY_PATH || './keys/private.pem')
+export const PUBLIC_KEY_PATH = path.resolve(process.cwd(), process.env.PUBLIC_KEY_PATH || './keys/public.pem')
