@@ -1,6 +1,5 @@
 import { createElement, FC } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/app/store/store";
+import { useDispatch } from "react-redux";
 import { DraftingCompass, Notebook, Pencil } from "@/Utils/Icons";
 import SearchBar from "@/features/drafts/components/Drafts/SearchBar";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -20,15 +19,14 @@ import {
 import { useDraftMutations } from "@/features/drafts/hooks/useDraftMutations";
 import { toast } from "sonner";
 import { setSelectedDraft } from "@/features/drafts/slices/draftSlice";
+import { useAuthContext } from "@/hooks/useAuthContext";
 
 const Header: FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const authenticate = useSelector(
-    (state: RootState) => state.auth?.accessToken
-  );
-
+  const { isAuthenticated } = useAuthContext();
   const { createDraftMutation } = useDraftMutations();
+
 
   const handleCreateDraft = async () => {
     try {
@@ -105,7 +103,7 @@ const Header: FC = () => {
             <div className="flex items-center pr-4 space-x-4">
               <SearchBar size={18} />
               <div className="hidden space-x-4 lg:flex">
-                {authenticate ? <Authenticated /> : <NotAuthenticated />}
+                {isAuthenticated ? <Authenticated /> : <NotAuthenticated />}
               </div>
             </div>
           </div>
