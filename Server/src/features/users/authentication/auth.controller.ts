@@ -7,6 +7,7 @@ import { ApiResponse, AsyncHandler, entitiesValidation } from '@/utils'
 import { DatabaseError, UnauthorizedError } from '@/utils/Errors'
 import { ENUMS } from '@/types'
 import { ACCESS_TOKEN_VALIDITY_IN_SEC, REFRESH_TOKEN_VALIDITY_IN_SEC } from '@/config/app.config'
+// import { logger } from '@/utils/logger'b 
 
 export const signup = AsyncHandler(async (req: Request, res: Response): Promise<void> => {
     // Extract the user credentials from the request body
@@ -32,20 +33,20 @@ export const login = AsyncHandler(async (req: Request, res: Response) => {
     }
     // Attempt to log in the user
     // Generate access and refresh tokens
-    const tokens = await authServices.loginUser(credientials, options)
+    const details = await authServices.loginUser(credientials, options)
 
     // If the login fails, throw an error
-    if (!tokens) {
+    if (!details) {
         throw new DatabaseError('User name or password is invalid')
     }
 
     // Set the tokens in the cookies
-    res.cookie('access_token', tokens.accessToken, {
+    res.cookie('access_token', details.tokens.accessToken, {
         httpOnly: true,
         secure: !(appConfig.ENV === ENUMS.EApplicationEnvironment.PRODUCTION),
         sameSite: 'strict',
         maxAge: 1000 * ACCESS_TOKEN_VALIDITY_IN_SEC
-    }).cookie('refresh_token', tokens.refreshToken, {
+    }).cookie('refresh_token', details.tokens.refreshToken, {
         httpOnly: true,
         secure: !(appConfig.ENV === ENUMS.EApplicationEnvironment.PRODUCTION),
         sameSite: 'strict',
@@ -53,7 +54,7 @@ export const login = AsyncHandler(async (req: Request, res: Response) => {
     })
 
     return ApiResponse(req, res, 200, 'User logged in successfully', {
-        token: 'tokens.accessToken'
+        details
     })
 })
 
@@ -70,12 +71,10 @@ export const logout = AsyncHandler(async (req: Request, res: Response): Promise<
         httpOnly: true,
         secure: !(appConfig.ENV === ENUMS.EApplicationEnvironment.PRODUCTION),
         sameSite: 'strict',
-        maxAge: 1000 * ACCESS_TOKEN_VALIDITY_IN_SEC
     }).clearCookie('refresh_token', {
         httpOnly: true,
         secure: !(appConfig.ENV === ENUMS.EApplicationEnvironment.PRODUCTION),
         sameSite: 'strict',
-        maxAge: 1000 * REFRESH_TOKEN_VALIDITY_IN_SEC
     })
 
     ApiResponse(req, res, 200, 'User logged out successfully', {
