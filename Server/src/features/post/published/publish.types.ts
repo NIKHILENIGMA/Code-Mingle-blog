@@ -23,5 +23,3 @@ export interface CommunityPosts {
         profileImage: string | null
     }
 }
-
-

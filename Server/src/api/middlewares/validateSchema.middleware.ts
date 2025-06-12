@@ -80,8 +80,7 @@ export const validateFile = <T extends AnyZodObject>(schema: T, file: File) => {
                 throw error // Re-throw other unexpected errors
             }
 
-            next(error) 
-            
+            next(error)
         }
 
         next() // Proceed if validation is successful
