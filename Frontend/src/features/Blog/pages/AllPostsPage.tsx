@@ -79,7 +79,7 @@ const AllPostsPage: FC = () => {
               {dummyPosts?.map((post: PostInterface) => (
                 <div
                   key={post.id}
-                  className="w-full p-4 space-y-4 transition rounded-lg cursor-pointer border-[1px] sm:flex md:flex-row bg-background text-muted-foreground md:p-6 md:space-y-0 md:space-x-6 hover:shadow-md border-secondary/85 hover:bg-secondary/15"
+                  className="w-full p-4 bg-card space-y-4 transition rounded-lg cursor-pointer border-[1px] sm:flex md:flex-row text-muted-foreground md:p-6 md:space-y-0 md:space-x-6 hover:shadow-md border-secondary/85 hover:bg-secondary/15"
                   onClick={() => handleReadPost(post.id.toString())}
                 >
                   {/* Post Image */}
