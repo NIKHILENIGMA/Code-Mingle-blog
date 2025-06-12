@@ -13,6 +13,7 @@ import {
 } from '@/config/app.config'
 import { logger } from './logger/index'
 import { Permission } from '@/features/users/authentication/auth.types'
+import { StandardError } from './Errors/StandardError'
 
 interface JWTPayload {
     id: string
@@ -50,35 +51,49 @@ class TokenManagement {
     }
 
     public async generateToken(tokenPayload: TokenPayload): Promise<string> {
-        const PRIVATE_KEY = await fs.readFile(PRIVATE_KEY_PATH, 'utf8')
+        try {
+            const PRIVATE_KEY: string = await fs.readFile(PRIVATE_KEY_PATH, 'utf8')
+            if (!PRIVATE_KEY) {
+                throw new InternalServerError('Failed to read private key, please check the file path')
+            }
 
-        if (!PRIVATE_KEY) {
-            throw new InternalServerError('Failed to read private key, please check the file path')
+            const payload = {
+                id: tokenPayload.subject.id,
+                email: tokenPayload.subject.email,
+                username: tokenPayload.subject.username,
+                roleId: tokenPayload.subject.roleId,
+                lastLoginAt: tokenPayload.subject.lastLoginAt,
+                emailVerified: tokenPayload.subject.emailVerified
+            }
+
+            const signOptions: SignOptions = {
+                algorithm: JWT_ALGORITHM as Algorithm,
+                issuer: JWT_ISSUER,
+                audience: JWT_AUDIENCE,
+                expiresIn: tokenPayload.type === 'ACCESS' ? ACCESS_TOKEN_VALIDITY_IN_SEC : REFRESH_TOKEN_VALIDITY_IN_SEC
+            }
+
+            const token = sign(payload, PRIVATE_KEY, signOptions)
+
+            if (!token) {
+                throw new InternalServerError('Failed to generate token')
+            }
+
+            return token
+        } catch (error) {
+            if (error instanceof StandardError) {
+                throw error
+            }
+
+            if (error instanceof Error && error.message.includes('ENOENT')) {
+                throw new InternalServerError(`Private key file not found at ${PRIVATE_KEY_PATH}`, 'generateToken')
+                
+            }
+
+            logger.error('Error generating token', error)
+
+            throw new InternalServerError('Something went wrong while generating the token', 'generateToken')
         }
-
-        const payload = {
-            id: tokenPayload.subject.id,
-            email: tokenPayload.subject.email,
-            username: tokenPayload.subject.username,
-            roleId: tokenPayload.subject.roleId,
-            lastLoginAt: tokenPayload.subject.lastLoginAt,
-            emailVerified: tokenPayload.subject.emailVerified
-        }
-
-        const signOptions: SignOptions = {
-            algorithm: JWT_ALGORITHM as Algorithm,
-            issuer: JWT_ISSUER,
-            audience: JWT_AUDIENCE,
-            expiresIn: tokenPayload.type === 'ACCESS' ? ACCESS_TOKEN_VALIDITY_IN_SEC : REFRESH_TOKEN_VALIDITY_IN_SEC
-        }
-
-        const token = sign(payload, PRIVATE_KEY, signOptions)
-
-        if (!token) {
-            throw new InternalServerError('Failed to generate token')
-        }
-
-        return token
     }
 
     public async verifyToken(token: string): Promise<JWTPayload> {

@@ -1,8 +1,8 @@
 import { Resend } from 'resend'
 import { logger } from './logger/index'
-import { resendApiKey } from '@/config/resend.config'
+import { RESEND_API_KEY } from '@/config'
 
-const resend = new Resend(resendApiKey)
+const resend = new Resend(RESEND_API_KEY)
 
 const sendResetEmail = async (email: string, resetLink: string) => {
     await resend.emails.send({

@@ -1,9 +1,6 @@
 import { z } from 'zod'
 import { ValidationError } from '@/utils/Errors'
 
-
-
-
 function baseValidation<T>(schema: z.ZodSchema, data: T) {
     const validationResult = schema.safeParse(data)
 
@@ -22,7 +19,7 @@ function baseValidation<T>(schema: z.ZodSchema, data: T) {
 
 export function entitiesValidation<T>(schema: z.ZodSchema, body: T) {
     return baseValidation(schema, body)
-}   
+}
 
 export function fileValidation<T>(schema: z.ZodSchema, file: T) {
     return baseValidation(schema, file)
