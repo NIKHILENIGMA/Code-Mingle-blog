@@ -18,6 +18,6 @@ router.route('/check-slug').get(checkIsSlugAvailable)
  * - Change current status of the post
  */
 router.route('/:id').post(isAuthenticated, publishPost).delete(isAuthenticated, deletePublishedPost)
-router.route('/change-current-status').patch(isAuthenticated)
+// router.route('/change-current-status').patch(isAuthenticated)
 
 export default router
