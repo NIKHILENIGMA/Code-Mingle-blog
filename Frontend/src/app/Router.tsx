@@ -1,56 +1,59 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import HomePage from "../pages/Public/HomePage";
-import React from "react";
-import AboutPage from "../pages/Public/AboutPage";
-import Main from "@/Layout/Main";
-import DraftLayout from "@/features/drafts/Layout/DraftLayout";
-import PreviewPostPage from "@/features/drafts/pages/PreviewPostPage";
-// import PrivateRoute from "@/components/common/PrivateRoute";
-import ProtectedRoute from "@/components/common/ProtectedRoute";
-import ProfileSettings from "@/features/Profile/pages/ProfileSetting";
-import PersonalSettings from "@/features/Profile/pages/PersonalSettings";
-import ProfileSecurity from "@/features/Profile/pages/ProfileSecurity";
-import AccountSettings from "@/features/Profile/pages/AccountSettings";
-import GeneralDetails from "@/features/Profile/pages/GeneralDetails";
-import UserDashboard from "@/features/Profile/pages/UserDashboard";
-import DraftPage from "@/features/drafts/pages/DraftPage";
-import ReadPostPage from "@/features/Blog/pages/ReadPostPage";
-import AllPostsPage from "@/features/Blog/pages/AllPostsPage";
-import AdminPanelLayout from "@/features/admin/Layout";
+import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import HomePage from '../pages/Public/HomePage'
+import React from 'react'
+import AboutPage from '../pages/Public/AboutPage'
+import Main from '@/Layout/Main'
+import DraftLayout from '@/features/drafts/Layout/DraftLayout'
+import PreviewPostPage from '@/features/drafts/pages/PreviewPostPage'
+import NotFoundPage from './../pages/Public/NotFoundPage'
+import ProtectedRoute from '@/components/common/ProtectedRoute'
+import ProfileSettings from '@/features/Profile/pages/ProfileSetting'
+import PersonalSettings from '@/features/Profile/pages/PersonalSettings'
+import ProfileSecurity from '@/features/Profile/pages/ProfileSecurity'
+import AccountSettings from '@/features/Profile/pages/AccountSettings'
+import GeneralDetails from '@/features/Profile/pages/GeneralDetails'
+import UserDashboard from '@/features/Profile/pages/UserDashboard'
+import DraftPage from '@/features/drafts/pages/DraftPage'
+import ReadPostPage from '@/features/Blog/pages/ReadPostPage'
+import AllPostsPage from '@/features/Blog/pages/AllPostsPage'
+import AdminPanelLayout from '@/features/admin/Layout'
 import {
-  AdminCategory,
   AdminDashboard,
   AdminPosts,
   AdminUsers,
   AdminReports,
-} from "@/features/admin";
-import PreviewPage from "@/features/drafts/pages/PreviewPage";
-import Login from "@/features/auth/pages/Login";
-import Signup from "@/features/auth/pages/Signup";
+} from '@/features/admin'
+import PreviewPage from '@/features/drafts/pages/PreviewPage'
+import Login from '@/features/auth/pages/Login'
+import Signup from '@/features/auth/pages/Signup'
+import ForgotPassword from '@/features/auth/pages/ForgotPassword'
+import ResetPassword from '@/features/auth/pages/ResetPassword'
+import RolesAndPermissions from '@/features/admin/pages/RolesAndPermissions'
+import SessionManagement from '@/features/admin/pages/SessionManagement'
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: '/',
     element: <Main />,
     children: [
       {
-        path: "/",
+        path: '/',
         element: <HomePage />,
       },
       {
-        path: "/about",
+        path: '/about',
         element: <AboutPage />,
       },
       {
-        path: "/posts",
+        path: '/posts',
         element: <AllPostsPage />,
       },
       {
-        path: "/posts/:id",
+        path: '/posts/:id',
         element: <ReadPostPage />,
       },
       {
-        path: "/profile/me",
+        path: '/profile/me',
         element: (
           <ProtectedRoute>
             <UserDashboard />
@@ -59,7 +62,7 @@ const router = createBrowserRouter([
         children: [],
       },
       {
-        path: "/profile/settings",
+        path: '/profile/settings',
         element: (
           // <PrivateRoute>
           <ProfileSettings />
@@ -67,19 +70,19 @@ const router = createBrowserRouter([
         ),
         children: [
           {
-            path: "general-details",
+            path: 'general-details',
             element: <GeneralDetails />,
           },
           {
-            path: "personal-settings",
+            path: 'personal-settings',
             element: <PersonalSettings />,
           },
           {
-            path: "security",
+            path: 'security',
             element: <ProfileSecurity />,
           },
           {
-            path: "account",
+            path: 'account',
             element: <AccountSettings />,
           },
         ],
@@ -88,7 +91,7 @@ const router = createBrowserRouter([
   },
 
   {
-    path: "/draft",
+    path: '/draft',
     element: (
       <ProtectedRoute>
         <DraftLayout />
@@ -96,96 +99,85 @@ const router = createBrowserRouter([
     ),
     children: [
       {
-        path: ":draftId",
+        path: ':draftId',
         element: <DraftPage />,
       },
     ],
   },
   {
-    path: "/preview/:draftId",
+    path: '/preview/:draftId',
     element: <PreviewPostPage />,
   },
   {
-    path: "/posts/preview/:id",
+    path: '/posts/preview/:id',
     element: <PreviewPage />,
   },
   {
-    path: "/learn",
+    path: '/learn',
     lazy: async () => {
-      const { LearnEditorPage } = await import("@/pages");
+      const { LearnEditorPage } = await import('@/pages')
       return {
         element: <LearnEditorPage />,
-      };
+      }
     },
   },
 
   {
-    path: "/login",
+    path: '/login',
     element: <Login />,
   },
   {
-    path: "/forgot-password",
-    lazy: async () => {
-      const ResetPasswordPage = (
-        await import("@/pages/Auth/ForgotPasswordPage")
-      ).default;
-      return {
-        element: <ResetPasswordPage />,
-      };
-    },
+    path: '/forgot-password',
+    element: <ForgotPassword />,
   },
   {
-    path: "/reset-password",
-    lazy: async () => {
-      const ResetPasswordPage = (await import("@/pages/Auth/ResetPasswordPage"))
-        .default;
-      return {
-        element: <ResetPasswordPage />,
-      };
-    },
+    path: '/reset-password',
+    element: <ResetPassword />,
   },
   {
-    path: "/signup",
+    path: '/signup',
     element: <Signup />,
   },
   {
-    path: "/admin",
+    path: '/admin',
     element: <AdminPanelLayout />,
     children: [
       {
-        path: "dashboard",
+        path: 'dashboard',
         element: <AdminDashboard />,
       },
       {
-        path: "posts",
+        path: 'posts',
         element: <AdminPosts />,
       },
       {
-        path: "users",
+        path: 'users',
         element: <AdminUsers />,
       },
       {
-        path: "categories",
-        element: <AdminCategory />,
+        path: 'user-sessions',
+        element: <SessionManagement />,
       },
       {
-        path: "reports",
+        path: 'role-permissions',
+        element: <RolesAndPermissions />,
+      },
+      {
+        path: 'aduit-logs',
+        element: <AdminUsers />,
+      },
+      {
+        path: 'reports',
         element: <AdminReports />,
       },
     ],
   },
 
   {
-    path: "*",
-    lazy: async () => {
-      const NotFoundPage = (await import("../pages/Public/NotFoundPage"))
-        .default;
-      return {
-        element: <NotFoundPage />,
-      };
-    },
+    path: '*',
+    element: <NotFoundPage />,
   },
-]);
+])
 
 /**
  * AppRouter
@@ -193,7 +185,7 @@ const router = createBrowserRouter([
  * @returns - RouterProvider
  */
 const AppRouter: React.FC = () => {
-  return <RouterProvider router={router} />;
-};
+  return <RouterProvider router={router} />
+}
 
-export default AppRouter;
+export default AppRouter
