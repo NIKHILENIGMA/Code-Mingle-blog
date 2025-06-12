@@ -12,6 +12,7 @@ const Login: React.FC = () => {
     email: "",
     password: "",
   });
+  const [rememberMe, setRememberMe] = useState<boolean>(false);
   const [isVisible, setVisibility] = useState(false);
   const { login, loading } = useAuthContext();
   const location = useLocation();
@@ -27,7 +28,10 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    if (!formState.email || !formState.password) {
+      return;
+    }
+    localStorage.setItem("isPersistent", String(rememberMe));
     await login(formState.email, formState.password);
 
     const from = (location.state as { from?: Location })?.from?.pathname || "/";
@@ -97,7 +101,12 @@ const Login: React.FC = () => {
 
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <Checkbox id="remember-me" defaultChecked />
+              <Checkbox
+                id="remember-me"
+                name="rememberMe"
+                checked={rememberMe}
+                onCheckedChange={() => setRememberMe(!rememberMe)}
+              />
               <label
                 htmlFor="remember-me"
                 className="ml-2 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
