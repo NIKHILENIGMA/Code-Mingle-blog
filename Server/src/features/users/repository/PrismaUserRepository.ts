@@ -2,6 +2,7 @@ import prisma from '@/config/prisma.config'
 import { User } from '@prisma/client'
 import { Permission, UserDTO } from '../authentication/auth.types'
 import { Dashboard } from '../profile/profile.types'
+import { DatabaseError } from '@/utils/Errors'
 // import { DatabaseError } from '@/utils/Errors'
 
 interface NewUser {
@@ -9,9 +10,9 @@ interface NewUser {
     lastName: string | undefined
     username: string
     email: string
-    hashPassword: string
-    roleId: string
+    password: string
     lastLoginAt?: Date | null
+    roleId: string
 }
 
 export interface IUserRepository {
@@ -47,11 +48,15 @@ export class PrismaUserRepository implements IUserRepository {
     }
 
     public async create(payload: NewUser): Promise<User> {
-        const user = await prisma.user.create({
-            data: payload
-        })
+        try {
+            const user = await prisma.user.create({
+                data: payload
+            })
 
-        return user
+            return user
+        } catch (error) {
+            throw new DatabaseError(`Error creating user: ${(error as Error).message}`, 'PrismaUserRepository.create')
+        }
     }
 
     public async update(userId: string, payload: Partial<User>): Promise<User> {
@@ -185,11 +190,15 @@ export class PrismaUserRepository implements IUserRepository {
     }
 
     public async getUserByEmail(email: string): Promise<User | null> {
-        return await prisma.user.findUnique({
-            where: {
-                email
-            }
-        })
+        try {
+            return await prisma.user.findUnique({
+                where: {
+                    email
+                }
+            })
+        } catch (error) {
+            throw new DatabaseError(`Error fetching user by email: ${(error as Error).message}`, 'PrismaUserRepository.getUserByEmail')
+        }
     }
 
     public async getUserByUsername(username: string): Promise<UserDTO | null> {

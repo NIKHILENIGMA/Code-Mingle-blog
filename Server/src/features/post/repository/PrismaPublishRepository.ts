@@ -4,7 +4,6 @@ import { DatabaseError } from '@/utils/Errors'
 import { Post } from '@prisma/client'
 import { CommunityPosts, OrderBy } from '../published/publish.types'
 
-
 export interface PublishPostPayload {
     slug?: string
     status: ENUMS.DRAFT_STATUS.PUBLISHED
@@ -12,8 +11,6 @@ export interface PublishPostPayload {
         id: string
     }[]
 }
-
-
 
 type PublishedPost = {
     id: string
@@ -322,8 +319,6 @@ export class PrismaPublishRepository implements IPublishRepository {
             if (error instanceof Error) {
                 throw new DatabaseError('searchTagsByName', error.message)
             }
-
-            
         }
         return null
     }
