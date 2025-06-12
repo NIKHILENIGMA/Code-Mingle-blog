@@ -1,6 +1,7 @@
 import { isProduction, tokenInfo, appConfig } from './app.config'
 import {
-    fileUploadConfig,
+    FILE_SIZE_LIMIT,
+    FILE_UPLOAD_PATH,
     cloudinaryConfig,
     ALLOWED_FORMATS,
     MAX_BYTES,
@@ -11,14 +12,14 @@ import {
     INVALIDATE
 } from './cloudinary.config'
 import { openAIConfig } from './openai.config'
-import { resendApiKey } from './resend.config'
+import { RESEND_API_KEY } from './resend.config'
 
 export {
     appConfig,
     isProduction,
     tokenInfo,
-    // keyPath,
-    fileUploadConfig,
+    FILE_UPLOAD_PATH,
+    FILE_SIZE_LIMIT,
     cloudinaryConfig,
     ALLOWED_FORMATS,
     MAX_BYTES,
@@ -28,5 +29,5 @@ export {
     OVERWRITE,
     INVALIDATE,
     openAIConfig,
-    resendApiKey
+    RESEND_API_KEY
 }

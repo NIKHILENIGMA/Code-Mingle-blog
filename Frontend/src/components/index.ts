@@ -1,8 +1,8 @@
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
-import { Label } from "./ui/label";
-import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
-import { Textarea } from "./ui/textarea";
+import { Button } from './ui/button'
+import { Input } from './ui/input'
+import { Label } from './ui/label'
+import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar'
+import { Textarea } from './ui/textarea'
 import {
   Select,
   SelectGroup,
@@ -14,16 +14,16 @@ import {
   SelectSeparator,
   SelectScrollUpButton,
   SelectScrollDownButton,
-} from "./ui/select";
-import { Checkbox } from "./ui/checkbox";
-import { Switch } from "./ui/switch";
-import { Skeleton } from "./ui/skeleton";
+} from './ui/select'
+import { Checkbox } from './ui/checkbox'
+import { Switch } from './ui/switch'
+import { Skeleton } from './ui/skeleton'
 import {
   Tooltip,
   TooltipTrigger,
   TooltipContent,
   TooltipProvider,
-} from "./ui/tooltip";
+} from './ui/tooltip'
 import {
   Command,
   CommandDialog,
@@ -34,7 +34,7 @@ import {
   CommandItem,
   CommandShortcut,
   CommandSeparator,
-} from "./ui/command";
+} from './ui/command'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -51,7 +51,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuRadioGroup,
-} from "./ui/dropdown-menu";
+} from './ui/dropdown-menu'
 import {
   Dialog,
   DialogPortal,
@@ -63,13 +63,13 @@ import {
   DialogFooter,
   DialogTitle,
   DialogDescription,
-} from "./ui/dialog";
+} from './ui/dialog'
 import {
   Popover,
   PopoverTrigger,
   PopoverContent,
   PopoverAnchor,
-} from "./ui/popover";
+} from './ui/popover'
 import {
   Sheet,
   SheetPortal,
@@ -81,20 +81,29 @@ import {
   SheetFooter,
   SheetTitle,
   SheetDescription,
-} from "./ui/sheet";
-import Img from "./common/Img";
-import Card from "./common/Card";
-import DeleteDialog from "./common/DeleteDialog";
-import PrivateRoute from "./common/PrivateRoute";
-import { ModeToggle } from "./DarkMode/mode-toggle";
-import { useTheme, ThemeProvider } from "./DarkMode/theme-provider";
-import SideBarNotRender from "./Error/SideBarNotRender";
-import Loader from "./Loader/Loader";
-import SidebarLoader from "./Loader/SidebarLoader";
-import SpinLoader from "./Loader/SpinLoader";
-import Header from "./Header";
-import Footer from "./Footer";
+} from './ui/sheet'
 
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationPrevious,
+  PaginationEllipsis,
+  PaginationNext,
+} from './ui/pagination'
+
+import Img from './common/Img'
+import Card from './common/Card'
+import DeleteDialog from './common/DeleteDialog'
+import PrivateRoute from './common/PrivateRoute'
+import { ModeToggle } from './DarkMode/mode-toggle'
+import { useTheme, ThemeProvider } from './DarkMode/theme-provider'
+import SideBarNotRender from './Error/SideBarNotRender'
+import Loader from './Loader/Loader'
+import SidebarLoader from './Loader/SidebarLoader'
+import SpinLoader from './Loader/SpinLoader'
+import Header from './Header'
+import Footer from './Footer'
 
 export {
   Header,
@@ -182,4 +191,10 @@ export {
   Loader,
   SidebarLoader,
   SpinLoader,
-};
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationPrevious,
+  PaginationEllipsis,
+  PaginationNext,
+}
