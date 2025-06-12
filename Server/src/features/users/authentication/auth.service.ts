@@ -3,34 +3,62 @@ import { tokenManagement } from '@/utils'
 import { StandardError } from '@/utils/Errors/StandardError'
 import { logger } from '@/utils/logger/index'
 import { BadRequestError, ConflictError, DatabaseError, InternalServerError, NotFoundError, UnauthorizedError } from '@/utils/Errors'
-import { USER_ROLE_ID } from '@/config/app.config'
 import { SignupCredientials, LoginCredientials, Permission } from './auth.types'
 import { PrismaUserRepository } from '../repository/PrismaUserRepository'
 import { PrismaSessionRepository } from '../repository/PrismaSessionRepository'
 import { PrismaResetPasswordRepository } from '../repository/PrismaResetPasswordRepository'
 import sendResetEmail from '@/utils/resend'
 import { comparePassword, hashedPassword } from '@/utils/HashPassword'
+import { PrismaRoleRepository } from '../repository/PrismaRoleRepository'
+import { ROLE } from '@/types/common/enum.types'
+
+interface AuthTokens {
+    accessToken: string
+    refreshToken: string
+}
+
+interface UserLogin {
+    user: {
+        id: string
+        firstName: string
+        lastName: string
+        email: string
+        profileImage?: string
+        username: string
+        roleId: string
+        lastLoginAt: Date
+        verifiedEmail: boolean
+    },
+    permissions: Permission[]
+    tokens: AuthTokens
+}
 
 class AuthService {
     private userRepository: PrismaUserRepository
     private sessionRepository: PrismaSessionRepository
     private resetPasswordRepository: PrismaResetPasswordRepository
+    private roleRepository: PrismaRoleRepository
 
     constructor() {
         this.userRepository = new PrismaUserRepository()
         this.sessionRepository = new PrismaSessionRepository()
         this.resetPasswordRepository = new PrismaResetPasswordRepository()
+        this.roleRepository = new PrismaRoleRepository()
     }
 
     public async registerUser(credentials: SignupCredientials): Promise<void> {
         try {
             // Check if email exists
-            const existedUser = await this.userRepository.getUserByEmail(credentials?.email)
-            if (existedUser) throw new ConflictError('User with this email already exists')
-
-            // Check if username exists
-            const existedUsername = await this.userRepository.getUserByUsername(credentials?.username)
-            if (existedUsername) throw new ConflictError('User with this username already exists')
+            if (credentials?.email) {
+                const existedUser = await this.userRepository.getUserByEmail(credentials?.email)
+                if (existedUser) throw new ConflictError('User with this email already exists')
+            } else if (credentials?.username) {
+                // Check if username exists
+                const existedUsername = await this.userRepository.getUserByUsername(credentials?.username)
+                if (existedUsername) throw new ConflictError('User with this username already exists')
+            } else {
+                throw new BadRequestError('Email or username is required for registration')
+            }
 
             // Hash password
             const hashPassword = await hashedPassword(credentials?.password)
@@ -39,31 +67,42 @@ class AuthService {
             // Set password to hashed password
             credentials.password = hashPassword
 
-            // Create user
+            const role = await this.roleRepository.getRoleByName(ROLE.USER)
+            if (!role) {
+                throw new NotFoundError('User role not found')
+            }
+
+            // Create user role_id
             const newUser = await this.userRepository.create({
                 firstName: credentials?.firstName,
                 lastName: credentials?.lastName,
                 username: credentials?.username,
                 email: credentials?.email,
-                hashPassword: credentials?.password,
-                roleId: USER_ROLE_ID,
+                password: credentials?.password,
+                roleId: role.id,
                 lastLoginAt: new Date()
             })
             if (!newUser) {
                 throw new DatabaseError('Database error occurred while creating user')
             }
+
+            // Check if user has a valid roleId
+            if (!newUser.roleId) {
+                throw new DatabaseError('User does not have a valid roleId')
+            }
         } catch (error) {
             if (error instanceof StandardError) {
+                throw error
+            }
+            if (error instanceof Error) {
+                logger.error(`Error during user registration: ${error.message}`)
                 throw error
             }
             throw new InternalServerError('An unexpected error occurred during registration')
         }
     }
 
-    public async loginUser(
-        credientials: LoginCredientials,
-        options: { userAgent: string; ipAddress: string }
-    ): Promise<{ accessToken: string; refreshToken: string }> {
+    public async loginUser(credientials: LoginCredientials, options: { userAgent: string; ipAddress: string }): Promise<UserLogin> {
         try {
             // Check if user exists
             const user = await this.verifyUserByEmail(credientials.email)
@@ -79,15 +118,13 @@ class AuthService {
             }
 
             // Take User Permissions
-            const userPermissions = await this.userRepository.getUserPermissions(user.roleId)
-
-            if (!userPermissions) {
+            const userRolePermissions = await this.userRepository.getUserPermissions(user.roleId)
+            if (!userRolePermissions) {
                 throw new DatabaseError('Database error occurred while fetching user permissions')
             }
-            logger.info(`User permissions: ${JSON.stringify(userPermissions)}`)
-            // Generate access and refresh tokens
-            //todo Remember to add user permissions to the token payload
-            const tokens = await this.getTokens(user, userPermissions)
+
+            // Generate access and refresh tokens with user permissions
+            const tokens = await this.getTokens(user, userRolePermissions)
             if (!tokens) {
                 throw new InternalServerError('Error generating tokens')
             }
@@ -105,7 +142,24 @@ class AuthService {
             await this.sessionRepository.createSession(sessionPayload)
 
             // Update user lastLoginAt
-            return tokens
+            return {
+                user: {
+                    id: user.id,
+                    firstName: user.firstName || '',
+                    lastName: user.lastName || '',
+                    profileImage: user.profileImage || '',
+                    email: user.email,
+                    username: user.username,
+                    roleId: user.roleId,
+                    lastLoginAt: user.lastLoginAt!,
+                    verifiedEmail: user.verifiedEmail
+                },
+                permissions: userRolePermissions,
+                tokens: {
+                    accessToken: tokens.accessToken,
+                    refreshToken: tokens.refreshToken
+                }
+            }
         } catch (error) {
             if (error instanceof StandardError) {
                 throw error
@@ -169,13 +223,13 @@ class AuthService {
 
     public async resetPasswordService(payload: { userId: string; token: string; newPassword: string }): Promise<void> {
         try {
-            const hashedToken: string | null = await this.resetPasswordRepository.verifyResetPasswordToken(payload.userId)
-            if (!hashedToken) {
+            const hashToken = await this.resetPasswordRepository.verifyResetPasswordToken(payload.userId)
+            if (!hashToken) {
                 throw new NotFoundError('Reset password token not found or expired')
             }
 
             // Compare the hashed token with the raw token
-            const isTokenValid: boolean = await comparePassword(payload.token, hashedToken)
+            const isTokenValid: boolean = await comparePassword(payload.token, hashToken.tokenHash)
             if (!isTokenValid) {
                 throw new BadRequestError('Token which is already expired or invalid')
             }
@@ -296,6 +350,11 @@ class AuthService {
             if (error instanceof StandardError) {
                 throw error
             }
+            if (error instanceof Error) {
+                logger.error(`Error generating tokens: ${error.message}`)
+                throw new InternalServerError('Error generating tokens')
+            }
+
             throw new InternalServerError('An unexpected error occurred while generating tokens')
         }
     }
