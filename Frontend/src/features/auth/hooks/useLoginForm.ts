@@ -53,10 +53,6 @@ export const useLoginForm = () => {
           })
         );
 
-        // Persist the access token
-        localStorage.setItem("__acc", response?.data.token);
-        localStorage.setItem("__persist", "true");
-
         // Reset the form
         reset();
 
