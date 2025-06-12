@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { fileUploadConfig } from '@/config'
+import { FILE_SIZE_LIMIT } from '@/config'
 
 const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
 
@@ -21,5 +21,5 @@ export const ProfileUpdateBodySchema = z.object({
 
 export const ProfileImageSchema = z.object({
     mimetype: z.string().refine((type) => ACCEPTED_IMAGE_TYPES.includes(type), { message: 'Invalid image file type' }),
-    size: z.number().refine((size) => size <= fileUploadConfig.FILE_SIZE_LIMIT, { message: 'Image file size is too large' })
+    size: z.number().refine((size) => size <= FILE_SIZE_LIMIT, { message: 'Image file size is too large' })
 })

@@ -7,7 +7,6 @@ export type AcceptedImageType = (typeof ACCEPTED_IMAGE_TYPES)[number] // 'image/
 const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
 const MIN_FILE_SIZE = 100 // 100 bytes
 
-
 export const PublishParamsSchema = z.object({
     id: z.string().uuid()
 })
