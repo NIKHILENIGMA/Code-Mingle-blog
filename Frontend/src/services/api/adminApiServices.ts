@@ -1,4 +1,4 @@
-import { ADMIN_URL } from "@/constants/constants";
+import { ADMIN_URL } from "@/constants";
 import { apiInstance } from "./apiInstance";
 import { toast } from "sonner";
 

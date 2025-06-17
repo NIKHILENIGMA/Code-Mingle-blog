@@ -1,4 +1,4 @@
-import { DRAFT_URL } from "@/constants/constants";
+import { DRAFT_URL } from "@/constants";
 import { apiInstance } from "./apiInstance";
 import { Draft } from "@/features/drafts/types";
 import { AxiosError } from "axios";

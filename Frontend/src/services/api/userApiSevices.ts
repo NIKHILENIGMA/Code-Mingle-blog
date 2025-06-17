@@ -1,6 +1,6 @@
 import { AxiosError, AxiosResponse } from "axios";
 import { apiInstance } from "./apiInstance";
-import { PROFILE_URL } from "@/constants/constants";
+import { PROFILE_URL } from "@/constants";
 
 export const createUser = async (data: unknown): Promise<AxiosResponse> => {
   try {

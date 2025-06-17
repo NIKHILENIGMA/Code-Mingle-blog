@@ -1,4 +1,4 @@
-import { PUBLISH_URL } from "@/constants/constants";
+import { PUBLISH_URL } from "@/constants";
 import { apiInstance } from "./apiInstance";
 
 
