@@ -7,6 +7,9 @@ import SharePostLink from "@/features/Blog/components/Comments/SharePostLink";
 import ReactHtmlParser from "react-html-parser";
 import { Button } from "@/components";
 
+// Todo: Replace with your actual post data structure
+
+
 const ReadPostPage: React.FC = () => {
   const { postId } = useParams<{ postId: string }>();
   const [liked, setLiked] = React.useState<boolean>(false);
@@ -38,7 +41,7 @@ const ReadPostPage: React.FC = () => {
                   className="object-cover rounded-full w-14 h-14"
                 />
                 <div className="flex flex-col items-center justify-center p-5 rounded-3xl ">
-                  <p className="px-8 text-2xl font-medium  text-start ">
+                  <p className="px-8 text-2xl font-medium text-start ">
                     @{postCard?.author.name}
                   </p>
                   <p className="text-sm text-start">
@@ -53,7 +56,7 @@ const ReadPostPage: React.FC = () => {
 
           {/* Title and Content */}
           <div className="w-full h-[40%]  md:px-28 md:mx-auto text-center">
-            <h2 className="w-full text-2xl font-semibold text-center  lg:text-5xl ">
+            <h2 className="w-full text-2xl font-semibold text-center lg:text-5xl ">
               {postCard?.title}
             </h2>
           </div>
