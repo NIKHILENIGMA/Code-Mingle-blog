@@ -1,5 +1,4 @@
 import {
-  createContext,
   FC,
   ReactNode,
   useCallback,
@@ -15,6 +14,7 @@ import {
 } from "@/services/api/authApiServices";
 import { apiInstance } from "@/services/api/apiInstance";
 import { AxiosError } from "axios";
+import { AuthContext } from "@/hooks/useAuthContext";
 
 type User = {
   id: string;
@@ -37,7 +37,7 @@ type AuthContextType = {
   setIsPersistent: (value: boolean) => void;
 };
 
-export const AuthContext = createContext<AuthContextType | null>(null);
+
 
 export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
