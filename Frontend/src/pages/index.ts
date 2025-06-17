@@ -3,7 +3,7 @@ import AboutPage from "./Public/AboutPage";
 import NotFoundPage from "./Public/NotFoundPage";
 import LoginPage from "./Auth/LoginPage";
 import ResetPasswordPage from "./Auth/ForgotPasswordPage";
-import SignupPage from "./Auth/SignupPage";
+// import SignupPage from "./Auth/SignupPage";
 import ReadPostPage from "@/pages/Blog/ReadPostPage";
 import LearnEditorPage from "@/pages/Blog/LearnEditorPage";
 
@@ -13,7 +13,7 @@ export {
   NotFoundPage,
   LoginPage,
   ResetPasswordPage,
-  SignupPage,
+  // SignupPage,
   ReadPostPage,
   // PreviewPostPage,
   LearnEditorPage,
