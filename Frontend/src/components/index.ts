@@ -104,6 +104,7 @@ import SidebarLoader from './Loader/SidebarLoader'
 import SpinLoader from './Loader/SpinLoader'
 import Header from './Header'
 import Footer from './Footer'
+import AppDropdown from './common/AppDropdown'
 
 export {
   Header,
@@ -146,6 +147,7 @@ export {
   SelectSeparator,
   SelectScrollUpButton,
   SelectScrollDownButton,
+  AppDropdown,
   Checkbox,
   Switch,
   Textarea,
