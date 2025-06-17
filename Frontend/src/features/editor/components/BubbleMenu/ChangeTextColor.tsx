@@ -1,7 +1,7 @@
 import { FC } from "react";
 import { Editor } from "@tiptap/core";
 import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components";
-import { hexOptions } from "@/constants/constants";
+import { TEXT_COLOR_HEXCODES } from "@/constants";
 
 interface ChangeTextColorProps {
   editor: Editor | null;
@@ -32,7 +32,7 @@ const ChangeTextColor: FC<ChangeTextColorProps> = ({ editor }) => {
           e.preventDefault();
         }}
       >
-        {hexOptions.map((option) => (
+        {TEXT_COLOR_HEXCODES.map((option) => (
           <SelectItem
             key={option.value}
             value={option.value}
@@ -42,7 +42,7 @@ const ChangeTextColor: FC<ChangeTextColorProps> = ({ editor }) => {
             }}
           >
             <span
-              className="inline-block w-3 h-3 rounded-full mr-2"
+              className="inline-block w-3 h-3 mr-2 rounded-full"
               style={{ backgroundColor: option.value }}
             />
             {option.label}

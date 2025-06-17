@@ -3,7 +3,7 @@ import {
     allDraftsService,
     getDraftService,
 } from "@/services/api/draftApiServices";
-import { DRAFT_GC_TIME, DRAFT_STALE_TIME } from "@/constants/constants";
+import { DRAFT_GC_TIME, DRAFT_STALE_TIME } from "@/constants";
 
 /**
  * Custom hook to manage queries for drafts.
@@ -39,6 +39,7 @@ export const useDraftQuery = (id?: string) => {
   const getDraftsQuery = useQuery({
     queryKey: ["drafts"],
     queryFn: async () => await allDraftsService(),
+    enabled: !!id, 
     refetchOnWindowFocus: false,
     staleTime: DRAFT_STALE_TIME,
     gcTime: DRAFT_GC_TIME,

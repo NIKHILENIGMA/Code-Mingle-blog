@@ -8,38 +8,59 @@ import { RootState } from "@/app/store/store";
 import { useDraftQuery } from "../hooks/useDraftQuery";
 import { toast } from "sonner";
 
-// DraftPage component: Responsible for displaying and managing a single draft page
+
+/**
+ * DraftPage component for displaying and editing a specific draft.
+ * 
+ * This component serves as the main page for viewing and editing draft content.
+ * It fetches draft data based on the draftId URL parameter, manages the selected
+ * draft state in Redux, and renders the draft's actions, cover image, and form.
+ * 
+ * @component
+ * @example
+ * ```tsx
+ * // Used in router configuration
+ * <Route path="/draft/:draftId" element={<DraftPage />} />
+ * ```
+ * 
+ * @throws {Error} Throws an error if draftId parameter is not provided in the URL
+ * 
+ * @returns {JSX.Element} The rendered draft page containing:
+ *   - DraftActions: Action buttons for the draft (save, delete, etc.)
+ *   - DraftCoverImage: Component displaying the draft's cover image
+ *   - DraftForm: Form for editing the draft's content
+ * 
+ * @requires useParams - React Router hook to extract draftId from URL
+ * @requires useDispatch - Redux hook for dispatching actions
+ * @requires useSelector - Redux hook for accessing selectedDraft state
+ * @requires useDraftQuery - Custom hook for fetching draft data
+ * 
+ * @sideEffects
+ * - Displays error toast if draftId is missing
+ * - Updates Redux state with selected draft when draft data is loaded
+ * - Fetches draft data from API based on draftId parameter
+ */
 const DraftPage: FC = () => {
-  // Extract the draftId from the URL parameters
-  const { draftId } = useParams<{ draftId: string }>();
   
-  // If no draftId is provided, show an error toast and throw an error
+  const { draftId } = useParams<{ draftId: string }>();
   if (!draftId) {
     toast.error("Draft ID is required");
     throw new Error("Draft ID is required");
   }
 
-  // Initialize the Redux dispatch function
   const dispatch = useDispatch();
-
-  // Retrieve the currently selected draft from the Redux store
   const selectedDraft = useSelector(
     (state: RootState) => state?.draft?.selectedDraft
   );
-
-  // Fetch the draft data using a custom hook
   const { getDraftQuery } = useDraftQuery(draftId);
-  const Draft = getDraftQuery.data; // The fetched draft data
+  const Draft = getDraftQuery.data; 
 
-  // useEffect hook: Sync the fetched draft with the Redux store
   useEffect(() => {
-    // If no draft is selected in the store and the draft data is fetched, update the store
     if (!selectedDraft && Draft) {
       dispatch(setSelectedDraft({ selectedDraft: Draft }));
     }
   }, [Draft, selectedDraft, dispatch]);
 
-  // Render the draft page UI
   return (
     <div className="w-full h-full">
       {/* Actions related to the draft (e.g., save, delete) */}

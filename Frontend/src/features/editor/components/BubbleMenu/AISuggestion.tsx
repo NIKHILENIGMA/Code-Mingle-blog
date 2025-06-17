@@ -2,7 +2,7 @@ import { createElement, FC, useState } from "react";
 import { Editor } from "@tiptap/core";
 import { Wand } from "@/Utils/Icons";
 import { Button } from "@/components";
-import { aiOptions } from "@/constants/constants";
+import { AI_OPTIONS } from "@/constants";
 
 interface AISuggestionProps {
   editor: Editor;
@@ -47,22 +47,22 @@ const AISuggestion: FC<AISuggestionProps> = ({ editor }) => {
       <Button
         variant={"outline"}
         onClick={handleShowMenu}
-        className="border-none shadow-none bg-transparent hover:bg-primary/10 hover:text-primary transition-colors"
+        className="transition-colors bg-transparent border-none shadow-none hover:bg-primary/10 hover:text-primary"
       >
         <Wand />
         Ask AI
       </Button>
 
       {menu ? (
-        <div className="absolute w-58 top-full mt-1 left-0 rounded-lg shadow-lg border border-primary/70 bg-background">
+        <div className="absolute left-0 mt-1 border rounded-lg shadow-lg w-58 top-full border-primary/70 bg-background">
           <ul className="py-2">
-            {aiOptions.map((option, index) => (
+            {AI_OPTIONS.map((option, index) => (
               <li
                 key={index + option.label}
-                className="relative group cursor-pointer"
+                className="relative cursor-pointer group"
               >
                 <div
-                  className="flex items-center px-4 py-2 hover:bg-primary/10 hover:text-primary transition-colors"
+                  className="flex items-center px-4 py-2 transition-colors hover:bg-primary/10 hover:text-primary"
                   onClick={() => handleOptionSelect(option)}
                 >
                   {createElement(option.icon, {
@@ -72,11 +72,11 @@ const AISuggestion: FC<AISuggestionProps> = ({ editor }) => {
                 </div>
 
                 {option?.subOptions && option.subOptions?.length > 0 && (
-                  <ul className="absolute left-full top-0 w-64 rounded-lg shadow-lg border bg-background hidden group-hover:block z-10">
+                  <ul className="absolute top-0 z-10 hidden w-64 border rounded-lg shadow-lg left-full bg-background group-hover:block">
                     {option.subOptions.map((subOption, subIndex) => (
                       <li
                         key={subIndex + subOption.label}
-                        className="flex items-center px-4 py-2 hover:bg-primary/10 hover:text-primary cursor-pointer transition-colors"
+                        className="flex items-center px-4 py-2 transition-colors cursor-pointer hover:bg-primary/10 hover:text-primary"
                         onClick={() =>
                           handleOptionSelect({
                             type: option.label,

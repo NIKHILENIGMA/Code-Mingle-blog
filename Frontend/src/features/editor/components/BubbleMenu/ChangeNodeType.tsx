@@ -1,7 +1,7 @@
 import { FC } from "react";
 import { Editor } from "@tiptap/core";
 import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components";
-import { nodeOptions } from "@/constants/constants";
+import { NODE_TYPE } from "@/constants";
 
 export type Level = 1 | 2 | 3;
 
@@ -43,7 +43,7 @@ const ChangeNodeType: FC<ChangeNodeTypeProps> = ({ editor }) => {
           e.preventDefault();
         }}
       >
-        {nodeOptions.map((option) => (
+        {NODE_TYPE.map((option) => (
           <SelectItem
             key={option.value}
             value={option.value}
@@ -53,7 +53,7 @@ const ChangeNodeType: FC<ChangeNodeTypeProps> = ({ editor }) => {
             }}
           >
             <span
-              className="inline-block w-3 h-3 rounded-full mr-2"
+              className="inline-block w-3 h-3 mr-2 rounded-full"
               style={{ backgroundColor: option.value }}
             />
             {option.label}

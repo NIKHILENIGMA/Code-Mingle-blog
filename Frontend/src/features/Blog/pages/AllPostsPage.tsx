@@ -1,24 +1,24 @@
-import { FC } from "react";
-import { useNavigate } from "react-router-dom";
-import { dummyPosts } from "@/constants/constants";
-import Container from "@/container/Container";
-import { Button, Input } from "@/components";
+import { FC } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { DUMMY_POSTS } from '@/constants'
+import Container from '@/container/Container'
+import { Button, Input } from '@/components'
 // import { getAllPostsService } from "@/services/api/postApiServices";
 // import { useQuery } from "@tanstack/react-query";
 
 interface PostInterface {
-  id: number;
-  image: string;
-  title: string;
-  date: string;
-  description: string;
-  author: string;
-  role: string;
-  category: string;
+  id: number
+  image: string
+  title: string
+  date: string
+  description: string
+  author: string
+  role: string
+  category: string
 }
 
 const AllPostsPage: FC = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
   // const {
   //   data: posts,
   //   isLoading,
@@ -35,12 +35,13 @@ const AllPostsPage: FC = () => {
   // if (error) return <div>Error: {error.message}</div>;
 
   const handleReadPost = (id: string) => {
-    navigate(`/posts/${id}`);
-  };
+    navigate(`/posts/${id}`)
+  }
 
   return (
     <Container>
-      <div className="w-full p-4 my-16 md:p-8 bg-background">
+      <div className="relative z-10 w-full p-4 my-16 bg-background md:p-8">
+        <div className="absolute bottom-0 left-0 right-0 top-0 -z-[1] bg-[radial-gradient(circle_300px_at_100%_200px,#d5c5ff,transparent)] sm:bg-[radial-gradient(circle_400px_at_50%_300px,#d5c5ff,transparent)] dark:bg-[radial-gradient(circle_400px_at_50%_300px,#4f388c,transparent)]"></div>
         {/* Header */}
         <h1 className="mb-6 text-3xl font-bold text-center md:text-4xl">
           Explore Community Stories
@@ -51,19 +52,19 @@ const AllPostsPage: FC = () => {
           <Input
             type="text"
             placeholder="Search blogs, stories and more..."
-            className="md:w-[30%] w-full"
+            className="md:w-[30%] w-full bg-background text-muted-foreground"
           />
           {/* <div className="absolute flex items-center justify-center w-8 h-8 text-white rounded-full cursor-pointer bottom-2 right-2 bg-primary hover:bg-primary/80"></div> */}
         </div>
 
         <div className="flex items-center justify-center w-full mb-6 space-x-4">
-          <Button variant={"outline"} className="w-full rounded-full md:w-auto">
+          <Button variant={'outline'} className="w-full rounded-full md:w-auto">
             Followings
           </Button>
-          <Button variant={"outline"} className="w-full rounded-full md:w-auto">
+          <Button variant={'outline'} className="w-full rounded-full md:w-auto">
             Popular
           </Button>
-          <Button variant={"outline"} className="w-full rounded-full md:w-auto">
+          <Button variant={'outline'} className="w-full rounded-full md:w-auto">
             Latest
           </Button>
         </div>
@@ -74,12 +75,12 @@ const AllPostsPage: FC = () => {
           <div className="w-full "></div>
 
           {/* Posts List */}
-          <div className="flex ">
+          <div className="z-10 flex">
             <div className="w-full space-y-6 md:w-[80%] px-10">
-              {dummyPosts?.map((post: PostInterface) => (
+              {DUMMY_POSTS.map((post: PostInterface) => (
                 <div
                   key={post.id}
-                  className="w-full p-4 bg-card space-y-4 transition rounded-lg cursor-pointer border-[1px] sm:flex md:flex-row text-muted-foreground md:p-6 md:space-y-0 md:space-x-6 hover:shadow-md border-secondary/85 hover:bg-secondary/15"
+                  className="w-full p-4 bg-card space-y-4 transition rounded-lg cursor-pointer border-[1px] sm:flex md:flex-row text-muted-foreground md:p-6 md:space-y-0 md:space-x-6 hover:shadow-md border-secondary/85 "
                   onClick={() => handleReadPost(post.id.toString())}
                 >
                   {/* Post Image */}
@@ -141,8 +142,8 @@ const AllPostsPage: FC = () => {
                     key={num}
                     className={`px-3 py-1 rounded-full ${
                       num === 1
-                        ? "bg-purple-600 text-white"
-                        : "border border-gray-300 text-gray-600 hover:bg-gray-100"
+                        ? 'bg-purple-600 text-white'
+                        : 'border border-gray-300 text-gray-600 hover:bg-gray-100'
                     }`}
                   >
                     {num}
@@ -213,7 +214,7 @@ const AllPostsPage: FC = () => {
         </div>
       </div>
     </Container>
-  );
-};
+  )
+}
 
-export default AllPostsPage;
+export default AllPostsPage

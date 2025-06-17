@@ -6,7 +6,7 @@ import {
   SelectItem,
   SelectTrigger,
 } from "@/components";
-import { hexOptions } from "@/constants/constants";
+import { TEXT_HIGHLIGHT_HEXCODES } from "@/constants";
 
 interface HighlightTextProps {
   editor: Editor | null;
@@ -36,7 +36,7 @@ const HighlightText: FC<HighlightTextProps> = ({ editor }) => {
           e.preventDefault();
         }}
       >
-        {hexOptions.map((option) => (
+        {TEXT_HIGHLIGHT_HEXCODES.map((option) => (
           <SelectItem
             key={option.value}
             value={option.value}
@@ -46,7 +46,7 @@ const HighlightText: FC<HighlightTextProps> = ({ editor }) => {
             }}
           >
             <span
-              className="inline-block w-3 h-3 rounded-full mr-2"
+              className="inline-block w-3 h-3 mr-2 rounded-full"
               style={{ backgroundColor: option.value }}
             />
             {option.label}
@@ -60,12 +60,12 @@ const HighlightText: FC<HighlightTextProps> = ({ editor }) => {
 export default HighlightText;
 {
   /* <div
-      className="bg-card rounded-md"
+      className="rounded-md bg-card"
       onMouseDown={(e) => e.preventDefault()} // prevents BubbleMenu from closing
     >
       <Button
         onClick={() => setOpen((prev) => !prev)}
-        className="flex items-center gap-1 px-3 py-1 bg-card rounded-md text-sm"
+        className="flex items-center gap-1 px-3 py-1 text-sm rounded-md bg-card"
       >
         Highlight <ChevronDown className="w-4 h-4" />
       </Button>
@@ -75,14 +75,14 @@ export default HighlightText;
           {options.map((option) => (
             <div
               key={option.value}
-              className="w-full flex items-center justify-start space-y-2"
+              className="flex items-center justify-start w-full space-y-2"
             >
               <button
                 onClick={() => handleSelect(option.value)}
-                className="text-start h-full flex items-center gap-2 px-3 py-1 w-full rounded-sm transition-colors"
+                className="flex items-center w-full h-full gap-2 px-3 py-1 transition-colors rounded-sm text-start"
               >
                 <span
-                  className="border-2 rounded-md p-3 w-4 h-4 flex items-center justify-center"
+                  className="flex items-center justify-center w-4 h-4 p-3 border-2 rounded-md"
                   style={{
                     color: option.value,
                   }}
