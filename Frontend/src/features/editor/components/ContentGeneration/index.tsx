@@ -7,7 +7,7 @@ import { ToneType, PromptType } from "@/Types/types";
 import { useAIContent } from "../../hooks/useAIContent";
 import SelectResponseType from "./SelectResponseType";
 import RenderAIContent from "./RenderAIContent";
-import { TONE_OPTIONS, TYPE_OPTIONS } from "@/constants/constants";
+import { TONE_OPTIONS, TYPE_OPTIONS } from "@/constants";
 
 const ContentGeneration: FC<NodeViewProps> = ({
   node,
@@ -31,7 +31,7 @@ const ContentGeneration: FC<NodeViewProps> = ({
 
   return (
     <NodeViewWrapper className="ai-content w-full min-h-[20vh] p-4 bg-card border border-secondary rounded-md shadow-md">
-      <div className="flex flex-col gap-2 relative" contentEditable={false}>
+      <div className="relative flex flex-col gap-2" contentEditable={false}>
         <NodeViewContent className="content is-editable">
           <div className="flex items-center space-x-3">
             <Wand size={22} />
@@ -42,7 +42,7 @@ const ContentGeneration: FC<NodeViewProps> = ({
           <Button
             variant={"link"}
             onClick={() => deleteNode()}
-            className="absolute right-4 top-1 cursor-pointer text-muted-foreground"
+            className="absolute cursor-pointer right-4 top-1 text-muted-foreground"
           >
             <Plus size={20} color="red" className="rotate-45" />
           </Button>
@@ -64,11 +64,11 @@ const ContentGeneration: FC<NodeViewProps> = ({
               autoComplete="off"
               autoFocus
               onChange={handlePromptChange}
-              className="w-full h-24 p-2 border border-secondary rounded-md resize-none"
+              className="w-full h-24 p-2 border rounded-md resize-none border-secondary"
             />
 
             {error && <span className="text-sm text-red-500">{error}</span>}
-            <div className="flex justify-start items-center space-x-2 mb-2">
+            <div className="flex items-center justify-start mb-2 space-x-2">
               <SelectResponseType
                 value={prompt?.type}
                 onChange={(value) => {

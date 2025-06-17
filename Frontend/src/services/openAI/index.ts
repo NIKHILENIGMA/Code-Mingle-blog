@@ -1,4 +1,4 @@
-import { OPEN_AI_URL } from "@/constants/constants";
+import { OPEN_AI_URL } from "@/constants";
 import { apiInstance } from "../api/apiInstance";
 import { PromptType, ToneType } from "@/Types/types";
 

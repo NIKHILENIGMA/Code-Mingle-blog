@@ -9,7 +9,7 @@ import {
   SelectItem,
 } from "@/components/ui/select"; // Adjust to your component path
 import { LanguageType } from "../../types";
-import { languageOptions } from "@/constants/constants";
+import { LANGUAGE_OPTIONS } from "@/constants";
 
 interface SelectLanguageProps {
   currentLanguage: LanguageType;
@@ -39,7 +39,7 @@ export const SelectLanguage: FC<SelectLanguageProps> = ({
       <SelectContent>
         <SelectGroup>
           <SelectLabel>Languages</SelectLabel>
-          {languageOptions.map((lang) => (
+          {LANGUAGE_OPTIONS.map((lang) => (
             <SelectItem key={lang} value={lang}>
               {lang.charAt(0).toUpperCase() + lang.slice(1)}
             </SelectItem>
