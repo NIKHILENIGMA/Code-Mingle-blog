@@ -30,6 +30,7 @@ import ForgotPassword from '@/features/auth/pages/ForgotPassword'
 import ResetPassword from '@/features/auth/pages/ResetPassword'
 import RolesAndPermissions from '@/features/admin/pages/RolesAndPermissions'
 import SessionManagement from '@/features/admin/pages/SessionManagement'
+import { LearnEditorPage } from '@/pages'
 
 const router = createBrowserRouter([
   {
@@ -114,12 +115,7 @@ const router = createBrowserRouter([
   },
   {
     path: '/learn',
-    lazy: async () => {
-      const { LearnEditorPage } = await import('@/pages')
-      return {
-        element: <LearnEditorPage />,
-      }
-    },
+    element: <LearnEditorPage />,
   },
 
   {
