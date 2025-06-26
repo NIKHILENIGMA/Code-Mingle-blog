@@ -117,7 +117,10 @@ const router = createBrowserRouter([
     path: '/learn',
     element: <LearnEditorPage />,
   },
-
+  {
+    path: '/verify-email?token=:token',
+    element: <div>Verify Email Page</div>, // Placeholder for email verification page
+  },
   {
     path: '/login',
     element: <Login />,
@@ -168,7 +171,6 @@ const router = createBrowserRouter([
       },
     ],
   },
-
   {
     path: '*',
     element: <NotFoundPage />,
