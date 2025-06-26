@@ -1,4 +1,4 @@
-import { isProduction, tokenInfo, appConfig } from './app.config'
+import { isProduction, appConfig } from './app.config'
 import {
     FILE_SIZE_LIMIT,
     FILE_UPLOAD_PATH,
@@ -17,7 +17,6 @@ import { RESEND_API_KEY } from './resend.config'
 export {
     appConfig,
     isProduction,
-    tokenInfo,
     FILE_UPLOAD_PATH,
     FILE_SIZE_LIMIT,
     cloudinaryConfig,

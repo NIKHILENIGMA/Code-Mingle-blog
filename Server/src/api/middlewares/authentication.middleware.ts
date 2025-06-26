@@ -4,10 +4,10 @@ import { AsyncHandler, tokenManagement } from '@/utils'
 import { StandardError } from '@/utils/Errors/StandardError'
 import { PrismaUserRepository } from '@/features/users/repository/PrismaUserRepository'
 import { UserDTO } from '@/features/users/authentication/auth.types'
-import { PrismaSessionRepository } from '@/features/users/repository/PrismaSessionRepository'
+import { sessionRepository } from '@/features/users/repository/PrismaSessionRepository'
 
 const userRepository = new PrismaUserRepository()
-const sessionRepository = new PrismaSessionRepository()
+
 
 const extractToken = (req: Request): string => {
     let token = null
@@ -73,10 +73,6 @@ export const isAuthenticated = AsyncHandler(async (req: Request, _: Response, ne
             refreshToken: session?.refreshToken,
             valid: session?.valid
         }
-
-        // todo add permissions to request object
-        // const permissions = await permissionRepository.getPermissionsByRoleId(user.roleId)
-        // req.perms = decodedToken.permission
 
         next()
     } catch (error) {
