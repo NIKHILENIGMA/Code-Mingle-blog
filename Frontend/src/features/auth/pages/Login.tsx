@@ -1,42 +1,61 @@
-import { Button, Input, Label } from "@/components";
-import React, { useState } from "react";
-import { Checkbox } from "@/components/ui/checkbox";
-import { useNavigate, useLocation, Link } from "react-router-dom";
-import { PiEyeClosedThin } from "react-icons/pi";
-import { PiEyeThin } from "react-icons/pi";
-import { useAuthContext } from "@/hooks/useAuthContext";
-import { FcGoogle } from "react-icons/fc";
+import React, { useCallback, useEffect, useState } from 'react'
+import { Button, Input, Label, Checkbox } from '@/components'
+import { useNavigate, useLocation, Link } from 'react-router-dom'
+import { useAuthContext } from '@/hooks/useAuthContext'
+import directUserToGoogleConsentScreen from '@/Utils/OAuth'
+import { PiEyeClosedThin, PiEyeThin, FcGoogle } from '@/Utils/Icons'
 
 const Login: React.FC = () => {
   const [formState, setFormState] = useState({
-    email: "",
-    password: "",
-  });
-  const [rememberMe, setRememberMe] = useState<boolean>(false);
-  const [isVisible, setVisibility] = useState(false);
-  const { login, loading } = useAuthContext();
-  const location = useLocation();
-  const navigate = useNavigate();
+    email: '',
+    password: '',
+  })
+  const [rememberMe, setRememberMe] = useState<boolean>(false)
+  const [isVisible, setVisibility] = useState(false)
+  const { login, handleGoogleLogin, loading } = useAuthContext()
+  const location = useLocation()
+  const navigate = useNavigate()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+    const { name, value } = e.target
     setFormState((prevState) => ({
       ...prevState,
       [name]: value,
-    }));
-  };
+    }))
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     if (!formState.email || !formState.password) {
-      return;
+      return
     }
-    localStorage.setItem("isPersistent", String(rememberMe));
-    await login(formState.email, formState.password);
+    localStorage.setItem('isPersistent', String(rememberMe))
+    await login(formState.email, formState.password)
 
-    const from = (location.state as { from?: Location })?.from?.pathname || "/";
-    navigate(from, { replace: true });
-  };
+    const from = (location.state as { from?: Location })?.from?.pathname || '/'
+    navigate(from, { replace: true })
+  }
+
+  const handleGoogleCallback = useCallback(async () => {
+    const urlParams = new URLSearchParams(window.location.search)
+    const code: string = urlParams.get('code')!
+
+    if (!code) {
+      console.log('Authentication code does not provide!')
+    }
+
+    try {
+      await handleGoogleLogin(code)
+    } catch (error) {
+      console.error(
+        `An error while handling the google callback: ${(error as Error)?.message}`,
+      )
+    }
+  }, [handleGoogleLogin])
+
+  useEffect(() => {
+    handleGoogleCallback()
+  }, [handleGoogleCallback])
 
   return (
     <div className="relative flex items-center justify-center min-h-screen px-4 py-12">
@@ -88,7 +107,7 @@ const Login: React.FC = () => {
               <Input
                 id="password"
                 name="password"
-                type={isVisible ? "text" : "password"}
+                type={isVisible ? 'text' : 'password'}
                 autoComplete="current-password"
                 required
                 placeholder="*********"
@@ -128,26 +147,31 @@ const Login: React.FC = () => {
           <div>
             <Button
               type="submit"
-              variant={"default"}
+              variant={'default'}
               className="w-full bg-primary text-primary-foreground hover:bg-secondary"
             >
-              {loading ? <span>Login...</span> : "Login"}
+              {loading ? <span>Login...</span> : 'Login'}
             </Button>
           </div>
         </form>
         <hr />
+
         <div className="space-y-2 text-center">
           <p className="text-sm font-medium text-secondary-foreground/40">
             Or continue with
           </p>
-          <Button variant={"outline"} className="w-full" onClick={() => {}}>
+          <Button
+            variant={'outline'}
+            className="w-full"
+            onClick={directUserToGoogleConsentScreen}
+          >
             <FcGoogle /> Continue with Google
           </Button>
         </div>
 
         <div className="text-center">
           <p className="text-sm font-light text-secondary-foreground">
-            Don't have an account?{" "}
+            Don't have an account?{' '}
             <Link
               to="/signup"
               className="font-medium text-primary hover:text-primary/80"
@@ -158,7 +182,7 @@ const Login: React.FC = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Login;
+export default Login
