@@ -3,14 +3,13 @@ import { User } from '@prisma/client'
 import { Permission, UserDTO } from '../authentication/auth.types'
 import { Dashboard } from '../profile/profile.types'
 import { DatabaseError } from '@/utils/Errors'
-// import { DatabaseError } from '@/utils/Errors'
 
 interface NewUser {
     firstName: string | undefined
     lastName: string | undefined
     username: string
     email: string
-    password: string
+    password?: string
     lastLoginAt?: Date | null
     roleId: string
 }

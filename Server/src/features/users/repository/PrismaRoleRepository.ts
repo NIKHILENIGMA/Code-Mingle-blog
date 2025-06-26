@@ -2,7 +2,7 @@ import prisma from '@/config/prisma.config'
 import { DatabaseError } from '@/utils/Errors'
 import { Role } from '@prisma/client'
 
-interface IRoleRepository {
+export interface IRoleRepository {
     createRole(name: string, description?: string): Promise<Role>
     updateRole(roleId: string, name?: string, description?: string): Promise<Role>
     deleteRole(roleId: string): Promise<Role>

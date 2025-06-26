@@ -3,23 +3,27 @@ import { DatabaseError } from '@/utils/Errors'
 import { Session } from '@prisma/client'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 
-interface SessionPayload {
+export interface SessionPayload {
     userId: string
     accessToken: string
     refreshToken: string
     userAgent?: string
     ipAddress?: string
+    valid?: boolean
 }
 
-interface ISessionRepository {
+export interface ISessionRepository {
     createSession(sessionPayload: SessionPayload): Promise<void>
     updateSession(sessionId: string, sessionPayload: Partial<SessionPayload>): Promise<void>
     getSession(accessToken: string): Promise<Session | null>
     getSessionByUserId(userId: string): Promise<Session | null>
     deleteSession(sessionId: string): Promise<void>
+    updateAllSessionsByUserId(userId: string, sessionPayload: Partial<SessionPayload>): Promise<void>
+    getSessionByRefreshToken(refreshToken: string): Promise<Session | null>
 }
 
-export class PrismaSessionRepository implements ISessionRepository {
+class PrismaSessionRepository implements ISessionRepository {
+    constructor() {}
     async createSession(sessionPayload: SessionPayload): Promise<void> {
         try {
             await prisma.session.create({
@@ -123,4 +127,29 @@ export class PrismaSessionRepository implements ISessionRepository {
             )
         }
     }
+
+    async updateAllSessionsByUserId(userId: string, payload: Partial<Session>): Promise<void> {
+        try {
+            await prisma.session.updateMany({
+                where: { userId, valid: true },
+                data: payload
+            })
+        } catch (error) {
+            if (error instanceof PrismaClientKnownRequestError) {
+                throw new DatabaseError(
+                    `Error deleting all sessions by user ID: ${error.message}`,
+                    'PrismaSessionRepository.deleteAllSessionsByUserId'
+                )
+            }
+
+            throw new DatabaseError(
+                `An unexpected error while deleting all sessions by user ID: ${(error as Error).message}`,
+                'PrismaSessionRepository.deleteAllSessionsByUserId'
+            )
+        }
+    }
+
+
 }
+
+export const sessionRepository = new PrismaSessionRepository()

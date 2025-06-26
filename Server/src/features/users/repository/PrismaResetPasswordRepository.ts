@@ -17,6 +17,7 @@ interface IResetPasswordRepository {
 }
 
 export class PrismaResetPasswordRepository implements IResetPasswordRepository {
+    constructor() {}
     public async createResetPasswordToken(payload: ResetTokenPayload): Promise<void> {
         try {
             await prisma.passwordResetToken.create({
