@@ -55,7 +55,7 @@ import {
   Clipboard,
   Moon,
   Search,
-  ClipboardCheck, 
+  ClipboardCheck,
   CircleUser,
   MonitorPlay,
   ClipboardList,
@@ -80,11 +80,17 @@ import {
   GripVertical,
   Save,
   BookCheck,
-} from "lucide-react";
+} from 'lucide-react'
 
+import { PiEyeClosedThin } from 'react-icons/pi'
+import { PiEyeThin } from 'react-icons/pi'
+import { FcGoogle } from 'react-icons/fc'
 export {
+  PiEyeClosedThin,
+  PiEyeThin,
+  FcGoogle,
   BookCheck,
-  ClipboardCheck, 
+  ClipboardCheck,
   ImagePlus,
   GripVertical,
   ShieldAlert,
@@ -164,4 +170,4 @@ export {
   PanelLeft,
   PanelRight,
   Settings,
-};
+}
