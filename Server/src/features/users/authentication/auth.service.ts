@@ -2,46 +2,27 @@ import { User } from '@prisma/client'
 import { tokenManagement } from '@/utils'
 import { StandardError } from '@/utils/Errors/StandardError'
 import { logger } from '@/utils/logger/index'
-import { BadRequestError, ConflictError, DatabaseError, InternalServerError, NotFoundError, UnauthorizedError } from '@/utils/Errors'
+import { BadRequestError, DatabaseError, InternalServerError, NotFoundError } from '@/utils/Errors'
 import { SignupCredientials, LoginCredientials, Permission } from './auth.types'
 import { PrismaUserRepository } from '../repository/PrismaUserRepository'
-import { PrismaSessionRepository } from '../repository/PrismaSessionRepository'
 import { PrismaResetPasswordRepository } from '../repository/PrismaResetPasswordRepository'
 import sendResetEmail from '@/utils/resend'
 import { comparePassword, hashedPassword } from '@/utils/HashPassword'
 import { PrismaRoleRepository } from '../repository/PrismaRoleRepository'
 import { ROLE } from '@/types/common/enum.types'
 
-interface AuthTokens {
-    accessToken: string
-    refreshToken: string
-}
-
 interface UserLogin {
-    user: {
-        id: string
-        firstName: string
-        lastName: string
-        email: string
-        profileImage?: string
-        username: string
-        roleId: string
-        lastLoginAt: Date
-        verifiedEmail: boolean
-    },
+    user: User
     permissions: Permission[]
-    tokens: AuthTokens
 }
 
-class AuthService {
+export class AuthService {
     private userRepository: PrismaUserRepository
-    private sessionRepository: PrismaSessionRepository
     private resetPasswordRepository: PrismaResetPasswordRepository
     private roleRepository: PrismaRoleRepository
 
     constructor() {
         this.userRepository = new PrismaUserRepository()
-        this.sessionRepository = new PrismaSessionRepository()
         this.resetPasswordRepository = new PrismaResetPasswordRepository()
         this.roleRepository = new PrismaRoleRepository()
     }
@@ -49,17 +30,8 @@ class AuthService {
     public async registerUser(credentials: SignupCredientials): Promise<void> {
         try {
             // Check if email exists
-            if (credentials?.email) {
-                const existedUser = await this.userRepository.getUserByEmail(credentials?.email)
-                if (existedUser) throw new ConflictError('User with this email already exists')
-            } else if (credentials?.username) {
-                // Check if username exists
-                const existedUsername = await this.userRepository.getUserByUsername(credentials?.username)
-                if (existedUsername) throw new ConflictError('User with this username already exists')
-            } else {
-                throw new BadRequestError('Email or username is required for registration')
-            }
-
+            await this.userRepository.getUserByEmail(credentials?.email)
+            
             // Hash password
             const hashPassword = await hashedPassword(credentials?.password)
             if (!hashPassword) throw new BadRequestError('Error hashing password')
@@ -85,11 +57,9 @@ class AuthService {
             if (!newUser) {
                 throw new DatabaseError('Database error occurred while creating user')
             }
-
-            // Check if user has a valid roleId
-            if (!newUser.roleId) {
-                throw new DatabaseError('User does not have a valid roleId')
-            }
+            // Send a verification email
+            // await sendVerificationEmail(newUser.email, newUser.id)
+            
         } catch (error) {
             if (error instanceof StandardError) {
                 throw error
@@ -102,7 +72,7 @@ class AuthService {
         }
     }
 
-    public async loginUser(credientials: LoginCredientials, options: { userAgent: string; ipAddress: string }): Promise<UserLogin> {
+    public async loginUser(credientials: LoginCredientials): Promise<UserLogin> {
         try {
             // Check if user exists
             const user = await this.verifyUserByEmail(credientials.email)
@@ -123,60 +93,16 @@ class AuthService {
                 throw new DatabaseError('Database error occurred while fetching user permissions')
             }
 
-            // Generate access and refresh tokens with user permissions
-            const tokens = await this.getTokens(user, userRolePermissions)
-            if (!tokens) {
-                throw new InternalServerError('Error generating tokens')
-            }
-
-            // Create session
-            const sessionPayload = {
-                userId: user.id,
-                accessToken: tokens.accessToken,
-                refreshToken: tokens.refreshToken,
-                userAgent: options.userAgent,
-                ipAddress: options.ipAddress
-            }
-
-            // Create session in the database
-            await this.sessionRepository.createSession(sessionPayload)
-
             // Update user lastLoginAt
             return {
-                user: {
-                    id: user.id,
-                    firstName: user.firstName || '',
-                    lastName: user.lastName || '',
-                    profileImage: user.profileImage || '',
-                    email: user.email,
-                    username: user.username,
-                    roleId: user.roleId,
-                    lastLoginAt: user.lastLoginAt!,
-                    verifiedEmail: user.verifiedEmail
-                },
-                permissions: userRolePermissions,
-                tokens: {
-                    accessToken: tokens.accessToken,
-                    refreshToken: tokens.refreshToken
-                }
+                user,
+                permissions: userRolePermissions
             }
         } catch (error) {
             if (error instanceof StandardError) {
                 throw error
             }
             throw new Error('An unexpected error occurred during login')
-        }
-    }
-
-    public async logoutUser(sessionId: string): Promise<void> {
-        try {
-            // Invalidate the session
-            await this.sessionRepository.deleteSession(sessionId)
-        } catch (error) {
-            if (error instanceof StandardError) {
-                throw error
-            }
-            throw new InternalServerError('An unexpected error occurred during logout')
         }
     }
 
@@ -187,7 +113,7 @@ class AuthService {
             if (user === null) {
                 throw new NotFoundError('User not found')
             }
-            const rawResetToken = tokenManagement.generateResetToken()
+            const rawResetToken = tokenManagement.generateVerificationToken()
 
             if (!rawResetToken) {
                 throw new InternalServerError('Error generating reset token')
@@ -268,18 +194,9 @@ class AuthService {
 
     public async verifyRefreshToken(refreshToken: string): Promise<{ accessToken: string; refreshToken: string }> {
         try {
-            // Check if the refresh token is valid
-            const session = await this.sessionRepository.getSessionByRefreshToken(refreshToken)
-            if (!session) {
-                throw new UnauthorizedError('User is not logged in')
-            }
-
-            if (session.refreshToken !== refreshToken) {
-                throw new BadRequestError('Invalid refresh token')
-            }
 
             // Create a new access token and refresh token
-            const user = await this.userRepository.getUserById(session.userId)
+            const user = await this.userRepository.getUserById(`userId ${refreshToken}`) // Replace 'userId' with the actual user ID from the session
             if (!user) {
                 throw new NotFoundError('User not found')
             }
@@ -296,12 +213,6 @@ class AuthService {
                 throw new InternalServerError('Error generating tokens')
             }
 
-            // Update the session with the new tokens
-            await this.sessionRepository.updateSession(session.id, {
-                accessToken: tokens.accessToken,
-                refreshToken: tokens.refreshToken
-            })
-
             return tokens
         } catch (error) {
             if (error instanceof StandardError) {
@@ -311,9 +222,7 @@ class AuthService {
         }
     }
 
-    // ------------------------------ PRIVATE METHODS ------------------------------------------------- //
-    // This method is private and is used to generate access and refresh tokens
-    private async getTokens(user: User, rolePermissions: Permission[]): Promise<{ accessToken: string; refreshToken: string }> {
+    public async getTokens(user: User, rolePermissions: Permission[]): Promise<{ accessToken: string; refreshToken: string }> {
         // Generate tokens
         const payload = {
             id: user.id,
@@ -339,7 +248,14 @@ class AuthService {
 
             const refreshToken = await tokenManagement.generateToken({
                 type: 'REFRESH',
-                subject: payload
+                subject: {
+                    id: user.id,
+                    email: user.email,
+                    username: user.username,
+                    roleId: user.roleId!,
+                    lastLoginAt: user.lastLoginAt!,
+                    emailVerified: user.verifiedEmail
+                }
             })
 
             return {
@@ -359,7 +275,7 @@ class AuthService {
         }
     }
 
-    private async verifyUserByEmail(email: string): Promise<User | null> {
+    public async verifyUserByEmail(email: string): Promise<User | null> {
         return await this.userRepository.getUserByEmail(email)
     }
 }

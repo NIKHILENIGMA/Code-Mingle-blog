@@ -60,3 +60,21 @@ export interface UserDTO {
     createdAt: Date
     updatedAt: Date
 }
+
+export interface LoginDTO {
+    user: {
+        id: string
+        firstName: string | null
+        lastName: string | null
+        email: string
+        username: string
+        profileImage: string | null
+        roleId: string
+        verifiedEmail: boolean
+    }
+    tokens: {
+        accessToken: string
+        refreshToken: string
+    }
+}
+
