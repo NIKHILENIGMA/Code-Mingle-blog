@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { apiInstance } from './apiInstance'
+import { api } from './apiInstance'
 import { AUTHENTICATION_URL, PROFILE_URL } from '@/constants'
 
 interface SignupCredentials {
@@ -30,7 +30,7 @@ class AuthService {
 
   public async signup(user: SignupCredentials) {
     try {
-      const response = await apiInstance.post(
+      const response = await api.post(
         `${AUTHENTICATION_URL}/signup`,
         user,
       )
@@ -51,7 +51,7 @@ class AuthService {
     }
 
     try {
-      const response = await apiInstance.post(`${AUTHENTICATION_URL}/login`, {
+      const response = await api.post(`${AUTHENTICATION_URL}/login`, {
         email,
         password,
       })
@@ -67,7 +67,7 @@ class AuthService {
 
   public async logout(): Promise<void> {
     try {
-      await apiInstance.delete(`${AUTHENTICATION_URL}/logout`)
+      await api.delete(`${AUTHENTICATION_URL}/logout`)
     } catch (error) {
       console.error(error)
     }
@@ -75,7 +75,7 @@ class AuthService {
 
   public async refreshToken() {
     try {
-      const response = await apiInstance.post(
+      const response = await api.post(
         `${AUTHENTICATION_URL}/refresh-token`,
       )
 
@@ -88,6 +88,19 @@ class AuthService {
       if (axios.isAxiosError(error)) {
         throw new Error(error.response?.data.message)
       }
+    }
+  }
+
+  public async loginWithGoogle(code: string) {
+    try {
+      const response = await api.post(`${AUTHENTICATION_URL}/google/callback`, {
+        code
+      })
+      if (response.status === 200) {
+        return response.data
+      }
+    } catch (error) {
+      console.error(`An error while get user details after successful google login: ${(error as Error)?.message}`)
     }
   }
 
@@ -113,7 +126,7 @@ export const authService = AuthService.getInstance()
 
 export const currentUserService = async () => {
   try {
-    const response = await apiInstance.get(`${PROFILE_URL}/get-user`)
+    const response = await api.get(`${PROFILE_URL}/get-user`)
 
     if (response.status !== 200) {
       throw new Error('Failed to get current user')
@@ -127,7 +140,7 @@ export const currentUserService = async () => {
 
 export const signupService = async (user: SignupCredentials) => {
   try {
-    const response = await apiInstance.post(
+    const response = await api.post(
       `${AUTHENTICATION_URL}/signup`,
       user,
     )
@@ -143,7 +156,7 @@ export const signupService = async (user: SignupCredentials) => {
 
 export const loginService = async (email: string, password: string) => {
   try {
-    const response = await apiInstance.post(`${AUTHENTICATION_URL}/login`, {
+    const response = await api.post(`${AUTHENTICATION_URL}/login`, {
       email,
       password,
     })
@@ -160,7 +173,7 @@ export const loginService = async (email: string, password: string) => {
 
 export const logoutService = async (): Promise<void> => {
   try {
-    await apiInstance.delete(`${AUTHENTICATION_URL}/logout`)
+    await api.delete(`${AUTHENTICATION_URL}/logout`)
   } catch (error) {
     console.error(error)
   }
@@ -168,7 +181,7 @@ export const logoutService = async (): Promise<void> => {
 
 export const refreshTokenService = async () => {
   try {
-    const response = await apiInstance.post(
+    const response = await api.post(
       `${AUTHENTICATION_URL}/refresh-token`,
     )
 
@@ -186,7 +199,7 @@ export const refreshTokenService = async () => {
 
 export const forgotPassword = async (email: string) => {
   try {
-    const response = await apiInstance.post(
+    const response = await api.post(
       `${AUTHENTICATION_URL}/forgot-password`,
       { email },
     )
@@ -206,7 +219,7 @@ export const resetPassword = async (
   confirmPassword: string,
 ) => {
   try {
-    const response = await apiInstance.post(
+    const response = await api.post(
       `${AUTHENTICATION_URL}/reset-password`,
       { password, confirmPassword },
     )

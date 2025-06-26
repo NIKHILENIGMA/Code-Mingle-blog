@@ -1,9 +1,9 @@
 import { PUBLISH_URL } from "@/constants";
-import { apiInstance } from "./apiInstance";
+import { api } from "./apiInstance";
 
 
 export const getAllPostsService = async () => {
-    const allPosts = await apiInstance.get(`${PUBLISH_URL}/`);
+    const allPosts = await api.get(`${PUBLISH_URL}/`);
 
     if (allPosts.status !== 200) {
         throw new Error("Error fetching posts");

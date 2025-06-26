@@ -1,12 +1,10 @@
-import { DRAFT_URL } from "@/constants";
-import { apiInstance } from "./apiInstance";
-import { Draft } from "@/features/drafts/types";
-import { AxiosError } from "axios";
-import { ApiResponse } from "@/Types/app-response";
+import { DRAFT_URL } from '@/constants'
+import { api } from './apiInstance'
+import { AxiosError } from 'axios'
 
 interface PostContent {
-  title: string;
-  content: string;
+  title: string
+  content: string
 }
 
 /**
@@ -20,17 +18,17 @@ interface PostContent {
 export const createDraftService = async () => {
   try {
     // The response is an ApiResponse containing the created draft
-    const response = await apiInstance.post(`${DRAFT_URL}/new`);
+    const response = await api.post(`${DRAFT_URL}/new`)
     if (response.status !== 200) {
-      throw new Error(`Draft generation failed: ${response.data}`);
+      throw new Error(`Draft generation failed: ${response.data}`)
     }
 
-    return response.data?.data;
+    return response.data?.data
   } catch (error) {
-    console.error(error);
-    throw new Error("Draft generation failed");
+    console.error(error)
+    throw new Error('Draft generation failed')
   }
-};
+}
 
 /**
  * @name autoSaveService
@@ -44,14 +42,14 @@ export const createDraftService = async () => {
 
 export const updateDraftService = async (
   id: string,
-  data: PostContent
+  data: PostContent,
 ): Promise<void> => {
   try {
-    await apiInstance.patch(`${DRAFT_URL}/${id}`, data);
+    await api.patch(`${DRAFT_URL}/${id}`, data)
   } catch (error) {
-    throw new Error(`${(error as AxiosError)?.message}`);
+    throw new Error(`${(error as AxiosError)?.message}`)
   }
-};
+}
 
 /**
  * @name getDraftService
@@ -62,22 +60,20 @@ export const updateDraftService = async (
  * @throws {Error} if draft retrieval fails.
  */
 
-export const getDraftService = async (
-  id: string
-): Promise<ApiResponse<{ draft: Draft }>> => {
+export const getDraftService = async (id: string) => {
   try {
-    const response = await apiInstance.get(`${DRAFT_URL}/${id}`);
+    const response = await api.get(`${DRAFT_URL}/${id}`)
 
     if (!response.data) {
-      throw new Error(`Draft generation failed: ${response.data}`);
+      throw new Error(`Draft generation failed: ${response.data}`)
     }
 
-    return response.data;
+    return response.data
   } catch (error) {
-    console.error(error);
-    throw new Error("Draft generation failed");
+    console.error(error)
+    throw new Error('Draft generation failed')
   }
-};
+}
 
 /**
  * @name deleteDraftService
@@ -90,11 +86,11 @@ export const getDraftService = async (
 
 export const deleteDraftService = async (id: string): Promise<void> => {
   try {
-    await apiInstance.delete(`${DRAFT_URL}/${id}`);
+    await api.delete(`${DRAFT_URL}/${id}`)
   } catch (error) {
-    throw new Error(`${(error as AxiosError)?.message}`);
+    throw new Error(`${(error as AxiosError)?.message}`)
   }
-};
+}
 
 /**
  * @name allDraftsService
@@ -106,125 +102,127 @@ export const deleteDraftService = async (id: string): Promise<void> => {
 
 export const allDraftsService = async () => {
   try {
-    const response = await apiInstance.get(
-      `${DRAFT_URL}/`
-    );
-    return response.data;
+    const response = await api.get(`${DRAFT_URL}/`)
+    return response.data
   } catch (error) {
     console.error(
-      `"Error fetching drafts:", ${(error as Error).message} || ${error}`
-    );
-    throw new Error("Failed to fetch drafts.");
+      `"Error fetching drafts:", ${(error as Error).message} || ${error}`,
+    )
+    throw new Error('Failed to fetch drafts.')
   }
-};
+}
 
 export const checkIsSlugAvailableService = async (
   id: string,
-  slug: string
+  slug: string,
 ): Promise<boolean | void> => {
   try {
-    const response = await apiInstance.post(`v1/published/${id}`, { slug });
+    const response = await api.post(`v1/published/${id}`, { slug })
 
     if (!response.data) {
-      throw new Error(`Failed to check if slug is available: ${response.data}`);
+      throw new Error(`Failed to check if slug is available: ${response.data}`)
     }
 
-    return response.data.data;
+    return response.data.data
   } catch (error) {
-    console.error(error);
-    throw new Error("Failed to check if slug is available.");
+    console.error(error)
+    throw new Error('Failed to check if slug is available.')
   }
-};
+}
 
 export const uploadDraftCoverImageService = async (
   id: string,
-  data: FormData
+  data: FormData,
 ) => {
   try {
-    const response = await apiInstance.post(
+    const response = await api.post(
       `${DRAFT_URL}/${id}/cover-image/upload/`,
-      data
-    );
+      data,
+    )
 
     if (!response.data) {
-      throw new Error(`Failed to upload draft cover image: ${response.data}`);
+      throw new Error(`Failed to upload draft cover image: ${response.data}`)
     }
 
-    return response.data?.data;
+    return response.data?.data
   } catch (error) {
-    console.error(error);
-    throw new Error("Failed to upload draft cover image.");
+    console.error(error)
+    throw new Error('Failed to upload draft cover image.')
   }
-};
+}
 
 export const uploadUnslashImageService = async (
   id: string,
-  data: { unsplashUrl: string }
+  data: { unsplashUrl: string },
 ) => {
   try {
-    const response = await apiInstance.post(
+    const response = await api.post(
       `${DRAFT_URL}/${id}/cover-image/upload`,
-      data
-    );
+      data,
+    )
 
     if (!response.data) {
-      throw new Error(`Failed to upload unsplash response: ${response.data}`);
+      throw new Error(`Failed to upload unsplash response: ${response.data}`)
     }
 
-    return response.data.data;
+    return response.data.data
   } catch (error) {
-    console.error(error);
-    throw new Error("Failed to upload unsplash image.");
+    console.error(error)
+    throw new Error('Failed to upload unsplash image.')
   }
-};
+}
 
 export const removeDraftCoverImageService = async (
-  id: string
+  id: string,
 ): Promise<void> => {
   try {
-    await apiInstance.delete(`${DRAFT_URL}/${id}/cover-image/remove/`);
+    await api.delete(`${DRAFT_URL}/${id}/cover-image/remove/`)
   } catch (error) {
-    console.error(error);
-    throw new Error("Failed to remove draft cover image.");
+    console.error(error)
+    throw new Error('Failed to remove draft cover image.')
   }
-};
+}
 
 // {{BASE_URL}}/drafts/b8ccdc53-a416-483d-8eaf-990d2f465de2/thumbnail/upload/
-export const uploadDraftThumbnailService = async (id: string, file: FormData) => { 
+export const uploadDraftThumbnailService = async (
+  id: string,
+  file: FormData,
+) => {
   try {
-    const response = await apiInstance.post(`${DRAFT_URL}/${id}/thumbnail/upload`, file);
+    const response = await api.post(`${DRAFT_URL}/${id}/thumbnail/upload`, file)
 
     if (!response.data) {
-      throw new Error(`Failed to upload draft thumbnail: ${response.data}`);
+      throw new Error(`Failed to upload draft thumbnail: ${response.data}`)
     }
 
-    return response.data.data;
+    return response.data.data
   } catch (error) {
-    console.error(error);
-    throw new Error("Failed to upload draft thumbnail.");
+    console.error(error)
+    throw new Error('Failed to upload draft thumbnail.')
   }
 }
 
-export const removeDraftThumbnailService = async (id: string): Promise<void> => {
+export const removeDraftThumbnailService = async (
+  id: string,
+): Promise<void> => {
   try {
-    await apiInstance.delete(`${DRAFT_URL}/${id}/thumbnail/remove`);
+    await api.delete(`${DRAFT_URL}/${id}/thumbnail/remove`)
   } catch (error) {
-    console.error(error);
-    throw new Error("Failed to remove draft thumbnail.");
+    console.error(error)
+    throw new Error('Failed to remove draft thumbnail.')
   }
 }
-
 
 export const previewDraftService = async (id: string) => {
   try {
-    const response = await apiInstance.get(`${DRAFT_URL}/${id}/preview`);
+    const response = await api.get(`${DRAFT_URL}/${id}/preview`)
 
     if (!response.data) {
-      throw new Error(`Failed to preview draft: ${response.data}`);
+      throw new Error(`Failed to preview draft: ${response.data}`)
     }
 
-    return response.data.data;
+    return response.data.data
   } catch (error) {
-    throw new Error(`${(error as AxiosError)?.message}`);
+    throw new Error(`${(error as AxiosError)?.message}`)
   }
 }
