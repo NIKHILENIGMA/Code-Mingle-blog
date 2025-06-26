@@ -14,6 +14,7 @@ import {
 import { logger } from './logger/index'
 import { Permission } from '@/features/users/authentication/auth.types'
 import { StandardError } from './Errors/StandardError'
+import { User } from '@prisma/client'
 
 interface JWTPayload {
     id: string
@@ -23,6 +24,10 @@ interface JWTPayload {
     lastLoginAt: Date
     emailVerified: boolean
     permission?: Permission[]
+}
+interface AuthTokens {
+    accessToken: string
+    refreshToken: string
 }
 
 interface TokenPayload {
@@ -87,7 +92,6 @@ class TokenManagement {
 
             if (error instanceof Error && error.message.includes('ENOENT')) {
                 throw new InternalServerError(`Private key file not found at ${PRIVATE_KEY_PATH}`, 'generateToken')
-                
             }
 
             logger.error('Error generating token', error)
@@ -122,7 +126,59 @@ class TokenManagement {
         }
     }
 
-    public generateResetToken(): string {
+    public async getTokens(user: User, rolePermissions: Permission[]): Promise<AuthTokens> {
+        // Generate tokens
+        const payload = {
+            id: user.id,
+            email: user.email,
+            username: user.username,
+            roleId: user.roleId!,
+            lastLoginAt: user.lastLoginAt!,
+            emailVerified: user.verifiedEmail,
+            permissions: rolePermissions.map((permission) => ({
+                id: permission.id,
+                name: permission.name,
+                resource: permission.resource,
+                actions: Array.isArray(permission.actions) ? permission.actions : [permission.actions]
+            }))
+        }
+
+        // Generate access and refresh tokens
+        try {
+            const accessToken = await tokenManagement.generateToken({
+                type: 'ACCESS',
+                subject: payload
+            })
+
+            const refreshToken = await tokenManagement.generateToken({
+                type: 'REFRESH',
+                subject: {
+                    id: user.id,
+                    email: user.email,
+                    username: user.username,
+                    roleId: user.roleId!,
+                    lastLoginAt: user.lastLoginAt!,
+                    emailVerified: user.verifiedEmail
+                }
+            })
+
+            return {
+                accessToken,
+                refreshToken
+            }
+        } catch (error) {
+            if (error instanceof StandardError) {
+                throw error
+            }
+            if (error instanceof Error) {
+                logger.error(`Error generating tokens: ${error.message}`)
+                throw new InternalServerError('Error generating tokens')
+            }
+
+            throw new InternalServerError('An unexpected error occurred while generating tokens')
+        }
+    }
+    public generateVerificationToken(): string {
         return crypto.randomBytes(32).toString('hex')
     }
 }
