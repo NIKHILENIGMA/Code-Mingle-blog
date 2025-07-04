@@ -1,10 +1,10 @@
 import { OPEN_AI_URL } from "@/constants";
-import { apiInstance } from "../api/apiInstance";
+import { api } from "../api/apiInstance";
 import { PromptType, ToneType } from "@/Types/types";
 
 export const simplifyTextContent = async (prompt: string) => {
   try {
-    const response = await apiInstance.post(`${OPEN_AI_URL}/simplify-text`, {
+    const response = await api.post(`${OPEN_AI_URL}/simplify-text`, {
       text: prompt,
     });
 
@@ -20,7 +20,7 @@ export const simplifyTextContent = async (prompt: string) => {
 
 export const changeTone = async (prompt: string, tone: string) => {
   try {
-    const response = await apiInstance.post(`${OPEN_AI_URL}/tone-change`, {
+    const response = await api.post(`${OPEN_AI_URL}/tone-change`, {
       text: prompt,
       type: tone,
     });
@@ -40,7 +40,7 @@ export const translateTextContent = async (
   language: string
 ) => {
   try {
-    const response = await apiInstance.post(`${OPEN_AI_URL}/translate-text`, {
+    const response = await api.post(`${OPEN_AI_URL}/translate-text`, {
       text: prompt,
       type: language,
     });
@@ -57,7 +57,7 @@ export const translateTextContent = async (
 
 export const makeTextLong = async (prompt: string) => {
   try {
-    const response = await apiInstance.post(`${OPEN_AI_URL}/make-text-long`, {
+    const response = await api.post(`${OPEN_AI_URL}/make-text-long`, {
       text: prompt,
     });
 
@@ -73,7 +73,7 @@ export const makeTextLong = async (prompt: string) => {
 
 export const makeTextShort = async (prompt: string) => {
   try {
-    const response = await apiInstance.post(`${OPEN_AI_URL}/make-text-short`, {
+    const response = await api.post(`${OPEN_AI_URL}/make-text-short`, {
       text: prompt,
     });
 
@@ -98,7 +98,7 @@ export const generateAiContentService = async ({
   type: PromptType;
 }) => {
   try {
-    const response = await apiInstance.post(`${OPEN_AI_URL}/generate-ai-content`, {
+    const response = await api.post(`${OPEN_AI_URL}/generate-ai-content`, {
       text: prompt,
       tone,
       type,

@@ -1,5 +1,5 @@
 import { ADMIN_URL } from "@/constants";
-import { apiInstance } from "./apiInstance";
+import { api } from "./apiInstance";
 import { toast } from "sonner";
 
 export const addCategoryService = async ({
@@ -10,7 +10,7 @@ export const addCategoryService = async ({
   description: string;
 }) => {
   try {
-    const response = await apiInstance.post(`${ADMIN_URL}/categories/new`, {
+    const response = await api.post(`${ADMIN_URL}/categories/new`, {
       name,
       description,
     });
@@ -33,7 +33,7 @@ export const updateCategoryService = async (
   category: { name: string; description: string }
 ) => {
   try {
-    const response = await apiInstance.patch(`${ADMIN_URL}/categories/${id}`, {
+    const response = await api.patch(`${ADMIN_URL}/categories/${id}`, {
       name: category.name,
       description: category.description,
     });
@@ -52,7 +52,7 @@ export const updateCategoryService = async (
 
 export async function deleteCategoryService(id: number) {
   try {
-    const response = await apiInstance.delete(`${ADMIN_URL}/categories/${id}`);
+    const response = await api.delete(`${ADMIN_URL}/categories/${id}`);
 
     if (response.status !== 200) {
       toast.error("Failed to delete category");
@@ -66,7 +66,7 @@ export async function deleteCategoryService(id: number) {
 
 export const getCategoriesService = async () => {
   try {
-    const response = await apiInstance.get(`${ADMIN_URL}/categories/`);
+    const response = await api.get(`${ADMIN_URL}/categories/`);
 
     if (response.status !== 200) {
       toast.error("Failed to fetch categories");
