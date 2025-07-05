@@ -95,7 +95,7 @@ import {
 import Img from './common/Img'
 import Card from './common/Card'
 import DeleteDialog from './common/DeleteDialog'
-import PrivateRoute from './common/PrivateRoute'
+// import PrivateRoute from './common/PrivateRoute'
 import { ModeToggle } from './DarkMode/mode-toggle'
 import { useTheme, ThemeProvider } from './DarkMode/theme-provider'
 import SideBarNotRender from './Error/SideBarNotRender'
@@ -104,7 +104,7 @@ import SidebarLoader from './Loader/SidebarLoader'
 import SpinLoader from './Loader/SpinLoader'
 import Header from './Header'
 import Footer from './Footer'
-import AppDropdown from './common/AppDropdown'
+// import AppDropdown from './common/AppDropdown'
 
 export {
   Header,
@@ -132,7 +132,7 @@ export {
   PopoverAnchor,
   Card,
   DeleteDialog,
-  PrivateRoute,
+  // PrivateRoute,
   ModeToggle,
   ThemeProvider,
   useTheme,
@@ -147,7 +147,7 @@ export {
   SelectSeparator,
   SelectScrollUpButton,
   SelectScrollDownButton,
-  AppDropdown,
+  // AppDropdown,
   Checkbox,
   Switch,
   Textarea,
