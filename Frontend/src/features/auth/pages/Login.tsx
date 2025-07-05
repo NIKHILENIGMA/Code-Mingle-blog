@@ -1,18 +1,21 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Button, Input, Label, Checkbox } from '@/components'
 import { useNavigate, useLocation, Link } from 'react-router-dom'
-import { useAuthContext } from '@/hooks/useAuthContext'
+import { useAuthContext } from '@/features/auth/hooks/useAuthContext'
 import directUserToGoogleConsentScreen from '@/Utils/OAuth'
 import { PiEyeClosedThin, PiEyeThin, FcGoogle } from '@/Utils/Icons'
+import { authService } from '../services/authApiServices'
 
 const Login: React.FC = () => {
   const [formState, setFormState] = useState({
     email: '',
     password: '',
   })
+  const [loading, setLoading] = useState<boolean>(false)
+  const [error, setError] = useState<string | null>(null)
   const [rememberMe, setRememberMe] = useState<boolean>(false)
-  const [isVisible, setVisibility] = useState(false)
-  const { login, handleGoogleLogin, loading } = useAuthContext()
+  const [isVisible, setVisibility] = useState<boolean>(false)
+  const { userAuthenticatedState } = useAuthContext()
   const location = useLocation()
   const navigate = useNavigate()
 
@@ -25,37 +28,66 @@ const Login: React.FC = () => {
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!formState.email || !formState.password) {
-      return
-    }
-    localStorage.setItem('isPersistent', String(rememberMe))
-    await login(formState.email, formState.password)
+    setLoading(true)
+    try {
+      e.preventDefault()
+      if (!formState.email || !formState.password) {
+        return
+      }
+      // Save the remember me preference in localStorage
+      localStorage.setItem('isPersistent', String(rememberMe))
 
-    const from = (location.state as { from?: Location })?.from?.pathname || '/'
-    navigate(from, { replace: true })
+      // Call the login service
+      const { data, success, message } = await authService.login({
+        email: formState.email,
+        password: formState.password,
+      })
+
+      if (!success) {
+        setError(message || 'Login failed. Please try again.')
+        throw new Error(message || 'Login failed. Please try again.')
+      }
+
+      if (!data || !data.user || !data.tokens?.accessToken) {
+        throw new Error('Invalid response from the server.')
+      }
+
+      userAuthenticatedState(data.user, data.tokens.accessToken)
+
+      setLoading(false)
+      const from =
+        (location.state as { from?: Location })?.from?.pathname || '/'
+      navigate(from, { replace: true })
+    } catch (error) {
+      const errorMessage =
+        (error as Error).message || 'An error occurred during login.'
+      throw new Error(errorMessage)
+    } finally {
+      setLoading(false)
+      setError(null)
+    }
   }
 
-  const handleGoogleCallback = useCallback(async () => {
-    const urlParams = new URLSearchParams(window.location.search)
-    const code: string = urlParams.get('code')!
+  // const handleGoogleCallback = useCallback(async () => {
+  //   const urlParams = new URLSearchParams(window.location.search)
+  //   const code: string = urlParams.get('code')!
 
-    if (!code) {
-      console.log('Authentication code does not provide!')
-    }
+  //   if (!code) {
+  //     console.log('Authentication code does not provide!')
+  //   }
 
-    try {
-      await handleGoogleLogin(code)
-    } catch (error) {
-      console.error(
-        `An error while handling the google callback: ${(error as Error)?.message}`,
-      )
-    }
-  }, [handleGoogleLogin])
+  //   try {
+  //     await handleGoogleLogin(code)
+  //   } catch (error) {
+  //     console.error(
+  //       `An error while handling the google callback: ${(error as Error)?.message}`,
+  //     )
+  //   }
+  // }, [handleGoogleLogin])
 
-  useEffect(() => {
-    handleGoogleCallback()
-  }, [handleGoogleCallback])
+  // useEffect(() => {
+  //   handleGoogleCallback()
+  // }, [handleGoogleCallback])
 
   return (
     <div className="relative flex items-center justify-center min-h-screen px-4 py-12">
@@ -82,6 +114,11 @@ const Login: React.FC = () => {
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-5 rounded-md">
+            {error && (
+              <div className="p-4 mb-4 text-sm text-red-800 bg-red-100 rounded-lg dark:bg-red-200 dark:text-red-800">
+                {error}
+              </div>
+            )}
             <div className="relative space-y-1">
               <Label htmlFor="email">Email:</Label>
               <Input
