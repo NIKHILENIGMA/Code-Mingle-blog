@@ -7,6 +7,7 @@ import { NAV_LINKS, NOT_AUTHENTICATED_OPTIONS } from '@/constants'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { ModeToggle } from '../DarkMode/mode-toggle'
 import {
+  DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
@@ -17,22 +18,22 @@ import {
 import { useDraftMutations } from '@/features/drafts/hooks/useDraftMutations'
 import { toast } from 'sonner'
 import { setSelectedDraft } from '@/features/drafts/slices/draftSlice'
-import { useAuthContext } from '@/hooks/useAuthContext'
-import { useLogout } from '@/features/auth/hooks/useLogout'
+import { useAuthContext } from '@/features/auth/hooks/useAuthContext'
+// import { useLogout } from '@/features/auth/hooks/useLogout'
 import { Link } from 'react-router-dom'
-import AppDropdown from './../common/AppDropdown'
 import { Button } from '../ui/button'
+import { authService } from '@/features/auth/services/authApiServices'
 
 const Header: FC = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const { isAuthenticated, user } = useAuthContext()
+  const { isAuthenticated, user, userLoggedOut } = useAuthContext()
   const { createDraftMutation } = useDraftMutations()
-  const { handleLogout } = useLogout()
+
   const handleClick = (to: string) => {
     navigate(to)
   }
-  
+
   const handleCreateDraft = async () => {
     try {
       const response = await createDraftMutation.mutateAsync()
@@ -59,12 +60,30 @@ const Header: FC = () => {
     }
   }
 
+  const handleLogout = async () => {
+    try {
+      const { success, message } = await authService.logout()
+      if (success) {
+        userLoggedOut()
+        // Clear localStorage for persistent login
+        localStorage.removeItem('isPersistent')
+        toast.success(message || 'Logged out successfully')
+        navigate('/')
+      } else {
+        toast.error(message || 'Failed to log out')
+      }
+    } catch (error) {
+      throw new Error((error as string) || 'Failed to log out')
+    }
+  }
+
   return (
-    <header className="fixed top-0 left-0 z-50 w-full bg-transparent shadow-sm backdrop-blur-md dark:bg-background/50">
+    <header className="sticky top-0 left-0 z-50 w-full bg-transparent shadow-sm backdrop-blur-md dark:bg-background/50">
       <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="text-xl font-bold">NODEDRAFTS</div>
-          <nav className="hidden space-x-8 md:flex">
+          {/* Added z-index to nav to ensure dropdown stays above other elements */}
+          <nav className="hidden space-x-8 md:flex relative z-[51]">
             {NAV_LINKS.map((navOpt, index) => (
               <NavLink
                 key={index}
@@ -79,16 +98,14 @@ const Header: FC = () => {
                 <span className="text-sm">{navOpt.name}</span>
               </NavLink>
             ))}
-            <AppDropdown
-              trigger={
-                <DropdownMenuTrigger asChild>
-                  <Button variant={'ghost'}>
-                    <Pencil size={18} /> <span>Write</span>
-                  </Button>
-                </DropdownMenuTrigger>
-              }
-            >
-              <DropdownMenuContent className="relative w-48">
+            {/* Dropdown for writing drafts */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant={'ghost'} className="relative z-[50]">
+                  <Pencil size={18} /> <span>Write</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="relative w-48 z-[52]">
                 <DropdownMenuLabel>My Drafts</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
@@ -104,8 +121,9 @@ const Header: FC = () => {
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
               </DropdownMenuContent>
-            </AppDropdown>
+            </DropdownMenu>
           </nav>
+          {/* Right side of the header */}
           <div className="flex items-center space-x-4">
             <ModeToggle />
             <div className="flex items-center pr-4 space-x-4">
@@ -113,25 +131,22 @@ const Header: FC = () => {
               <div className="hidden space-x-4 lg:flex">
                 {isAuthenticated && user ? (
                   <div className="flex justify-start w-full">
-                    <AppDropdown
-                      trigger={
-                        <DropdownMenuTrigger asChild>
-                          <Avatar>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Avatar>
+                          <AvatarImage
+                            src={user.avatar || '/no-avatar-user.png'}
+                            className="border-[0.2rem] border-primary/70 rounded-full object-cover"
+                          />
+                          <AvatarFallback>
                             <AvatarImage
-                              src={user.avatar}
-                              className="border-[0.2rem] border-primary/70 rounded-full object-cover"
+                              src="/no-avatar-user.png"
+                              className="object-cover border rounded-full border-primary/70"
+                              alt={`${user.firstName} ${user.lastName} Avatar`}
                             />
-                            <AvatarFallback>
-                              <AvatarImage
-                                src="/no-avatar-user.png"
-                                className="object-cover border rounded-full border-primary/70"
-                                alt={`${user.firstName} ${user.lastName} Avatar`}
-                              />
-                            </AvatarFallback>
-                          </Avatar>
-                        </DropdownMenuTrigger>
-                      }
-                    >
+                          </AvatarFallback>
+                        </Avatar>
+                      </DropdownMenuTrigger>
                       <DropdownMenuContent className="w-56">
                         <DropdownMenuLabel>{`${user.firstName} ${user.lastName}`}</DropdownMenuLabel>
                         <DropdownMenuSeparator />
@@ -153,7 +168,7 @@ const Header: FC = () => {
                           Log out
                         </DropdownMenuItem>
                       </DropdownMenuContent>
-                    </AppDropdown>
+                    </DropdownMenu>
                   </div>
                 ) : (
                   <div className="flex items-center justify-around space-x-3 text-xl">
