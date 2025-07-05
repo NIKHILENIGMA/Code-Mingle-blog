@@ -3,7 +3,7 @@ import { FC, useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { PiEyeClosedThin, PiEyeThin } from "react-icons/pi";
 import { Link } from "react-router-dom";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 interface SignupForm {
   firstName: string;
@@ -22,7 +22,6 @@ const Signup: FC = () => {
     password: "",
   });
   const [isVisible, setVisibility] = useState(false);
-  const location = useLocation();
   const navigate = useNavigate();
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -34,8 +33,7 @@ const Signup: FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const from = (location.state as { from?: Location })?.from?.pathname || "/";
-    navigate(from, { replace: true });
+    navigate('/login');
   };
   return (
     <div className="relative flex items-center justify-center min-h-screen px-4 py-12">
