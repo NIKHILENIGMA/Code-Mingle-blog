@@ -2,7 +2,7 @@ import AppRouter from "./app/Router";
 import { ThemeProvider } from "@/components/DarkMode/theme-provider";
 import { QueryClientProvider } from "@tanstack/react-query";
 import queryClient from "./Utils/queryClient";
-import { AuthProvider } from "./components/common/AuthContext";
+import { AuthProvider } from "./features/auth/components/AuthContext";
 
 function App(): JSX.Element {
   return (

@@ -5,8 +5,8 @@ enum ENIRONMENT {
     PRODUCTION = 'PRODUCTION'
 }
 // Application
-export const NODE_ENV: string = import.meta.env.NODE_ENV || 'development'
-export const SERVER_BASE_URL= import.meta.env.SERVER_BASE_URL || 'http://localhost:5000'
+export const NODE_ENV: string = import.meta.env.VITE_NODE_ENV || 'development'
+export const SERVER_BASE_URL= import.meta.env.VITE_SERVER_BASE_URL || 'http://localhost:5000'
 export const IS_DEVELOPMENT: boolean = import.meta.env.NODE_ENV === ENIRONMENT.DEVELOPMENT
 export const IS_PRODUCTION: boolean = import.meta.env.NODE_ENV === ENIRONMENT.PRODUCTION
 
