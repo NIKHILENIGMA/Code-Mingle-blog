@@ -1,51 +1,41 @@
-import { Button, Checkbox, Input, Label } from "@/components";
-import directUserToGoogleConsentScreen from "@/Utils/OAuth";
-import { FC, useState } from "react";
-import { FcGoogle } from "react-icons/fc";
-import { PiEyeClosedThin, PiEyeThin } from "react-icons/pi";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
-import { OAuthState } from '@/features/auth/types/authTypes';
-import { authService } from "../services/authApiServices";
-
-interface SignupForm {
-  firstName: string;
-  lastName: string;
-  username: string;
-  email: string;
-  password: string;
-}
+import { Button, Checkbox, Input, Label } from '@/components'
+import directUserToGoogleConsentScreen from '@/Utils/OAuth'
+import { FC, useState } from 'react'
+import { FcGoogle } from 'react-icons/fc'
+import { PiEyeClosedThin, PiEyeThin } from 'react-icons/pi'
+import { Link } from 'react-router-dom'
+import { OAuthState, SignupRequest } from '@/features/auth/types/authTypes'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { SignupSchema } from '../schema/authSchema'
+import { useSignupForm } from '../hooks/useSignupForm'
+import { Toaster } from '@/components/ui/sonner'
+import { AlertCircle } from 'lucide-react'
 
 const Signup: FC = () => {
-  const [formState, setFormState] = useState<SignupForm>({
-    firstName: "",
-    lastName: "",
-    username: "",
-    email: "",
-    password: "",
-  });
-  const [isVisible, setVisibility] = useState(false);
-  const navigate = useNavigate();
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormState((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-  };
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const response = await authService.signup(formState);
-    if (response.success === false && response.data === null) {
-      console.error(response.message);
-      return;
-    }
-    if (response.success === true) {
-      navigate("/");
-    }
-  };
+  const {
+    register,
+    handleSubmit,
+    clearErrors,
+    formState: { errors, isSubmitting },
+  } = useForm<SignupRequest>({
+    resolver: zodResolver(SignupSchema),
+    mode: 'onBlur', // Validate on blur for better UX
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      email: '',
+      password: '',
+    }, // Set default values for the form fields
+  })
+  const [isVisible, setVisibility] = useState(false)
+  const { isLoading, signup } = useSignupForm()
 
-  
+  const onSubmit = async (data: SignupRequest) => {
+    clearErrors() // Clear any previous errors
+    // Call the signup function from the custom hook
+    await signup(data)
+  }
 
   return (
     <div className="relative flex items-center justify-center min-h-screen px-4 py-12">
@@ -55,8 +45,8 @@ const Signup: FC = () => {
       </div>
       <div className="w-full max-w-md p-10 space-y-8 rounded-md shadow-md dark:shadow-lg bg-background">
         <div className="text-center">
-            {/* //todo add logo */}
-            {/* <div>
+          {/* //todo add logo */}
+          {/* <div>
                 <img
                     src="/logo.png"
                     alt="Logo"
@@ -70,81 +60,90 @@ const Signup: FC = () => {
             Enter your details to sign up for a new account.
           </p>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
           <div className="space-y-2 rounded-md">
             <div className="relative flex flex-col space-x-4 md:flex-row md:items-center">
-              <div className="relative space-y-1">
+              <div className="relative space-y-1 ">
                 <Label htmlFor="firstName">First Name:</Label>
                 <Input
+                  {...register('firstName')}
                   id="firstName"
-                  name="firstName"
                   type="text"
                   autoComplete="off"
                   required
                   placeholder="John"
-                  value={formState.firstName}
-                  onChange={(e) => handleChange(e)}
+                  className={`bg-card ${errors.firstName ? 'border-red-700' : ''}`}
                 />
+                {errors.firstName && (
+                  <div className="flex px-1 space-x-2 text-xs text-red-700">
+                    <AlertCircle className="w-4 h-4" />
+
+                    <span className="">{errors.firstName.message}</span>
+                  </div>
+                )}
               </div>
               <div className="relative space-y-1">
                 <Label htmlFor="lastName">Last Name:</Label>
                 <Input
+                  {...register('lastName')}
                   id="lastName"
-                  name="lastName"
                   type="text"
                   autoComplete="off"
                   required
-                  placeholder="Doe "
-                  value={formState.lastName}
-                  onChange={(e) => handleChange(e)}
+                  placeholder="Doe"
+                  className={`bg-card ${errors.lastName ? 'border-red-700' : ''}`}
                 />
+                {errors.lastName && (
+                  <div className="flex px-1 space-x-2 text-xs text-red-700">
+                    <AlertCircle className="w-4 h-4" />
+                    <span>{errors.lastName.message}</span>
+                  </div>
+                )}
               </div>
-            </div>
-            <div className="relative space-y-1">
-              <Label htmlFor="username">Username: </Label>
-              <Input
-                id="username"
-                name="username"
-                type="text"
-                autoComplete="off"
-                required
-                placeholder="johndoe123"
-                value={formState.username}
-                onChange={(e) => handleChange(e)}
-              />
             </div>
             <div className="relative space-y-1">
               <Label htmlFor="email">Email:</Label>
               <Input
+                {...register('email')}
                 id="email"
-                name="email"
                 type="email"
                 autoComplete="off"
                 required
                 placeholder="johndoe@example.com"
-                value={formState.email}
-                onChange={(e) => handleChange(e)}
+                className={`bg-card ${errors.email ? 'border-red-700' : ''}`}
               />
+              {errors.email && (
+                <div className="flex px-1 space-x-2 text-xs text-red-700">
+                  <AlertCircle className="w-4 h-4" />
+                  <span>{errors.email.message}</span>
+                </div>
+              )}
             </div>
             <div className="relative space-y-1">
               <span
                 onClick={() => setVisibility(!isVisible)}
-                className="absolute transform -translate-y-1/2 cursor-pointer right-3 top-3/4"
+                className={`absolute transform -translate-y-1/2 cursor-pointer right-3 ${errors.password ? 'top-1/2' : 'top-3/4'}`}
               >
                 {isVisible ? <PiEyeClosedThin /> : <PiEyeThin />}
               </span>
               <Label htmlFor="password">Password:</Label>
               <Input
+                {...register('password')}
                 id="password"
-                name="password"
-                type={isVisible ? "text" : "password"}
+                type={isVisible ? 'text' : 'password'}
                 autoComplete="current-password"
                 required
                 placeholder="*********"
-                value={formState.password}
-                className="bg-card"
-                onChange={(e) => handleChange(e)}
+                className={`bg-card ${errors.password ? 'border-red-700' : ''}`}
               />
+              {errors.password && (
+                <div className='flex px-1 space-x-2 text-xs text-red-700'>
+                  <AlertCircle className="w-4 h-4" />
+                  <span className="text-sm text-red-700">
+                    {errors.password.message}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -155,7 +154,7 @@ const Signup: FC = () => {
                 htmlFor="terms"
                 className="ml-2 text-sm font-normal leading-snug peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
-                By signing up, you agree to our{" "}
+                By signing up, you agree to our{' '}
                 <Link
                   to="/terms"
                   className="underline text-primary hover:text-primary/80"
@@ -168,8 +167,9 @@ const Signup: FC = () => {
 
           <div>
             <Button
+              disabled={isSubmitting || isLoading}
               type="submit"
-              variant={"default"}
+              variant={'default'}
               className="w-full bg-primary text-primary-foreground hover:bg-primary/80"
             >
               <span className="font-medium">Sign up</span>
@@ -181,14 +181,20 @@ const Signup: FC = () => {
           <p className="text-sm font-medium text-secondary-foreground/40">
             Or continue with
           </p>
-          <Button variant={"outline"} className="w-full" onClick={() => directUserToGoogleConsentScreen('signup' as OAuthState)}>
+          <Button
+            variant={'outline'}
+            className="w-full"
+            onClick={() =>
+              directUserToGoogleConsentScreen('signup' as OAuthState)
+            }
+          >
             <FcGoogle /> Sign up with Google
           </Button>
         </div>
 
         <div className="text-center">
           <p className="text-sm font-light text-secondary-foreground">
-            Already have an account?{" "}
+            Already have an account?{' '}
             <Link
               to="/login"
               className="font-medium text-primary hover:text-primary/80"
@@ -198,8 +204,9 @@ const Signup: FC = () => {
           </p>
         </div>
       </div>
+      <Toaster />
     </div>
-  );
-};
+  )
+}
 
-export default Signup;
+export default Signup
