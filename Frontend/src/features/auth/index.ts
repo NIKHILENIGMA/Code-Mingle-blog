@@ -19,11 +19,7 @@ import {
   LoginSchema,
   ResetPasswordSchema,
 } from './schema/authSchema'
-import {
-  validateLogin,
-  validateSchema,
-  validateSignup,
-} from './schema/validations'
+
 
 // Services
 
@@ -41,7 +37,4 @@ export {
   SignupSchema,
   LoginSchema,
   ResetPasswordSchema,
-  validateLogin,
-  validateSchema,
-  validateSignup,
 }
