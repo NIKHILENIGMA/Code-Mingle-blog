@@ -1,7 +1,6 @@
 import { createElement, FC } from 'react'
 import { useDispatch } from 'react-redux'
 import { DraftingCompass, Notebook, Pencil } from '@/Utils/Icons'
-import SearchBar from '@/features/drafts/components/Drafts/SearchBar'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { NAV_LINKS, NOT_AUTHENTICATED_OPTIONS } from '@/constants'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -19,7 +18,6 @@ import { useDraftMutations } from '@/features/drafts/hooks/useDraftMutations'
 import { toast } from 'sonner'
 import { setSelectedDraft } from '@/features/drafts/slices/draftSlice'
 import { useAuthContext } from '@/features/auth/hooks/useAuthContext'
-// import { useLogout } from '@/features/auth/hooks/useLogout'
 import { Link } from 'react-router-dom'
 import { Button } from '../ui/button'
 import { authService } from '@/features/auth/services/authApiServices'
@@ -27,7 +25,7 @@ import { authService } from '@/features/auth/services/authApiServices'
 const Header: FC = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const { isAuthenticated, user, userLoggedOut } = useAuthContext()
+  const { isAuthenticated, user, loggedOut } = useAuthContext()
   const { createDraftMutation } = useDraftMutations()
 
   const handleClick = (to: string) => {
@@ -64,9 +62,9 @@ const Header: FC = () => {
     try {
       const { success, message } = await authService.logout()
       if (success) {
-        userLoggedOut()
-        // Clear localStorage for persistent login
-        localStorage.removeItem('isPersistent')
+        loggedOut()
+
+        // Show success message and redirect
         toast.success(message || 'Logged out successfully')
         navigate('/')
       } else {
@@ -78,12 +76,14 @@ const Header: FC = () => {
   }
 
   return (
-    <header className="sticky top-0 left-0 z-50 w-full bg-transparent shadow-sm backdrop-blur-md dark:bg-background/50">
+    // Fixed Header Component
+    <header className="fixed top-0 left-0 z-50 w-full bg-transparent border-b shadow-sm backdrop-blur-md dark:bg-background/50 border-border/5">
       <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          <div className="text-xl font-bold">NODEDRAFTS</div>
-          {/* Added z-index to nav to ensure dropdown stays above other elements */}
-          <nav className="hidden space-x-8 md:flex relative z-[51]">
+        <div className="flex items-center justify-between h-16 min-h-[4rem]">
+          <div className="flex-shrink-0 text-xl font-bold">NODEDRAFTS</div>
+
+          {/* Navigation with proper flex layout */}
+          <nav className="items-center hidden space-x-6 md:flex">
             {NAV_LINKS.map((navOpt, index) => (
               <NavLink
                 key={index}
@@ -91,92 +91,123 @@ const Header: FC = () => {
                 className={({ isActive }: { isActive: boolean }): string =>
                   `${
                     isActive ? 'text-primary' : 'text-secondary-foreground'
-                  } flex items-center space-x-2 font-serif font-medium hover:text-primary/80 transition-colors duration-200 ease-in-out`
+                  } flex items-center space-x-2 font-serif font-medium hover:text-primary/80 transition-colors duration-200 ease-in-out whitespace-nowrap`
                 }
               >
-                <span>{createElement(navOpt.icon, { size: '18' })}</span>{' '}
+                <span>{createElement(navOpt.icon, { size: '18' })}</span>
                 <span className="text-sm">{navOpt.name}</span>
               </NavLink>
             ))}
-            {/* Dropdown for writing drafts */}
+
+            {/* Write Dropdown with fixed positioning */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant={'ghost'} className="relative z-[50]">
-                  <Pencil size={18} /> <span>Write</span>
+                <Button
+                  variant={'ghost'}
+                  className="flex items-center space-x-2 min-w-[80px] justify-center hover:bg-accent/50"
+                >
+                  <Pencil size={18} />
+                  <span className="text-sm">Write</span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="relative w-48 z-[52]">
+              <DropdownMenuContent
+                className="w-48 z-[60] bg-background/95 backdrop-blur-sm border shadow-lg"
+                side="bottom"
+                align="start"
+                sideOffset={8}
+                avoidCollisions={true}
+              >
                 <DropdownMenuLabel>My Drafts</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                   <DropdownMenuItem
-                    className="cursor-pointer"
+                    className="flex items-center space-x-2 cursor-pointer"
                     onClick={handleCreateDraft}
                   >
-                    <Notebook /> New Draft
+                    <Notebook size={16} />
+                    <span>New Draft</span>
                   </DropdownMenuItem>
-
-                  <DropdownMenuItem className="cursor-pointer">
-                    <DraftingCompass /> Edit Draft
+                  <DropdownMenuItem className="flex items-center space-x-2 cursor-pointer">
+                    <DraftingCompass size={16} />
+                    <span>Edit Draft</span>
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
               </DropdownMenuContent>
             </DropdownMenu>
           </nav>
-          {/* Right side of the header */}
-          <div className="flex items-center space-x-4">
-            <ModeToggle />
-            <div className="flex items-center pr-4 space-x-4">
-              <SearchBar size={18} />
-              <div className="hidden space-x-4 lg:flex">
+
+          {/* Right side with consistent spacing */}
+          <div className="flex items-center flex-shrink-0 space-x-3">
+            <div className="items-center hidden space-x-3 lg:flex">
+              <ModeToggle />
+            </div>
+            <div className="flex items-center space-x-3">
+              <div className="items-center hidden space-x-3 lg:flex">
                 {isAuthenticated && user ? (
-                  <div className="flex justify-start w-full">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Avatar>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Avatar className="w-8 h-8 transition-all cursor-pointer hover:ring-2 hover:ring-primary/20">
+                        <AvatarImage
+                          src="https://images.unsplash.com/photo-1661695423331-817b8aadd1a0?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                          className="object-cover"
+                        />
+                        <AvatarFallback>
                           <AvatarImage
-                            src={user.avatar || '/no-avatar-user.png'}
-                            className="border-[0.2rem] border-primary/70 rounded-full object-cover"
+                            src="/no-avatar-user.png"
+                            className="object-cover"
+                            alt={`${user.firstName} ${user.lastName} Avatar`}
                           />
-                          <AvatarFallback>
-                            <AvatarImage
-                              src="/no-avatar-user.png"
-                              className="object-cover border rounded-full border-primary/70"
-                              alt={`${user.firstName} ${user.lastName} Avatar`}
-                            />
-                          </AvatarFallback>
-                        </Avatar>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-56">
-                        <DropdownMenuLabel>{`${user.firstName} ${user.lastName}`}</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuGroup>
-                          <DropdownMenuItem>
-                            <Link to="/profile/me">Profile</Link>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Link to="/profile/settings/general-details">
-                              Settings
-                            </Link>
-                          </DropdownMenuItem>
-                        </DropdownMenuGroup>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>GitHub</DropdownMenuItem>
-                        <DropdownMenuItem>Support</DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={handleLogout}>
-                          Log out
+                        </AvatarFallback>
+                      </Avatar>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      className="w-48 border shadow-lg bg-background/95 backdrop-blur-sm"
+                      side="bottom"
+                      align="end"
+                      sideOffset={8}
+                      avoidCollisions={true}
+                    >
+                      <DropdownMenuLabel>{`${user.firstName} ${user.lastName}`}</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuGroup>
+                        <DropdownMenuItem className="cursor-pointer">
+                          <Link to="/profile/me" className="w-full">
+                            Profile
+                          </Link>
                         </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
+                        <DropdownMenuItem className="cursor-pointer">
+                          <Link
+                            to="/profile/settings/general-details"
+                            className="w-full"
+                          >
+                            Settings
+                          </Link>
+                        </DropdownMenuItem>
+                      </DropdownMenuGroup>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem className="cursor-pointer">
+                        GitHub
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="cursor-pointer">
+                        Support
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        onClick={handleLogout}
+                        className="cursor-pointer text-destructive focus:text-destructive"
+                      >
+                        Log out
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 ) : (
-                  <div className="flex items-center justify-around space-x-3 text-xl">
+                  <div className="flex items-center space-x-3">
                     {NOT_AUTHENTICATED_OPTIONS.map((option, index) => (
                       <Button
                         key={index}
                         onClick={() => handleClick(option?.to)}
                         variant={option?.variant}
+                        size="sm"
                       >
                         {option?.name}
                       </Button>
