@@ -37,18 +37,10 @@ export type AuthContextType = {
 
 export type LoginRequest = z.infer<typeof LoginSchema>
 
-export type SignupSchemaType = z.infer<typeof SignupSchema>
+export type SignupRequest = z.infer<typeof SignupSchema>
 
 export type ForgotPasswordRequest = z.infer<typeof ForgotPasswordSchema>
 
-
-export interface SignupRequest {
-  firstName: string
-  lastName: string
-  email: string
-  username: string
-  password: string
-}
 
 export interface GoogleRequest {
   code: string
