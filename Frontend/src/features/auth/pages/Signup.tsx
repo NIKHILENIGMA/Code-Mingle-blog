@@ -1,9 +1,12 @@
 import { Button, Checkbox, Input, Label } from "@/components";
+import directUserToGoogleConsentScreen from "@/Utils/OAuth";
 import { FC, useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { PiEyeClosedThin, PiEyeThin } from "react-icons/pi";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { OAuthState } from '@/features/auth/types/authTypes';
+import { authService } from "../services/authApiServices";
 
 interface SignupForm {
   firstName: string;
@@ -32,9 +35,18 @@ const Signup: FC = () => {
   };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    navigate('/login');
+    const response = await authService.signup(formState);
+    if (response.success === false && response.data === null) {
+      console.error(response.message);
+      return;
+    }
+    if (response.success === true) {
+      navigate("/");
+    }
   };
+
+  
+
   return (
     <div className="relative flex items-center justify-center min-h-screen px-4 py-12">
       {/* Background Grid + Gradient */}
@@ -169,7 +181,7 @@ const Signup: FC = () => {
           <p className="text-sm font-medium text-secondary-foreground/40">
             Or continue with
           </p>
-          <Button variant={"outline"} className="w-full" onClick={() => {}}>
+          <Button variant={"outline"} className="w-full" onClick={() => directUserToGoogleConsentScreen('signup' as OAuthState)}>
             <FcGoogle /> Sign up with Google
           </Button>
         </div>
