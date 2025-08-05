@@ -31,6 +31,7 @@ import ResetPassword from '@/features/auth/pages/ResetPassword'
 import RolesAndPermissions from '@/features/admin/pages/RolesAndPermissions'
 import SessionManagement from '@/features/admin/pages/SessionManagement'
 import { LearnEditorPage } from '@/pages'
+import { OAuthRedirect } from '@/features/auth'
 
 const router = createBrowserRouter([
   {
@@ -71,7 +72,7 @@ const router = createBrowserRouter([
         ),
         children: [
           {
-            path: 'general-details',
+            path: 'personal',
             element: <GeneralDetails />,
           },
           {
@@ -136,6 +137,10 @@ const router = createBrowserRouter([
   {
     path: '/signup',
     element: <Signup />,
+  },
+  {
+    path: '/oauth/callback',
+    element: <OAuthRedirect />,
   },
   {
     path: '/admin',
