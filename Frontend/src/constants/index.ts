@@ -75,12 +75,8 @@ export const NOT_AUTHENTICATED_OPTIONS: NotAuthenticatedOptionsType[] = [
  */
 export const SETTINGS_SIDEBAR_OPTIONS = [
   {
-    name: 'General Details',
-    path: '/profile/settings/general-details',
-  },
-  {
-    name: 'Writing Preference',
-    path: '/profile/settings/writing-preference',
+    name: 'Personal',
+    path: '/profile/settings/personal',
   },
   {
     name: 'Notification',
@@ -92,7 +88,11 @@ export const SETTINGS_SIDEBAR_OPTIONS = [
   },
   {
     name: 'Privacy & Security',
-    path: '/profile/settings/privacy-security',
+    path: '/profile/settings/security',
+  },
+  {
+    name: 'Writing Preference',
+    path: '/profile/settings/writing-preference',
   },
 ]
 

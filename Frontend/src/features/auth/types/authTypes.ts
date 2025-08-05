@@ -1,5 +1,5 @@
-import { z } from "zod"
-import { LoginSchema, SignupSchema } from "../schema/authSchema"
+import { z } from 'zod'
+import { ForgotPasswordSchema, LoginSchema, SignupSchema } from '../schema/authSchema'
 
 export interface TokenData {
   accessToken: string
@@ -31,28 +31,44 @@ export type AuthContextType = {
   user: User | null
   isAuthenticated: boolean
   accessToken: string | null
-  userAuthenticatedState: (userData: UserDTO, token: string) => void
-  userLoggedOut: () => void
+  loggedIn: (data: User, token: string) => void
+  loggedOut: () => void
 }
 
-
-export type LoginSchemaType = z.infer<typeof LoginSchema>
+export type LoginRequest = z.infer<typeof LoginSchema>
 
 export type SignupSchemaType = z.infer<typeof SignupSchema>
 
+export type ForgotPasswordRequest = z.infer<typeof ForgotPasswordSchema>
+
+
+export interface SignupRequest {
+  firstName: string
+  lastName: string
+  email: string
+  username: string
+  password: string
+}
+
+export interface GoogleRequest {
+  code: string
+}
+
+export interface ChangePasswordRequest {
+  oldPassword: string
+  newPassword: string
+}
 
 export interface LoginResponse {
-  user: UserDTO
+  user: User
   tokens: {
     accessToken: string
     refreshToken: string
   }
 }
 
-export interface ApiResponse<T> {
-  success: boolean
-  statusCode: number
-  message: string
-  data?: T
-  errors?: { message: string }[]
+export interface RefreshTokenResponse {
+  accessToken: string
 }
+
+export type OAuthState = 'login' | 'signup' | 'linked'

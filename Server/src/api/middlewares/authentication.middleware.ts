@@ -1,78 +1,61 @@
 import { Request, Response, NextFunction } from 'express'
-import { BadRequestError, InternalServerError, UnauthorizedError } from '@/utils/Errors'
+import { InternalServerError, UnauthorizedError } from '@/utils/Errors'
 import { AsyncHandler, tokenManagement } from '@/utils'
 import { StandardError } from '@/utils/Errors/StandardError'
-import { PrismaUserRepository } from '@/features/users/repository/PrismaUserRepository'
-import { UserDTO } from '@/features/users/authentication/auth.types'
 import { sessionRepository } from '@/features/users/repository/PrismaSessionRepository'
 
-const userRepository = new PrismaUserRepository()
 
-
-const extractToken = (req: Request): string => {
-    let token = null
-    const authHeader = req.headers['authorization']
-    if (authHeader && typeof authHeader === 'string') {
-        const parts = authHeader.split(' ')
-        if (parts.length === 2 && parts[0] === 'Bearer') {
-            token = parts[1]
-        }
-    }
-
-    if (!token) {
-        const cookies = req.cookies as Record<string, string>
-        token = cookies['access_token']
-        if (!token) {
-            throw new BadRequestError('Access token not found in request headers or cookies')
-        }
-    }
-
-    return token
-}
 
 export const isAuthenticated = AsyncHandler(async (req: Request, _: Response, next: NextFunction) => {
     try {
         // Check if the request has an authorization header
-        const accessToken = extractToken(req)
+        const accessToken = tokenManagement.extractToken(req)
+
+        if (!accessToken) {
+            throw new UnauthorizedError('Access token not found')
+        }
 
         // Check if the access token is valid
-        const decodedToken = await tokenManagement.verifyToken(accessToken)
+        const decodedToken = await tokenManagement.verifyAccessToken(accessToken)
         if (!decodedToken) {
             throw new UnauthorizedError('Invalid access token')
         }
 
-        // Find user by id
-        const user: UserDTO | null = await userRepository.getUserById(decodedToken.id)
-        if (!user) {
-            throw new BadRequestError('User not found')
+        const validateSession = await sessionRepository.validateSession(decodedToken.sub, accessToken)
+        if (!validateSession) {
+            throw new UnauthorizedError('Session is not valid or does not exist')
         }
 
-        // Attach user to request object
+        // Attach user information to the request object
         req.user = {
-            id: user.id,
-            email: user.email,
-            roleId: user.roleId!,
-            lastLoginAt: user.lastLoginAt!
+            id: validateSession.user.id,
+            firstName: validateSession.user.firstName!,
+            lastName: validateSession.user.lastName,
+            email: validateSession.user.email,
+            username: validateSession.user.username,
+            profileImage: validateSession.user.profileImage,
+            roleId: validateSession.user.roleId!,
+            verifiedEmail: validateSession.user.verifiedEmail
         }
 
-        // Check if session is valid
-        const session = await sessionRepository.getSessionByUserId(user.id)
-        if (!session) {
-            throw new UnauthorizedError('Session not found')
-        }
-
-        if (session.userId !== user.id) {
-            throw new UnauthorizedError('Session does not belong to the user')
-        }
-
-        // Attach session to request object
+        // Attach session information to the request object
         req.session = {
-            id: session?.id,
-            userId: session?.userId,
-            accessToken: session?.accessToken,
-            refreshToken: session?.refreshToken,
-            valid: session?.valid
+            id: validateSession.id,
+            userId: validateSession.userId,
+            accessToken: validateSession.accessToken,
+            refreshToken: validateSession.refreshToken,
+            valid: validateSession.valid
         }
+
+        // Check if the session is valid
+        const rolePermissions = decodedToken.permissions
+        if (!rolePermissions || Object.keys(rolePermissions).length === 0) {
+            throw new UnauthorizedError('No permissions found for the user')
+        }
+
+        // Attach role permissions to the request object
+        req.rolePermissions = rolePermissions
+        
 
         next()
     } catch (error) {

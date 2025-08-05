@@ -13,6 +13,7 @@ import {
 } from './cloudinary.config'
 import { openAIConfig } from './openai.config'
 import { RESEND_API_KEY } from './resend.config'
+import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI, GOOGLE_TOKEN_EXCHANGE_URL } from './google.config'
 
 export {
     appConfig,
@@ -28,5 +29,9 @@ export {
     OVERWRITE,
     INVALIDATE,
     openAIConfig,
-    RESEND_API_KEY
+    RESEND_API_KEY,
+    GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET,
+    GOOGLE_REDIRECT_URI,
+    GOOGLE_TOKEN_EXCHANGE_URL
 }

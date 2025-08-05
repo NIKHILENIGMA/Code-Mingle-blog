@@ -1,7 +1,9 @@
 // This file contains the types for the authentication feature
 import { z } from 'zod'
 import { forgotPasswordSchema, loginSchema, resetPasswordSchema, signupSchema } from '@/api'
-import { ActionType, Resource } from '@prisma/client'
+import { ActionType } from '@prisma/client'
+import { Post, User, Comment } from '@prisma/client'
+import { changePassword } from '@/api/validators/auth.validator'
 /**
  * Type definition for signup credentials
  * Inferred from the signupSchema Zod schema
@@ -34,7 +36,7 @@ export type ForgotPasswordCredientials = z.infer<typeof forgotPasswordSchema>
  */
 export type ResetPasswordCredentials = z.infer<typeof resetPasswordSchema>
 
-export interface AuthResponse {
+export interface CookieTokens {
     access_token: string
     refresh_token: string
 }
@@ -46,35 +48,88 @@ export interface Permission {
     actions: ActionType
 }
 
+
+
 export interface UserDTO {
     id: string
-    firstName: string | null
+    firstName: string
     lastName: string | null
     email: string
     username: string
-    bio: string | null
     profileImage: string | null
-    coverImage: string | null
-    lastLoginAt: Date | null
-    roleId: string | null
-    createdAt: Date
-    updatedAt: Date
+    roleId: string
+    verifiedEmail: boolean
 }
 
 export interface LoginDTO {
-    user: {
-        id: string
-        firstName: string | null
-        lastName: string | null
-        email: string
-        username: string
-        profileImage: string | null
-        roleId: string
-        verifiedEmail: boolean
-    }
+    user: UserDTO
     tokens: {
         accessToken: string
         refreshToken: string
     }
 }
 
+
+
+export const RESOURCE_ID_PARAMS = {
+    COMMENT: 'commentId',
+    POST: 'postId',
+    REPORT: 'reportId',
+    USER: 'id'
+} as const
+
+export type Resource = keyof typeof RESOURCE_ID_PARAMS
+export type Action = 'read' | 'create' | 'update' | 'delete'
+
+export type ResourceDataMap = {
+    COMMENT: Comment
+    POST: Post
+    REPORT: Report
+    USER: User
+}
+
+export interface GoogleTokenExchangeResponse {
+    access_token: string
+    expires_in: number
+    scope: string
+    token_type: string
+    id_token: string
+    refresh_token?: string
+}
+
+export interface GoogleDecodedTokenPayload {
+    iss: string
+    azp: string
+    aud: string
+    sub: string
+    email: string
+    email_verified: boolean
+    at_hash: string
+    name: string
+    picture: string
+    given_name: string
+    family_name: string
+    iat: number
+    exp: number
+}
+
+
+export type ChangePassword = z.infer<typeof changePassword>
+
+export enum OAuthProvider {
+    GOOGLE = 'GOOGLE',
+    GITHUB = 'GITHUB'
+}
+
+export interface CreateUserByGoogleOAuthPayload {
+    given_name: string
+    family_name: string
+    email: string
+    picture: string
+    sub: string
+    provider: OAuthProvider.GOOGLE
+    accessToken: string
+    refreshToken?: string
+    tokenExpiry?: Date
+
+}

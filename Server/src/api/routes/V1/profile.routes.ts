@@ -3,7 +3,6 @@ import {
     changeAvatar,
     changeCoverPhoto,
     changeUserPassword,
-    currentUser,
     deleteUserAccount,
     removeAvatar,
     removeCoverPhoto,
@@ -19,10 +18,9 @@ const router = Router()
 
 // ------------------------------------------- PUBLIC ROUTES ------------------------------------------------
 router.route('/get-user/:username').get()
-router.route('/me/dashboard').get(userDashboard)
 
 // ------------------------------------------ PRIVATE ROUTES ------------------------------------------------
-router.route('/get-user').get(isAuthenticated, currentUser)
+router.route('/me/dashboard').get(isAuthenticated, userDashboard)
 router.route('/me/update-details').patch(isAuthenticated, updateUserDetails)
 router.route('/me/change-password').patch(isAuthenticated, changeUserPassword)
 router.route('/me/delete-account').delete(isAuthenticated, deleteUserAccount)

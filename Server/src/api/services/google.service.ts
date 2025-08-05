@@ -1,125 +1,96 @@
-import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI } from '@/config/app.config'
-import { InternalServerError, NotFoundError } from '@/utils/Errors'
+import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI } from '@/config'
+import { Credentials, OAuth2Client, type TokenPayload } from 'google-auth-library'
+import { OAuthRepository } from '../../features/users/repository/PrismaOAuthRepository'
+import { CreateUserByGoogleOAuthPayload, Permission } from '@/features/users/authentication/auth.types'
 import { StandardError } from '@/utils/Errors/StandardError'
-import axios from 'axios'
-import { jwtDecode } from 'jwt-decode'
-import { CreateOAuthUserPayload, OAuthRepository, UpdateOAuthUserPayload } from '../../features/users/repository/PrismaOAuthRepository'
+import { InternalServerError, NotFoundError } from '@/utils/Errors'
+import { User } from '@prisma/client'
+import { EUserProvider } from '@/types/common/enum.types'
 
-interface GoogleTokenExchangeResponse {
-    access_token: string
-    expires_in: number
-    scope: string
-    token_type: string
-    id_token: string
-    refresh_token?: string
+interface ITokenResponse {
+    access_token: string;
+    refresh_token?: string;
+    id_token: string;
+    scope: string;
+    token_type: string;
+    expiry_date: number;
 }
 
-interface GoogleDecodedTokenPayload {
-    iss: string
-    azp: string
-    aud: string
-    sub: string
-    email: string
-    email_verified: boolean
-    at_hash: string
-    name: string
-    picture: string
-    given_name: string
-    family_name: string
-    iat: number
-    exp: number
-}
 
 class GoogleService {
+    private client: OAuth2Client
     constructor(private oAuthRepository: OAuthRepository) {
         this.oAuthRepository = oAuthRepository
+        this.client = new OAuth2Client({
+            clientId: GOOGLE_CLIENT_ID,
+            clientSecret: GOOGLE_CLIENT_SECRET,
+            redirectUri: GOOGLE_REDIRECT_URI
+        })
     }
 
-    public async exchangeGoogleCodeForToken(code: string): Promise<GoogleTokenExchangeResponse> {
-        try {
-            if (!code) {
-                throw new NotFoundError('Authorization code does not provided')
-            }
-
-            const { data }: { data: GoogleTokenExchangeResponse } = await axios.post(
-                'https://oauth2.googleapis.com/token',
-                new URLSearchParams({
-                    client_id: GOOGLE_CLIENT_ID,
-                    client_secret: GOOGLE_CLIENT_SECRET,
-                    redirect_uri: GOOGLE_REDIRECT_URI,
-                    grant_type: 'authorization_code',
-                    code
-                }),
-                {
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    }
-                }
-            )
-
-            return data
-        } catch (error) {
-            if (error instanceof StandardError) {
-                throw error
-            }
-
-            if (error instanceof Error) {
-                throw new InternalServerError(
-                    `An unexpected error occurred while exchanging the code for a token, potential reason can be: ${error.message}`,
-                    'exchangeGoogleCodeForToken'
-                )
-            }
-
-            throw new InternalServerError('An unexpected error while exchanging the code for a token', (error as Error).message)
-        }
-    }
-
-    public decodeGoogleJWTToken(token: GoogleTokenExchangeResponse) {
-        const jwtPayload: GoogleDecodedTokenPayload = jwtDecode(token.id_token)
-        if (!jwtPayload || !jwtPayload.email) {
-            throw new NotFoundError('Invalid JWT token or email not found in the token')
+    public async exchangeGoogleCodeForToken(code: string): Promise<{
+        tokens: Credentials
+        userInfo: TokenPayload
+    }> {
+        if (!code?.trim()) {
+            throw new NotFoundError('Authorization code is required and cannot be empty')
         }
 
-        return jwtPayload
-    }
-
-    public async createUserWithOAuth(payload: CreateOAuthUserPayload) {
         try {
-            const user = await this.oAuthRepository.createOAuthUser(payload)
-            if (!user) {
-                throw new NotFoundError('User not found or could not be created with OAuth data')
+            // Exchange code for tokens
+            const { tokens } = (await this.client.getToken(code)) as { tokens: ITokenResponse };
+            
+            // Validate tokens
+            if (!tokens) {
+                throw new NotFoundError('No tokens received from Google')
             }
 
-            return user
-        } catch (error) {
+            if (!tokens.access_token) {
+                throw new NotFoundError('Access token not received from Google')
+            }
+
+            if (!tokens.id_token) {
+                throw new NotFoundError('ID token not received from Google')
+            }
+
+            // Verify ID token and get user info
+            const userInfo: TokenPayload = await this.verifyGoogleIdToken(tokens.id_token)
+
+            // console.log('ID token verified successfully');
+
+            return {
+                tokens,
+                userInfo
+            }
+        } catch (error: unknown) {
+            // console.error('Error in exchangeGoogleCodeForToken:', error);
+
             if (error instanceof StandardError) {
                 throw error
-            }
-
-            if (error instanceof Error) {
-                throw new InternalServerError(
-                    `An unexpected error occurred while creating the user with OAuth data: ${error.message}`,
-                    'createUserWithOAuth'
-                )
             }
 
             throw new InternalServerError(
-                `An unexpected error occurred while creating the user with OAuth data: ${(error as Error).message}`,
-                'createUserWithOAuth'
+                `An unexpected error while exchanging the code for a token: ${(error as Error).message}`,
+                'exchangeGoogleCodeForToken'
             )
         }
     }
 
-    public async updateUserWithOAuth(payload: UpdateOAuthUserPayload) {
+    private async verifyGoogleIdToken(idToken: string): Promise<TokenPayload> {
         try {
-            const updatedUser = await this.oAuthRepository.updateUserWithOAuth(payload)
-            if (!updatedUser) {
-                throw new NotFoundError('User not found or could not be updated with OAuth data')
+            const client = new OAuth2Client(GOOGLE_CLIENT_ID)
+
+            const ticket = await client.verifyIdToken({
+                idToken,
+                audience: GOOGLE_CLIENT_ID
+            })
+
+            const payload = ticket.getPayload() // user info
+            if (!payload || !payload.email) {
+                throw new NotFoundError('Invalid ID token or email not found in the token')
             }
 
-            return updatedUser
-
-
+            return payload
         } catch (error) {
             if (error instanceof StandardError) {
                 throw error
@@ -127,14 +98,63 @@ class GoogleService {
 
             if (error instanceof Error) {
                 throw new InternalServerError(
-                    `An unexpected error occurred while updating the user with OAuth data: ${error.message}`,
-                    'updateUserWithOAuth'
+                    `An unexpected error occurred while verifying the ID token, potential reason can be: ${error.message}`,
+                    'verifyGoogleIdToken'
                 )
             }
 
+            throw new InternalServerError('An unexpected error while verifying the ID token', (error as Error).message)
+        }
+    }
+
+    public async createUserWithGoogleOAuth(token: CreateUserByGoogleOAuthPayload): Promise<{ user: User; permissions: Permission[] }> {
+        try {
+            if (!token.email) {
+                throw new NotFoundError('Email not found in the token payload')
+            }
+
+            return await this.oAuthRepository.createOAuthUser(token)
+        } catch (error) {
+            if (error instanceof StandardError) {
+                throw error
+            }
+
             throw new InternalServerError(
-                `An unexpected error occurred while updating the user with OAuth data: ${(error as Error).message}`,
-                'updateUserWithOAuth'
+                `An unexpected error while creating user with Google OAuth: ${(error as Error).message}`,
+                'createUserWithGoogleOAuth'
+            )
+        }
+    }
+
+    public async isGoogleAccountLinked(userId: string, googleId: string, provider: EUserProvider): Promise<boolean> {
+        try {
+            return await this.oAuthRepository.checkAccountLinked(userId, googleId, provider)
+        } catch (error) {
+            if (error instanceof StandardError) {
+                throw error
+            }
+
+            throw new InternalServerError(
+                `An unexpected error occurred while checking Google account link status: ${(error as Error).message}`,
+                'AuthService.isGoogleAccountLinked'
+            )
+        }
+    }
+
+    public async linkGoogleAccount(userId: string, code: string): Promise<void> {
+        if (!userId || !code) {
+            throw new NotFoundError('User ID and authorization code are required to link Google account')
+        }
+        try {
+            await this.oAuthRepository.linkGoogleAccount(userId, code)
+        } catch (error) {
+            if (error instanceof StandardError) {
+                throw error
+            }
+
+            throw new InternalServerError(
+                `An unexpected error occurred while linking Google account: ${(error as Error).message}`,
+                'GoogleService.linkGoogleAccount'
             )
         }
     }

@@ -1,73 +1,99 @@
 import { FC, ReactNode, useCallback, useEffect, useState } from 'react'
 import { AuthContext } from '@/features/auth/hooks/useAuthContext'
-import { AuthContextType, User, UserDTO } from '@/features/auth/types/authTypes'
-import { setApiRequestToken } from '@/services/api/apiInstance'
+import { AuthContextType, User } from '@/features/auth/types/authTypes'
 import { authService } from '../services/authApiServices'
 
+interface AuthState {
+  user: User | null
+  isAuthenticated: boolean
+  accessToken: string | null
+}
+
+const initialAuthState: AuthState = {
+  user: null,
+  isAuthenticated: false,
+  accessToken: null,
+}
+
 export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null)
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false)
-  const [accessToken, setAccessToken] = useState<string | null>(null)
+  const [authState, setAuthState] = useState<AuthState>(initialAuthState)
   const isPersistent = localStorage.getItem('isPersistent') === 'true'
 
-  const formatUser = (userData: UserDTO): User => ({
-    id: userData.id,
-    username: userData.username,
-    firstName: userData.firstName,
-    lastName: userData.lastName || '',
-    email: userData.email,
-    avatar: userData.profileImage || '',
-    role: userData.roleId,
-  })
+  // Change the authentication state after user logs in
+  // This will set the user and access token in the auth state
+  const loggedIn = (data: User, token: string): void => {
+    if (!data || !token) return
 
-  const userAuthenticatedState = useCallback((userData: UserDTO, token: string) => {
-    setUser(formatUser(userData))
-    setIsAuthenticated(true)
-    setAccessToken(token)
-    setApiRequestToken(token)
+    setAuthState({
+      user: data,
+      isAuthenticated: !!token,
+      accessToken: token,
+    })
+  }
+  // Change the authentication state after user logs out
+  // This will reset the auth state to initial state
+  const loggedOut = (): void => {
+    setAuthState(initialAuthState)
+    // Clear localStorage for persistent login
+    localStorage.removeItem('isPersistent')
+  }
+
+  // Create the context value
+  const value: AuthContextType = {
+    user: authState.user,
+    isAuthenticated: authState.isAuthenticated,
+    accessToken: authState.accessToken,
+    loggedIn,
+    loggedOut,
+  }
+
+  // Fetch the user profile if the user is authenticated
+  const keepUserLoggedIn = useCallback(async (): Promise<boolean> => {
+    try {
+      // Get the access token from refresh endpoint
+      const tokenResponse = await authService.refreshToken()
+      if (!tokenResponse.success || !tokenResponse.data) {
+        return false
+      }
+
+      // Get the user profile using the access token
+      const userResponse = await authService.getProfile()
+      if (!userResponse.success || !userResponse.data) {
+        return false
+      }
+
+      // Update the auth state with user data and access token
+      loggedIn(userResponse.data, tokenResponse.data.accessToken)
+      return true
+    } catch (error) {
+      console.warn('Failed to keep user logged in:', error)
+      return false
+    }
   }, [])
 
-  const userLoggedOut = () => {
-    setUser(null)
-    setIsAuthenticated(false)
-    setAccessToken(null)
-    setApiRequestToken(null)
-  }
-
-  const value: AuthContextType = {
-    user,
-    isAuthenticated,
-    accessToken,
-    userAuthenticatedState,
-    userLoggedOut,
-  }
-
-  const getCurrentSession = useCallback(async () => {
-    try {
-      // Attempt to refresh the token
-      const { success, data } = await authService.refreshToken()
-      if (!success || !data?.accessToken) throw new Error('No access token')
-
-      // Fetch the current user details
-      const { data: userData } = await authService.getCurrentUser()
-      if (!userData) throw new Error('No user data')
-
-      // Update the user state and access token
-      userAuthenticatedState(userData, data.accessToken)
-    } catch (err) {
-      throw new Error(
-        'Failed to get current session, reason might be: ' +
-          (err as Error).message,
-      )
-    }
-  }, [userAuthenticatedState])
-
-  // Fetch the current user details on initial load for persistent sessions to ensure the user is authenticated
+  // Check if the user is already logged in and fetch their profile
   useEffect(() => {
-    if (isPersistent && !accessToken && !user) {
-      getCurrentSession()
+    const initializeAuth = async () => {
+      if (
+        isPersistent &&
+        authState.isAuthenticated === false &&
+        authState.accessToken === null
+      ) {
+        const success = await keepUserLoggedIn()
+
+        if (!success) {
+          loggedOut()
+        }
+      }
     }
-  }, [accessToken, isPersistent, getCurrentSession, user])
+
+    initializeAuth()
+  }, [
+    authState.isAuthenticated,
+    authState.accessToken,
+    isPersistent,
+    keepUserLoggedIn,
+  ])
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

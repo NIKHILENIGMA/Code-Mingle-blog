@@ -1,15 +1,13 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import express from 'express'
+import { UserDTO } from '@/features/users/authentication/auth.types'
+import { FlattenedPermissions } from '@/utils/FlatPermission'
+import { Comment, Post } from '@prisma/client'
 
 declare global {
     namespace Express {
         interface Request {
-            user?: {
-                id?: string
-                email?: string
-                roleId?: string
-                lastLoginAt?: Date
-            }
+            user?: UserDTO,
             session?: {
                 id?: string
                 userId?: string
@@ -17,6 +15,12 @@ declare global {
                 refreshToken?: string
                 valid: boolean
             }
+            rolePermissions?: FlattenedPermissions
+            resourceData: {
+                post?: Post
+                comment?: Comment
+            }
+
         }
     }
 }

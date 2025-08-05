@@ -1,81 +1,95 @@
-import { FC } from "react";
-import { CircleCheckBig } from "lucide-react";
-
+import { FC } from 'react'
+import { CircleCheckBig } from 'lucide-react'
+import { BsTrash2 } from 'react-icons/bs'
 
 const GeneralDetails: FC = () => {
   return (
-    <div className="flex flex-col md:flex-row w-full">
+    <div className="flex flex-col w-full h-full md:flex-row">
       {/* Main Content */}
-      <main className="flex-1 bg-white p-6 rounded-lg shadow-md mx-4">
+      <main className="flex-1 p-12 mx-12 bg-yellow-200">
         <h2 className="text-2xl font-semibold text-gray-700">
-          General Details
+          Personal Details
         </h2>
-        <p className="text-gray-500 text-sm">
+        <p className="text-sm text-gray-500">
           Update your photo and personal details here.
         </p>
 
-        <form className="mt-4 space-y-4">
+        <div className="flex items-center mt-4">
+          <img
+            src="https://avatars.githubusercontent.com/u/12345678?v=4"
+            alt="Profile"
+            className="w-24 h-24 border-2 border-gray-300 rounded-full"
+          />
+          <button className="flex items-center justify-center px-4 py-2 ml-4 text-sm rounded-lg">
+            <BsTrash2 className="inline" size={16} color='red' />
+          </button>
+          <button className="px-4 py-2 ml-4 text-sm transition-colors rounded-lg bg-primary text-secondary hover:bg-accent ">
+            Change Photo
+          </button>
+        </div>
+
+        <form className="mt-4 space-y-4 ">
           {/* Name Fields */}
-          <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex flex-col gap-4 md:flex-row">
             <input
               type="text"
               placeholder="Enter first name"
-              className="w-full border rounded-lg p-3"
+              className="w-full p-3 border rounded-lg"
             />
             <input
               type="text"
               placeholder="Enter last name"
-              className="w-full border rounded-lg p-3"
+              className="w-full p-3 border rounded-lg"
             />
           </div>
 
           {/* Email & Username */}
           <div>
-            <label className="block text-gray-600 text-sm">Email Address</label>
+            <label className="block text-sm text-gray-600">Email Address</label>
             <div className="relative">
               <input
                 type="email"
                 value="barlyvallendito@gmail.com"
-                className="w-full border rounded-lg p-3 pr-10"
+                className="w-full p-3 pr-10 border rounded-lg"
                 readOnly
               />
               <CircleCheckBig
                 stroke="green"
-                className="absolute right-3 top-4 text-green-500"
+                className="absolute text-green-500 right-3 top-4"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-gray-600 text-sm">Username</label>
+            <label className="block text-sm text-gray-600">Username</label>
             <div className="relative">
               <input
                 type="text"
                 value="barlyvallendito"
-                className="w-full border rounded-lg p-3 pr-10"
+                className="w-full p-3 pr-10 border rounded-lg"
                 readOnly
               />
               <CircleCheckBig
                 stroke="green"
-                className="absolute right-3 top-4 text-green-500"
+                className="absolute text-green-500 right-3 top-4"
               />
             </div>
           </div>
 
           {/* Bio */}
           <div>
-            <label className="block text-gray-600 text-sm">Bio</label>
+            <label className="block text-sm text-gray-600">Bio</label>
             <textarea
               rows={3}
-              className="w-full border rounded-lg p-3"
+              className="w-full p-3 border rounded-lg"
               defaultValue="Hello Planet 👋. I'm a Product Designer based in Indonesia. I'm a professional UI/UX Designer with more than 7+ years of experience focused on web and mobile application design, wireframing, and prototyping with delivering high-quality designs."
             ></textarea>
           </div>
 
           {/* Timezone */}
           <div>
-            <label className="block text-gray-600 text-sm">Timezone</label>
-            <select className="w-full border rounded-lg p-3">
+            <label className="block text-sm text-gray-600">Timezone</label>
+            <select className="w-full p-3 border rounded-lg">
               <option>Pacific Standard Time (PST) UTC-08:00</option>
               <option>Eastern Standard Time (EST) UTC-05:00</option>
               <option>Central European Time (CET) UTC+01:00</option>
@@ -84,39 +98,17 @@ const GeneralDetails: FC = () => {
 
           {/* Buttons */}
           <div className="flex justify-end gap-3">
-            <button className="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg">
+            <button className="px-6 py-2 text-gray-700 bg-gray-300 rounded-lg">
               Cancel
             </button>
-            <button className="bg-blue-600 text-white px-6 py-2 rounded-lg">
+            <button className="px-6 py-2 text-white bg-blue-600 rounded-lg">
               Save
             </button>
           </div>
         </form>
       </main>
-
-      {/* Profile Section */}
-      <aside className="w-full md:w-1/4 bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-lg font-semibold text-gray-700">Your Photo</h2>
-        <div className="mt-4 flex flex-col items-center">
-          <div className="w-24 h-24 rounded-full bg-gray-300"></div>
-          <button className="text-blue-600 mt-2">Update</button>
-          <button className="text-red-500 mt-1">Delete</button>
-        </div>
-        <p className="text-sm text-gray-500 mt-4">
-          Click to upload or drag and drop (SVG, PNG, JPG, GIF) max 800x400px.
-        </p>
-
-        {/* Google Section */}
-        <div className="mt-6 p-4 bg-gray-100 rounded-lg">
-          <p className="text-sm text-gray-700">Google</p>
-          <p className="text-sm text-green-600">Connected</p>
-          <a href="#" className="text-blue-600 text-sm">
-            Click here to learn more.
-          </a>
-        </div>
-      </aside>
     </div>
-  );
-};
+  )
+}
 
-export default GeneralDetails;
+export default GeneralDetails

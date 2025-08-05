@@ -1,70 +1,27 @@
 // Auth routes for handling user authentication and authorization.
 import { Router } from 'express'
-import { forgotPassword, login, logout, refreshAccessToken, resetPassword, signup } from '@/features/users/authentication/auth.controller'
+import { changeUserPassword, currentUser, forgotPassword, googleLoginCallback, googleSignUpCallback, login, logout, refreshAccessToken, resetPassword, signup } from '@/features/users/authentication/auth.controller'
 import { isAuthenticated } from '@/api/middlewares'
+
+// Create a new router instance
 const router = Router()
 
-/**
- * Route for user signup.
- * @name post/signup
- * @function
- * @memberof module:auth.routes
- * @inner
- * @param {function} validateBody - Middleware to validate request body against signupSchema.
- * @param {function} signup - Controller function to handle user signup.
- */
+// Public routes
+// These routes do not require authentication and can be accessed by anyone.
 router.route('/signup').post(signup)
-
-/**
- * Route for user login.
- * @name post/login
- * @function
- * @memberof module:auth.routes
- * @inner
- * @param {function} validateBody - Middleware to validate request body against loginSchema.
- * @param {function} login - Controller function to handle user login.
- */
 router.route('/login').post(login)
+router.route('/refresh-token').post(refreshAccessToken)
+router.route('/google-login-callback').post(googleLoginCallback)
+router.route('/google-signup-callback').post(googleSignUpCallback)
 
-/**
- * Route for user logout.
- * @name delete/logout
- * @function
- * @memberof module:auth.routes
- * @inner
- * @param {function} isAuthenticated - Middleware to check if user is authenticated.
- * @param {function} logout - Controller function to handle user logout.
- */
-router.route('/logout').delete(isAuthenticated, logout)
-
-/**
- * Route for password recovery.
- * @name post/password-recovery
- * @function
- * @memberof module:auth.routes
- * @inner
- * @param {function} forgotPassword - Controller function to handle password recovery.
- */
+// Todo: Implement password recovery and reset functionality
 router.route('/password-recovery').post(forgotPassword)
-
-/**
- * Route for resetting password.
- * @name post/reset-password
- * @function
- * @memberof module:auth.routes
- * @inner
- * @param {function} resetPassword - Controller function to handle password reset.
- */
 router.route('/reset-password').post(resetPassword)
 
-/**
- * Route for refreshing token.
- * @name post/refresh-token
- * @function
- * @memberof module:auth.routes
- * @inner
- * @param {function} refreshToken - Controller function to handle token refresh.
- */
-router.route('/refresh-token').post(refreshAccessToken)
+// Protected routes
+router.route('/logout').delete(isAuthenticated, logout)
+router.route('/current-user').get(isAuthenticated, currentUser)
+router.route('/change-password').put(isAuthenticated, changeUserPassword)
+
 
 export default router

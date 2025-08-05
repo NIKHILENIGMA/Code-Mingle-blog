@@ -4,6 +4,7 @@ import { Session } from '@prisma/client'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 
 export interface SessionPayload {
+    id?: string
     userId: string
     accessToken: string
     refreshToken: string
@@ -12,14 +13,36 @@ export interface SessionPayload {
     valid?: boolean
 }
 
+export interface SessionWithUser {
+    id: string
+    userId: string
+    accessToken: string
+    refreshToken: string
+    valid: boolean
+    createdAt: Date
+    updatedAt: Date
+    user: {
+        id: string
+        firstName: string | null
+        lastName: string | null
+        email: string
+        username: string
+        profileImage: string | null
+        roleId: string | null
+        verifiedEmail: boolean
+    }
+}
+
 export interface ISessionRepository {
     createSession(sessionPayload: SessionPayload): Promise<void>
     updateSession(sessionId: string, sessionPayload: Partial<SessionPayload>): Promise<void>
     getSession(accessToken: string): Promise<Session | null>
+    validateSession(userId: string, accessToken: string): Promise<SessionWithUser | null>
     getSessionByUserId(userId: string): Promise<Session | null>
     deleteSession(sessionId: string): Promise<void>
     updateAllSessionsByUserId(userId: string, sessionPayload: Partial<SessionPayload>): Promise<void>
-    getSessionByRefreshToken(refreshToken: string): Promise<Session | null>
+    getSessionByRefreshToken(userId: string, refreshToken: string): Promise<Session | null>
+    loginUserSession(sessionPayload: SessionPayload): Promise<void>
 }
 
 class PrismaSessionRepository implements ISessionRepository {
@@ -59,6 +82,37 @@ class PrismaSessionRepository implements ISessionRepository {
         }
     }
 
+    async validateSession(userId: string, accessToken: string): Promise<SessionWithUser | null> {
+        try {
+            return await prisma.session.findFirst({
+                where: { userId, accessToken, valid: true },
+                include: {
+                    user: {
+                        select: {
+                            id: true,
+                            firstName: true,
+                            lastName: true,
+                            username: true,
+                            email: true,
+                            roleId: true,
+                            profileImage: true,
+                            verifiedEmail: true
+                        }
+                    }
+                }
+            })
+        } catch (error) {
+            if (error instanceof PrismaClientKnownRequestError) {
+                throw new DatabaseError(`Error validating session: ${error.message}`, 'PrismaSessionRepository.validateSession')
+            }
+
+            throw new DatabaseError(
+                `An unexpected error while validating session: ${(error as Error).message}`,
+                'PrismaSessionRepository.validateSession'
+            )
+        }
+    }
+
     async getSession(accessToken: string): Promise<Session | null> {
         try {
             return await prisma.session.findUnique({
@@ -90,11 +144,15 @@ class PrismaSessionRepository implements ISessionRepository {
         }
     }
 
-    async getSessionByRefreshToken(refreshToken: string): Promise<Session | null> {
+    async getSessionByRefreshToken(userId: string, refreshToken: string): Promise<Session | null> {
         try {
-            return await prisma.session.findUnique({
-                where: { refreshToken, valid: true }
+            const userSession = await prisma.session.findUnique({
+                where: { userId, refreshToken, valid: true }
             })
+            if (!userSession) {
+                return null
+            }
+            return userSession
         } catch (error) {
             if (error instanceof PrismaClientKnownRequestError) {
                 throw new DatabaseError(
@@ -149,7 +207,36 @@ class PrismaSessionRepository implements ISessionRepository {
         }
     }
 
+    async loginUserSession(sessionPayload: SessionPayload): Promise<void> {
+        try {
+            await prisma.$transaction(async (tx) => {
+                await tx.session.updateMany({
+                    where: { userId: sessionPayload.userId, valid: true },
+                    data: { valid: false }
+                })
+            })
 
+            await prisma.session.create({
+                data: {
+                    userId: sessionPayload.userId,
+                    accessToken: sessionPayload.accessToken,
+                    refreshToken: sessionPayload.refreshToken,
+                    userAgent: sessionPayload.userAgent,
+                    ipAddress: sessionPayload.ipAddress,
+                    valid: true
+                }
+            })
+        } catch (error) {
+            if (error instanceof PrismaClientKnownRequestError) {
+                throw new DatabaseError(`Error logging in user session: ${error.message}`, 'PrismaSessionRepository.loginUserSession')
+            }
+
+            throw new DatabaseError(
+                `An unexpected error while logging in user session: ${(error as Error).message}`,
+                'PrismaSessionRepository.loginUserSession'
+            )
+        }
+    }
 }
 
 export const sessionRepository = new PrismaSessionRepository()

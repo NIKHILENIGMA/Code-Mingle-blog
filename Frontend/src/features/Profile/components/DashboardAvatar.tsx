@@ -49,13 +49,13 @@ const DashboardAvatar: FC<ProfileAvatarProps> = ({ user }) => {
         <img
           src={"https://www.gravatar.com/avatar/"}
           alt="User Avatar"
-          className="w-28 h-28 rounded-full border-4 border-white mx-auto object-cover"
+          className="object-cover mx-auto border-4 border-white rounded-full w-28 h-28"
         />
       ) : (
         <img
           src={user?.avatarImg}
           alt="User Avatar"
-          className="w-28 h-28 rounded-full border-4 border-white mx-auto object-cover"
+          className="object-cover mx-auto border-4 border-white rounded-full w-28 h-28"
         />
       )}
 
@@ -63,7 +63,7 @@ const DashboardAvatar: FC<ProfileAvatarProps> = ({ user }) => {
         avatar={user?.avatarImg ?? ""}
         alt={user?.firstName ?? "User"}
       />
-      <h1 className="text-2xl font-bold mt-2">{`${user?.firstName} ${user?.lastName}`}</h1>
+      <h1 className="mt-2 text-2xl font-bold">{`${user?.firstName} ${user?.lastName}`}</h1>
       <p className="text-gray-300">
         Web Developer | UI/UX Enthusiast | Blogger
       </p>

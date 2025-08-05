@@ -7,14 +7,6 @@ import { DatabaseError, InternalServerError, UnauthorizedError } from '@/utils/E
 import { ProfileChangePasswordCredentials, UpdateProfileCredentials } from './profile.types'
 import { ProfileChangePasswordSchema, ProfileUpdateBodySchema } from '@/api'
 
-export const currentUser = (req: Request, res: Response) => {
-    const user = req.user
-    if (!user) {
-        throw new UnauthorizedError('User is not logged in')
-    }
-
-    ApiResponse(req, res, 200, 'Current user', { user })
-}
 
 export const updateUserDetails = AsyncHandler(async (req: Request, res: Response) => {
     const userId: string | undefined = req.user?.id

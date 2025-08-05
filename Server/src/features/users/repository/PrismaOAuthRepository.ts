@@ -1,26 +1,16 @@
 import prisma from '@/config/prisma.config'
-import { ROLE } from '@/types/common/enum.types'
-import { DatabaseError } from '@/utils/Errors'
+import { EUserProvider, ROLE } from '@/types/common/enum.types'
+import { DatabaseError, InternalServerError, NotFoundError } from '@/utils/Errors'
 import { StandardError } from '@/utils/Errors/StandardError'
-import { Permission } from '../authentication/auth.types'
-import { User } from '@prisma/client'
+import { CreateUserByGoogleOAuthPayload, Permission } from '../authentication/auth.types'
+import { User, UserProvider } from '@prisma/client'
+import { generateUniqueUsername } from '@/utils/generateUsername'
 
 export interface OAuthRepository {
-    createOAuthUser(payload: CreateOAuthUserPayload): Promise<{ user: User; permissions: Permission[] }>
-    updateUserWithOAuth(payload: UpdateOAuthUserPayload): Promise<{ user: User; permissions: Permission[] }>
-}
-
-export interface CreateOAuthUserPayload {
-    firstName: string
-    lastName: string
-    email: string
-    username: string
-    profileImage: string
-    provider: 'GOOGLE' | 'GITHUB'
-    providerId: string
-    providerAcessToken: string
-    providerRefreshToken?: string
-    providerTokenExpiry?: Date
+    createOAuthUser(payload: CreateUserByGoogleOAuthPayload): Promise<{ user: User; permissions: Permission[] }>
+    updateUserProviderTokens(payload: Partial<UserProvider>): Promise<UserProvider>
+    checkAccountLinked(userId: string, googleId: string, provider: EUserProvider): Promise<boolean>
+    linkGoogleAccount(userId: string, code: string): Promise<void>
 }
 
 export interface UpdateOAuthUserPayload {
@@ -34,25 +24,33 @@ export interface UpdateOAuthUserPayload {
 }
 
 class PrismaOAuthRepository implements OAuthRepository {
-    async createOAuthUser(payload: CreateOAuthUserPayload): Promise<{ user: User; permissions: Permission[] }> {
+    async createOAuthUser(payload: CreateUserByGoogleOAuthPayload): Promise<{ user: User; permissions: Permission[] }> {
         try {
             return await prisma.$transaction(async (tx) => {
                 const user = await tx.user.create({
                     data: {
-                        firstName: payload.firstName,
-                        lastName: payload.lastName,
-                        username: payload.username,
-                        authProvider: payload.provider,
-                        providerId: payload.providerId,
+                        firstName: payload.given_name,
+                        lastName: payload.family_name,
                         email: payload.email,
-                        profileImage: payload.profileImage,
-                        providerAccessToken: payload.providerAcessToken,
-                        providerRefreshToken: payload.providerRefreshToken ? payload.providerRefreshToken : null,
+                        username: generateUniqueUsername(payload.given_name),
+                        profileImage: payload.picture,
                         verifiedEmail: true,
                         lastLoginAt: new Date()
                     }
                 })
 
+                await tx.userProvider.create({
+                    data: {
+                        userId: user.id,
+                        provider: 'GOOGLE',
+                        providerId: payload.sub,
+                        providerAccessToken: payload.accessToken,
+                        providerRefreshToken: payload.refreshToken ? payload.refreshToken : null,
+                        providerTokenExpiry: payload.tokenExpiry ? payload.tokenExpiry : null
+                    }
+                })
+
+                // Get the user role and permissions
                 const role = await tx.role.findFirst({
                     where: {
                         name: ROLE.USER
@@ -74,7 +72,7 @@ class PrismaOAuthRepository implements OAuthRepository {
                 const permissions: Permission[] = rolePermissions.map((rp) => ({
                     id: rp.permission.id,
                     name: rp.permission.name,
-                    resource: rp.permission.resource,
+                    resource: rp.permission.resource as Permission['resource'],
                     actions: rp.permission.actions
                 }))
 
@@ -88,59 +86,83 @@ class PrismaOAuthRepository implements OAuthRepository {
         }
     }
 
-    async updateUserWithOAuth(payload: UpdateOAuthUserPayload): Promise<{ user: User; permissions: Permission[] }> {
+    async updateUserProviderTokens(payload: Partial<UserProvider>): Promise<UserProvider> {
+        if (!payload.userId || !payload.provider) {
+            throw new InternalServerError('User ID and provider are required to update user provider', 'PrismaOAuthRepository.updateUserProvider')
+        }
         try {
-            return await prisma.$transaction(async (tx) => {
-                const user = await tx.user.update({
+            return await prisma.userProvider.update({
+                where: {
+                    userId_provider: {
+                        userId: payload.userId,
+                        provider: payload.provider
+                    }
+                },
+                data: {
+                    providerAccessToken: payload.providerAccessToken,
+                    providerRefreshToken: payload.providerRefreshToken,
+                    providerTokenExpiry: payload.providerTokenExpiry
+                }
+            })
+        } catch (error) {
+            if (error instanceof StandardError) {
+                throw error
+            }
+            throw new DatabaseError(`Error updating user provider: ${(error as Error).message}`, 'PrismaOAuthRepository.updateUserProvider')
+        }
+    }
+
+    async checkAccountLinked(userId: string, googleId: string, provider: EUserProvider): Promise<boolean> {
+        try {
+            const userProvider = await prisma.userProvider.findFirst({
+                where: {
+                    userId,
+                    provider,
+                    providerId: googleId
+                }
+            })
+            return userProvider !== null
+        } catch (error) {
+            if (error instanceof StandardError) {
+                throw error
+            }
+            throw new DatabaseError(`Error checking account linked status: ${(error as Error).message}`, 'PrismaOAuthRepository.checkAccountLinked')
+        }
+    }
+
+    async linkGoogleAccount(userId: string, code: string): Promise<void> {
+        try {
+            await prisma.$transaction(async (tx) => {
+                const userProvider = await tx.userProvider.findFirst({
                     where: {
-                        id: payload.userId
-                    },
-                    data: {
-                        profileImage: payload.profileImage,
-                        authProvider: payload.provider,
-                        providerId: payload.providerId,
-                        providerAccessToken: payload.providerAcessToken,
-                        providerRefreshToken: payload.providerRefreshToken,
-                        providerTokenExpiry: payload.providerTokenExpiry,
-                        verifiedEmail: true,
-                        lastLoginAt: new Date()
+                        userId,
+                        provider: EUserProvider.GOOGLE
                     }
                 })
 
-                const role = await tx.role.findFirst({
-                    where: {
-                        name: ROLE.USER
-                    }
-                })
-
-                if (!role) {
-                    throw new DatabaseError('User role not found')
+                if (!userProvider) {
+                    throw new NotFoundError('User provider not found', 'PrismaOAuthRepository.linkGoogleAccount')
                 }
 
-                const rolePermissions = await tx.rolePermission.findMany({
+                // Update the user provider with the new code
+                await tx.userProvider.update({
                     where: {
-                        roleId: role.id
+                        id: userProvider.id
                     },
-                    include: {
-                        permission: true
+                    data: {
+                        providerAccessToken: code, // Assuming code is the access token here
+                        providerTokenExpiry: new Date(Date.now() + 3600 * 1000) // Set expiry to 1 hour from now
                     }
                 })
 
-                const permissions: Permission[] = rolePermissions.map((rp) => ({
-                    id: rp.permission.id,
-                    name: rp.permission.name,
-                    resource: rp.permission.resource,
-                    actions: rp.permission.actions
-                }))
 
-                return { user, permissions }
             })
         } catch (error) {
             if (error instanceof StandardError) {
                 throw error
             }
 
-            throw new DatabaseError(`Error updating OAuth user: ${(error as Error).message}`, 'PrismaOAuthRepository.updateUserWithOAuth')
+            throw new DatabaseError(`Error linking Google account: ${(error as Error).message}`, 'PrismaOAuthRepository.linkGoogleAccount')
         }
     }
 }

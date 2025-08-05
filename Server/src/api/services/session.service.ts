@@ -1,6 +1,6 @@
 import { StandardError } from '@/utils/Errors/StandardError'
 import { ISessionRepository, SessionPayload, sessionRepository } from '../../features/users/repository/PrismaSessionRepository'
-import { DatabaseError, InternalServerError } from '@/utils/Errors'
+import { BadRequestError, DatabaseError, InternalServerError, NotFoundError } from '@/utils/Errors'
 import { Session } from '@prisma/client'
 
 class SessionService {
@@ -53,7 +53,10 @@ class SessionService {
                 throw error
             }
             if (error instanceof Error) {
-                throw new InternalServerError(`An unexpected error occurred while invalidating session: ${error.message}`, 'SessionService.invalidateSession')
+                throw new InternalServerError(
+                    `An unexpected error occurred while invalidating session: ${error.message}`,
+                    'SessionService.invalidateSession'
+                )
             }
 
             throw new InternalServerError(
@@ -66,14 +69,16 @@ class SessionService {
     public async invalidateAllSessionsByUserId(userId: string): Promise<void> {
         try {
             await this.sessionRepository.updateAllSessionsByUserId(userId, { valid: false })
-
         } catch (error) {
             if (error instanceof StandardError) {
                 throw error
             }
 
             if (error instanceof Error) {
-                throw new InternalServerError(`An unexpected error occurred while invalidating all sessions by user ID: ${error.message}`, 'SessionService.invalidateAllSessionsByUserId')
+                throw new InternalServerError(
+                    `An unexpected error occurred while invalidating all sessions by user ID: ${error.message}`,
+                    'SessionService.invalidateAllSessionsByUserId'
+                )
             }
 
             throw new InternalServerError(
@@ -101,6 +106,26 @@ class SessionService {
         }
     }
 
+    public async createSessionForLoginUser(sessionPayload: SessionPayload): Promise<void> {
+        try {
+            await this.sessionRepository.loginUserSession(sessionPayload)
+        } catch (error) {
+            if (error instanceof StandardError) {
+                throw error
+            }
+            if (error instanceof Error) {
+                throw new InternalServerError(
+                    `An unexpected error occurred while creating session for login user: ${error.message}`,
+                    'SessionService.createSessionForLoginUser'
+                )
+            }
+
+            throw new InternalServerError(
+                `An unexpected error occurred while creating session for login user: ${(error as Error).message}`,
+                'SessionService.createSessionForLoginUser'
+            )
+        }
+    }
 
     // -------------------------------------------- Query Services --------------------------------------------
     public async getSession(sessionId: string): Promise<Session> {
@@ -125,15 +150,30 @@ class SessionService {
         }
     }
 
-    public async getSessionByRefreshToken(refreshToken: string): Promise<Session | null> {
+    public async getSessionByRefreshToken(userId: string, refreshToken: string): Promise<Session | null> {
         try {
-            return await this.sessionRepository.getSessionByRefreshToken(refreshToken)
+            if (!userId || !refreshToken) {
+                throw new NotFoundError('User ID and refresh token are required', 'SessionService.getSessionByRefreshToken')
+            }
+
+            const currentSession = await this.sessionRepository.getSessionByRefreshToken(userId, refreshToken)
+            if (!currentSession) {
+                throw new NotFoundError('Session not found or refresh token mismatch', 'SessionService.getSessionByRefreshToken')
+            }
+
+            if (!currentSession.valid) {
+                throw new BadRequestError('Session is invalid or expired', 'SessionService.getSessionByRefreshToken')
+            }
+            return currentSession
         } catch (error) {
             if (error instanceof StandardError) {
                 throw error
             }
             if (error instanceof Error) {
-                throw new InternalServerError(`An unexpected error occurred while retrieving session by refresh token: ${error.message}`, 'SessionService.getSessionByRefreshToken')
+                throw new InternalServerError(
+                    `An unexpected error occurred while retrieving session by refresh token: ${error.message}`,
+                    'SessionService.getSessionByRefreshToken'
+                )
             }
 
             throw new InternalServerError(
@@ -151,7 +191,10 @@ class SessionService {
                 throw error
             }
             if (error instanceof Error) {
-                throw new InternalServerError(`An unexpected error occurred while retrieving session by user ID: ${error.message}`, 'SessionService.getSessionByUserId')
+                throw new InternalServerError(
+                    `An unexpected error occurred while retrieving session by user ID: ${error.message}`,
+                    'SessionService.getSessionByUserId'
+                )
             }
 
             throw new InternalServerError(

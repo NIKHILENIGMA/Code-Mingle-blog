@@ -1,20 +1,20 @@
-import { FC } from "react";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
-import { Outlet } from "react-router-dom";
-import { Toaster } from "@/components/ui/sonner";
+import { FC } from 'react'
+import Header from '../components/Header'
+import Footer from '../components/Footer'
+import { Outlet } from 'react-router-dom'
+import { Toaster } from '@/components/ui/sonner'
 
 const Main: FC = () => {
   return (
-    <div>
+    <div className="flex flex-col min-h-screen">
       <Header />
-      <main className="">
+      <main className="flex-grow">
         <Outlet />
         <Toaster />
       </main>
       <Footer />
     </div>
-  );
-};
+  )
+}
 
-export default Main;
+export default Main

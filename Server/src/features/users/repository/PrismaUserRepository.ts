@@ -1,8 +1,10 @@
 import prisma from '@/config/prisma.config'
-import { User } from '@prisma/client'
+import { User, UserProvider } from '@prisma/client'
 import { Permission, UserDTO } from '../authentication/auth.types'
 import { Dashboard } from '../profile/profile.types'
-import { DatabaseError } from '@/utils/Errors'
+import { DatabaseError, NotFoundError } from '@/utils/Errors'
+import { comparePassword, hashedPassword } from '@/utils/HashPassword'
+import { StandardError } from '@/utils/Errors/StandardError'
 
 interface NewUser {
     firstName: string | undefined
@@ -18,16 +20,21 @@ export interface IUserRepository {
     create(payload: NewUser): Promise<User>
     update(userId: string, payload: Partial<User>): Promise<User>
     delete(userId: string): Promise<User>
-    updatePassword(userId: string, newPassword: string): Promise<boolean>
+    updatePassword(userId: string, oldPassword: string, newPassword: string): Promise<boolean>
     updateUserDetails(userId: string, payload: Partial<User>): Promise<void>
     getUserPermissions(roleId: string): Promise<unknown>
     getUserById(userId: string): Promise<User | null>
+    getUserForLogin(email: string): Promise<{
+        user: User
+        permissions: Permission[]
+    } | null>
     getUserByEmail(email: string): Promise<User | null>
     getUserByUsername(username: string): Promise<UserDTO | null>
     getAllUsers(take?: number, skip?: number): Promise<UserDTO[] | null>
     getFollowingStatus(viewerId: string, profileId: string): Promise<boolean>
-    getUserByEmailOrUsername(emailOrUsername: string): Promise<UserDTO | null>
+    getUserByEmailOrUsername(emailOrUsername: string): Promise<Partial<User> | null>
     getDashboardDetails(userId: string): Promise<Dashboard | null>
+    getUserLoginByGoogle(email: string): Promise<UserProvider | null>
 }
 
 export class PrismaUserRepository implements IUserRepository {
@@ -42,6 +49,7 @@ export class PrismaUserRepository implements IUserRepository {
         coverImage: true,
         lastLoginAt: true,
         roleId: true,
+        verifiedEmail: true,
         createdAt: true,
         updatedAt: true
     }
@@ -79,16 +87,39 @@ export class PrismaUserRepository implements IUserRepository {
         return deletedUser
     }
 
-    public async updatePassword(userId: string, newPassword: string): Promise<boolean> {
-        await prisma.user.update({
-            where: {
-                id: userId
-            },
-            data: {
-                password: newPassword
+    public async updatePassword(userId: string, oldPassword: string, newPassword: string): Promise<boolean> {
+        const updatedPassword = await prisma.$transaction(async (tx) => {
+            const user = await tx.user.findFirst({
+                where: {
+                    id: userId
+                }
+            })
+            if (!user) {
+                throw new DatabaseError('User not found', 'PrismaUserRepository.updatePassword')
             }
+            if (!user.password) {
+                throw new DatabaseError('User does not have a password set', 'PrismaUserRepository.updatePassword')
+            }
+
+            // Compare the old password
+            const match = await comparePassword(user.password, oldPassword)
+            if (!match) {
+                throw new DatabaseError('Old password is incorrect', 'PrismaUserRepository.updatePassword')
+            }
+
+            // Update the password
+            const hashPassword: string = await hashedPassword(newPassword)
+            return await tx.user.update({
+                where: {
+                    id: userId
+                },
+                data: {
+                    password: hashPassword
+                }
+            })
         })
-        return true
+
+        return updatedPassword !== null
     }
 
     public async updateUserDetails(userId: string, payload: Partial<User>): Promise<void> {
@@ -98,6 +129,39 @@ export class PrismaUserRepository implements IUserRepository {
             },
             data: payload
         })
+    }
+
+    public async getUserForLogin(email: string): Promise<{
+        user: User
+        permissions: Permission[]
+    } | null> {
+        const result = await prisma.user.findUnique({
+            where: { email },
+            include: {
+                role: {
+                    include: {
+                        rolePerms: {
+                            include: {
+                                permission: true
+                            }
+                        }
+                    }
+                }
+            }
+        })
+
+        if (!result) return null
+
+        return {
+            user: result,
+            permissions:
+                result.role?.rolePerms.map((rp) => ({
+                    id: rp.permission.id,
+                    name: rp.permission.name,
+                    resource: rp.permission.resource as Permission['resource'],
+                    actions: rp.permission.actions
+                })) || []
+        }
     }
 
     public async getUserPermissions(roleId: string): Promise<Permission[]> {
@@ -113,7 +177,7 @@ export class PrismaUserRepository implements IUserRepository {
         const permissions: Permission[] = rolePermissions.map((rp) => ({
             id: rp.permission.id,
             name: rp.permission.name,
-            resource: rp.permission.resource,
+            resource: rp.permission.resource as Permission['resource'],
             actions: rp.permission.actions
         }))
 
@@ -201,27 +265,89 @@ export class PrismaUserRepository implements IUserRepository {
     }
 
     public async getUserByUsername(username: string): Promise<UserDTO | null> {
-        return await prisma.user.findUnique({
+        const user = await prisma.user.findUnique({
             where: {
                 username
             },
             select: this.userSelect
         })
+
+        if (!user) return null
+
+        return {
+            ...user,
+            firstName: user.firstName ?? '',
+            lastName: user.lastName ?? '',
+            profileImage: user.profileImage ?? '',
+            roleId: user.roleId ?? ''
+        }
     }
 
     public async getAllUsers(take?: number, skip?: number): Promise<UserDTO[] | null> {
-        return await prisma.user.findMany({
+        const users = await prisma.user.findMany({
             take,
             skip,
             select: this.userSelect
         })
+
+        return users.map((user) => ({
+            ...user,
+            firstName: user.firstName ?? '',
+            lastName: user.lastName ?? '',
+            bio: user.bio ?? '',
+            profileImage: user.profileImage ?? '',
+            coverImage: user.coverImage ?? '',
+            roleId: user.roleId ?? ''
+        }))
     }
-    public async getUserByEmailOrUsername(emailOrUsername: string): Promise<UserDTO | null> {
-        return await prisma.user.findFirst({
+    public async getUserByEmailOrUsername(emailOrUsername: string): Promise<Partial<User> | null> {
+        const user = await prisma.user.findFirst({
             where: {
                 OR: [{ email: emailOrUsername }, { username: emailOrUsername }]
             },
             select: this.userSelect
         })
+
+        if (!user) return null
+
+        return {
+            ...user,
+            firstName: user.firstName ?? '',
+            lastName: user.lastName ?? '',
+            profileImage: user.profileImage ?? '',
+            coverImage: user.coverImage ?? '',
+            roleId: user.roleId ?? ''
+        }
+    }
+
+    public async getUserLoginByGoogle(email: string): Promise<UserProvider | null> {
+        try {
+            return await prisma.$transaction(async (tx) => {
+                try {
+                    const user = await tx.user.findUnique({
+                        where: { email }
+                    })
+
+                    if (!user) {
+                        throw new NotFoundError('User not found', 'PrismaUserRepository.getUserGoogleLogin')
+                    }
+
+                    const provider = await tx.userProvider.findFirst({
+                        where: { userId: user.id, provider: 'GOOGLE' }
+                    })
+
+                    return provider
+
+                } catch (error) {
+                    if (error instanceof StandardError) {
+                        throw error
+                    }
+
+                    throw new DatabaseError(`Error fetching user for Google login: ${(error as Error).message}`, 'PrismaUserRepository.getUserGoogleLogin')
+                }
+            })
+        } catch (error) {
+            throw new DatabaseError(`Error fetching user for Google login: ${(error as Error).message}`, 'PrismaUserRepository.getUserGoogleLogin')
+        }
     }
 }

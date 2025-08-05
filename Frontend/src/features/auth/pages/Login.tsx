@@ -1,93 +1,41 @@
 import React, { useState } from 'react'
 import { Button, Input, Label, Checkbox } from '@/components'
-import { useNavigate, useLocation, Link } from 'react-router-dom'
-import { useAuthContext } from '@/features/auth/hooks/useAuthContext'
+import { Link } from 'react-router-dom'
 import directUserToGoogleConsentScreen from '@/Utils/OAuth'
 import { PiEyeClosedThin, PiEyeThin, FcGoogle } from '@/Utils/Icons'
-import { authService } from '../services/authApiServices'
+import { useLoginForm } from '../hooks/useLoginForm'
+import { Loader2 } from 'lucide-react'
+import { useForm } from 'react-hook-form'
+import { LoginRequest } from '../types/authTypes'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { LoginSchema } from '../schema/authSchema'
+import { Toaster } from '@/components/ui/sonner'
 
 const Login: React.FC = () => {
-  const [formState, setFormState] = useState({
-    email: '',
-    password: '',
+  const {
+    register,
+    handleSubmit,
+    clearErrors,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginRequest>({
+    resolver: zodResolver(LoginSchema),
+    mode: 'onBlur', // Validate on blur for better UX
+    defaultValues: {
+      email: '',
+      password: '',
+    }, // Set default values for the form fields
   })
-  const [loading, setLoading] = useState<boolean>(false)
-  const [error, setError] = useState<string | null>(null)
   const [rememberMe, setRememberMe] = useState<boolean>(false)
   const [isVisible, setVisibility] = useState<boolean>(false)
-  const { userAuthenticatedState } = useAuthContext()
-  const location = useLocation()
-  const navigate = useNavigate()
+  const { login, isLoading } = useLoginForm()
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setFormState((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }))
+  // Handle the form submission
+  const onSubmit = async (data: LoginRequest) => {
+    clearErrors() // Clear any previous server errors
+
+    // Call the login function with the form data
+    await login(data.email, data.password, rememberMe)
   }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    setLoading(true)
-    try {
-      e.preventDefault()
-      if (!formState.email || !formState.password) {
-        return
-      }
-      // Save the remember me preference in localStorage
-      localStorage.setItem('isPersistent', String(rememberMe))
-
-      // Call the login service
-      const { data, success, message } = await authService.login({
-        email: formState.email,
-        password: formState.password,
-      })
-
-      if (!success) {
-        setError(message || 'Login failed. Please try again.')
-        throw new Error(message || 'Login failed. Please try again.')
-      }
-
-      if (!data || !data.user || !data.tokens?.accessToken) {
-        throw new Error('Invalid response from the server.')
-      }
-
-      userAuthenticatedState(data.user, data.tokens.accessToken)
-
-      setLoading(false)
-      const from =
-        (location.state as { from?: Location })?.from?.pathname || '/'
-      navigate(from, { replace: true })
-    } catch (error) {
-      const errorMessage =
-        (error as Error).message || 'An error occurred during login.'
-      throw new Error(errorMessage)
-    } finally {
-      setLoading(false)
-      setError(null)
-    }
-  }
-
-  // const handleGoogleCallback = useCallback(async () => {
-  //   const urlParams = new URLSearchParams(window.location.search)
-  //   const code: string = urlParams.get('code')!
-
-  //   if (!code) {
-  //     console.log('Authentication code does not provide!')
-  //   }
-
-  //   try {
-  //     await handleGoogleLogin(code)
-  //   } catch (error) {
-  //     console.error(
-  //       `An error while handling the google callback: ${(error as Error)?.message}`,
-  //     )
-  //   }
-  // }, [handleGoogleLogin])
-
-  // useEffect(() => {
-  //   handleGoogleCallback()
-  // }, [handleGoogleCallback])
 
   return (
     <div className="relative flex items-center justify-center min-h-screen px-4 py-12">
@@ -112,46 +60,54 @@ const Login: React.FC = () => {
             Enter your email and password to log in to your account.
           </p>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        {/* Login Form */}
+        <form
+          className="mt-8 space-y-6"
+          onSubmit={handleSubmit(onSubmit)}
+          noValidate
+        >
           <div className="space-y-5 rounded-md">
-            {error && (
-              <div className="p-4 mb-4 text-sm text-red-800 bg-red-100 rounded-lg dark:bg-red-200 dark:text-red-800">
-                {error}
-              </div>
-            )}
             <div className="relative space-y-1">
               <Label htmlFor="email">Email:</Label>
               <Input
+                {...register('email')}
                 id="email"
-                name="email"
                 type="email"
-                autoComplete="off"
-                required
-                autoFocus
+                autoComplete="email"
                 placeholder="johndoe@example.com"
-                value={formState.email}
-                onChange={(e) => handleChange(e)}
+                className={`${errors.email ? 'border-red-700' : 'border-primary focus:border-primary-500'}`}
               />
+              {errors.email && (
+                <div className="text-sm text-red-700">
+                  {errors.email.message}
+                </div>
+              )}
             </div>
             <div className="relative space-y-1">
-              <span
-                onClick={() => setVisibility(!isVisible)}
-                className="absolute transform -translate-y-1/2 cursor-pointer right-3 top-3/4"
-              >
-                {isVisible ? <PiEyeClosedThin /> : <PiEyeThin />}
-              </span>
               <Label htmlFor="password">Password:</Label>
-              <Input
-                id="password"
-                name="password"
-                type={isVisible ? 'text' : 'password'}
-                autoComplete="current-password"
-                required
-                placeholder="*********"
-                value={formState.password}
-                className="bg-card"
-                onChange={(e) => handleChange(e)}
-              />
+              <div className="relative">
+                <Input
+                  {...register('password')}
+                  id="password"
+                  type={isVisible ? 'text' : 'password'}
+                  autoComplete="current-password"
+                  placeholder="*********"
+                  className={` pr-10 ${errors.password ? 'border-red-700' : 'border-primary focus:border-primary-500'}`}
+                />
+                <button
+                  type="button"
+                  aria-label="Toggle password visibility"
+                  onClick={() => setVisibility(!isVisible)}
+                  className="absolute transform -translate-y-1/2 cursor-pointer right-3 top-1/2"
+                >
+                  {isVisible ? <PiEyeClosedThin /> : <PiEyeThin />}
+                </button>
+              </div>
+              {errors.password && (
+                <div className="text-sm text-red-600">
+                  {errors.password.message}
+                </div>
+              )}
             </div>
           </div>
 
@@ -183,11 +139,19 @@ const Login: React.FC = () => {
 
           <div>
             <Button
+              disabled={isLoading || isSubmitting}
               type="submit"
               variant={'default'}
               className="w-full bg-primary text-primary-foreground hover:bg-secondary"
             >
-              {loading ? <span>Login...</span> : 'Login'}
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Logging In...
+                </>
+              ) : (
+                'Login'
+              )}
             </Button>
           </div>
         </form>
@@ -200,7 +164,7 @@ const Login: React.FC = () => {
           <Button
             variant={'outline'}
             className="w-full"
-            onClick={directUserToGoogleConsentScreen}
+            onClick={() => directUserToGoogleConsentScreen('login')}
           >
             <FcGoogle /> Continue with Google
           </Button>
@@ -218,6 +182,7 @@ const Login: React.FC = () => {
           </p>
         </div>
       </div>
+      <Toaster />
     </div>
   )
 }

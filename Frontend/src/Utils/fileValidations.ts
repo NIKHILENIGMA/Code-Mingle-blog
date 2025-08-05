@@ -66,3 +66,6 @@ export const fileValidations = (file: File): { error: boolean; message?: string 
     return true 
 }
 
+
+
+

@@ -1,6 +1,5 @@
 import { FC } from "react";
 import DashboardHeader from "../components/DashboardHeader";
-// import FeaturePosts from "../components/FeaturePosts";
 import RecentPosts from "../components/RecentPosts";
 import Loader from "@/components/Loader/Loader";
 import { useDashboard } from "../hooks/useDashboard";
@@ -11,14 +10,14 @@ const UserDashboard: FC = () => {
   return (
     <>
       {isPending ? (
-        <Loader />
+        <Loader size={10} />
       ) : (
-        <div className="bg-background min-h-screen w-full">
+        <div className="w-full min-h-screen bg-background">
           {/* Profile Header */}
           <DashboardHeader  user={user}/>
 
           {/* Main Content */}
-          <main className="max-w-4xl mx-auto p-5">
+          <main className="max-w-4xl p-5 mx-auto">
             {/* Featured Posts */}
             {/* {user?.featurePosts && <FeaturePosts />} */}
 

@@ -39,3 +39,11 @@ export enum EApplicationEnvironment {
     DEVELOPMENT = 'development',
     PRODUCTION = 'production'
 }
+
+
+export enum EUserProvider {
+    GOOGLE = 'GOOGLE',
+    GITHUB = 'GITHUB',
+    FACEBOOK = 'FACEBOOK',
+    TWITTER = 'TWITTER'
+}

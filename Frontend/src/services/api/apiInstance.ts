@@ -21,16 +21,38 @@ declare module 'axios' {
 const API_URL = '/api'
 // Initialize accessToken to null
 let accessToken: string | null = null
+// A promise to handle token refresh requests
 let refreshTokenPromise: Promise<string> | null = null
 
 function setApiRequestToken(token: string | null): void {
   accessToken = token
 }
 
+// Create a single axios instance for API requests
 const api = axios.create({
   baseURL: API_URL,
   withCredentials: true,
+  timeout: 5000,
 })
+
+// Create a separate instance for authentication-related requests to avoid conflicts
+const authApi = axios.create({
+  baseURL: API_URL,
+  withCredentials: true,
+  timeout: 5000,
+})
+
+function handleNetworkError(error: unknown): never {
+  if (axios.isAxiosError(error)) {
+    if (error.code === 'ECONNABORTED') {
+      throw new Error('Request timeout - please check your connection')
+    }
+    if (error.code === 'ERR_NETWORK') {
+      throw new Error('Network error - please check your internet connection')
+    }
+  }
+  throw new Error(`Network error: ${(error as Error).message}`)
+}
 
 async function fetchAPI<T>(
   config: AxiosRequestConfig,
@@ -43,15 +65,28 @@ async function fetchAPI<T>(
       // If the error is an Axios error and has a response, return the error data
       return error.response.data as ApiErrorResponse
     }
-    throw new Error(`Network error: ${(error as Error).message}`)
+    handleNetworkError(error)
   }
+}
+
+async function performTokenRefresh(): Promise<string> {
+  const response = await authApi.post<
+    ApiSuccessResponse<{ accessToken: string }>
+  >(`${AUTHENTICATION_URL}/refresh-token`)
+
+  const { data, success } = response.data
+  if (!success || !data?.accessToken) {
+    throw new Error('Token refresh failed')
+  }
+
+  return data.accessToken
 }
 
 // ───────────────────────────────────────────── REQUEST INTERCEPTOR ────────────────────────────────────────────
 // This interceptor adds the access token to the request headers if it exists.
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  if (accessToken !== null) {
-    config.headers.Authorization = `Bearer ${accessToken}` // Add the access token to the request headers
+  if (accessToken) {
+    config.headers.Authorization = `Bearer ${accessToken}`
   }
 
   return config // Return the modified config
@@ -106,19 +141,7 @@ api.interceptors.response.use(
 
       // Reuse ongoing refresh token call if already started
       if (!refreshTokenPromise) {
-        refreshTokenPromise = (async () => {
-          const { data, success } = await fetchAPI<{ accessToken: string }>({
-            method: 'POST',
-            url: `${AUTHENTICATION_URL}/refresh-token`,
-          })
-
-          if (!success || !data?.accessToken) {
-            throw new Error('Failed to refresh token')
-          }
-
-          setApiRequestToken(data.accessToken) // Update the access token in the API instance
-          return data.accessToken
-        })()
+        refreshTokenPromise = performTokenRefresh()
 
         // Clear lock after resolution
         refreshTokenPromise.finally(() => {
@@ -128,7 +151,7 @@ api.interceptors.response.use(
 
       // Wait for the shared refresh promise to resolve
       const newAccessToken = await refreshTokenPromise
-
+      setApiRequestToken(newAccessToken) // Update the access token
       // Set new token on original failed request
       if (originalRequest.headers) {
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`
@@ -137,7 +160,8 @@ api.interceptors.response.use(
       // Retry the original request with the new token
       return api(originalRequest)
     } catch (refreshError) {
-      console.error('Silent refresh failed:', refreshError)
+      setApiRequestToken(null)
+      localStorage.removeItem('isPersistent')
       window.location.href = '/login'
       return Promise.reject(refreshError)
     }

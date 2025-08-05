@@ -41,28 +41,24 @@ enum PostStatus {
 
 // User model 
 model User {
-  id                   String           @id @default(cuid())
-  firstName            String?          @map("first_name")
-  lastName             String?          @map("last_name")
-  username             String           @unique @map("username")
-  email                String           @unique
-  password             String?
-  verifiedEmail        Boolean          @default(false) @map("verified_email")
-  bio                  String?          @map("bio_data")
-  profileImage         String?          @map("profile_image")
-  coverImage           String?          @map("cover_image") // Cover image URL
-  isActive             Boolean          @default(true) @map("is_active") // Is the user active?
-  lastLoginAt          DateTime?        @map("last_login_at") // Last login date
-  authProvider         String?          @map("auth_provider") // local, google, facebook, etc.
-  providerId           String?          @map("auth_provider_id") // ID from the auth provider
-  providerAccessToken  String?          @map("auth_provider_access_token") // Access token from the auth provider
-  providerRefreshToken String?          @map("auth_provider_refresh_token") // Refresh token from the auth provider
-  providerTokenExpiry  DateTime?        @map("auth_provider_token_expiry") // Expiry date of the access token
-  roleId               String?          @map("role_id") // Role ID for the user
-  socialLinks          UserSocialMedia?
-  createdAt            DateTime         @default(now())
-  updatedAt            DateTime         @updatedAt
+  id            String           @id @default(cuid())
+  firstName     String?          @map("first_name")
+  lastName      String?          @map("last_name")
+  username      String           @unique @map("username")
+  email         String           @unique
+  password      String?
+  verifiedEmail Boolean          @default(false) @map("verified_email")
+  bio           String?          @map("bio_data")
+  profileImage  String?          @map("profile_image")
+  coverImage    String?          @map("cover_image") // Cover image URL
+  isActive      Boolean          @default(true) @map("is_active") // Is the user active?
+  lastLoginAt   DateTime?        @map("last_login_at") // Last login date
+  roleId        String?          @map("role_id") // Role ID for the user
+  socialLinks   UserSocialMedia?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
 
+  userProviders      UserProvider[] // OAuth providers linked to the user
   savedPosts         SavedPost[] // Posts saved by the user
   posts              Post[] // Posts created by the user
   comments           Comment[] // Comments made by the user
@@ -75,6 +71,22 @@ model User {
   passwordResetToken PasswordResetToken[] // Password reset tokens for the user
 
   @@map("users")
+}
+
+model UserProvider {
+  id                   String    @id @default(cuid())
+  userId               String    @map("user_id")
+  provider             String    @map("provider_name") // google, github, twitter
+  providerId           String    @map("provider_id") // sub from OAuth
+  providerAccessToken  String?   @map("provider_access_token") // Access token from OAuth
+  providerRefreshToken String?   @map("provider_refresh_token") // Refresh token from OAuth
+  providerTokenExpiry  DateTime? @map("provider_token_expiry") // Expiry date of the access token
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, provider])
 }
 
 model UserSocialMedia {

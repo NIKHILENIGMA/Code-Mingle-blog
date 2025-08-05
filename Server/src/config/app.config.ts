@@ -11,6 +11,8 @@ interface IAppConfig {
     DATABASE_URL: string | undefined
 }
 
+type CookieSameSite = 'strict' | 'lax' | 'none'
+
 // Check if the environment is production
 export const isProduction: boolean = process.env.NODE_ENV === 'production'
 export const FRONTEND_URL: string = process.env.FRONTEND_URL || 'http://localhost:5173'
@@ -22,6 +24,13 @@ export const appConfig: IAppConfig = {
     SERVER_URL: process.env.SERVER_URL,
     DATABASE_URL: process.env.DATABASE_URL
 }
+
+// Cookie Configuration
+export const ACCESS_COOKIE_NAME: string = process.env.ACCESS_COOKIE_NAME || 'access_token'
+export const REFRESH_COOKIE_NAME: string = process.env.REFRESH_COOKIE_NAME || 'refresh_token'
+export const COOKIE_SAME_SITE: CookieSameSite = process.env.COOKIE_SAME_SITE as CookieSameSite || 'lax'
+export const COOKIE_SECURE: boolean = process.env.COOKIE_SECURE === 'true' || isProduction
+export const COOKIE_HTTP_ONLY: boolean = process.env.COOKIE_HTTP_ONLY === 'true' || true
 
 
 
@@ -47,7 +56,5 @@ export const PUBLIC_KEY_PATH = path.resolve(process.cwd(), process.env.PUBLIC_KE
 
 
 // Google OAuth 2.0 
-export const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || 'your-google-client-id'
-export const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_SECRET || 'your-client-secret'
-export const GOOGLE_REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI || 'http://localhost:5173/login'
+
 

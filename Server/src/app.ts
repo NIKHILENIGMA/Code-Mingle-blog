@@ -43,10 +43,10 @@ const app: Application = express()
 // Middlewares
 app.use(helmet()) // Security middleware to set various HTTP headers
 app.use(morganMiddleware) // Logging HTTP requests
+app.use(cookieParser())
 app.use(express.json({ limit: '10kb' }))
 app.use(express.urlencoded({ extended: true, limit: '10kb' }))
 app.use(express.static('public'))
-app.use(cookieParser())
 app.use(cors(corsOptions))
 
 // Routes
