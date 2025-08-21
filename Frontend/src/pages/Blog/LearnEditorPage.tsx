@@ -1,40 +1,38 @@
-import React from "react";
-import { House } from "@/Utils/Icons";
-import TiptapEditor from "@/features/editor/components/TiptapEditor/TipTapEditor";
-import { Button } from "@/components";
-import { useNavigate } from "react-router";
-import { ModeToggle } from "@/components";
+import React from 'react'
+import { House } from '@/Utils/Icons'
+import { Button } from '@/components'
+import { useNavigate } from 'react-router'
+import { ModeToggle } from '@/components'
+import { EditorRoot } from '@/features/tiptap/components/EditorRoot'
 
 interface LearnEditorPageProps {
-  title: string;
-  setEditor: (editor: string) => void;
+  title: string
+  setEditor: (editor: string) => void
 }
 
-
 const LearnEditorPage: React.FC = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
   const [editor, setEditor] = React.useState<LearnEditorPageProps>({
-    title: "",
+    title: '',
     setEditor: () => {},
-  });
+  })
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    console.log(editor);
+    console.log(editor)
 
-    setEditor((prev) => ({ ...prev, title: e.target.value }));
-  };
+    setEditor((prev) => ({ ...prev, title: e.target.value }))
+  }
   return (
     <div className="flex flex-col items-center justify-center w-full min-h-screen px-[5vw] py-10 bg-background mb-16">
       <div className="flex items-center justify-end w-full h-20 px-4 space-x-4">
         <Button
-          variant={"outline"}
-          onClick={() => navigate("/")}
+          variant={'outline'}
+          onClick={() => navigate('/')}
           className="flex items-center justify-center rounded-lg text-md"
-          >
+        >
           <House size={20} />
         </Button>
         <ModeToggle />
-        
       </div>
       <div className="flex flex-col min-h-full w-[80vw] px-52  mx-auto space-y-3  rounded-lg ">
         <div className="flex flex-col justify-start w-full mb-4 space-y-4 ">
@@ -43,23 +41,23 @@ const LearnEditorPage: React.FC = () => {
             rows={2}
             maxLength={90}
             onInput={(e) => {
-              const target = e.target as HTMLTextAreaElement;
-              target.style.height = "auto";
-              target.style.height = `${target.scrollHeight}px + 10px`;
-              target.style.scrollbarWidth = "none";
-              target.style.overflow = "hidden";
+              const target = e.target as HTMLTextAreaElement
+              target.style.height = 'auto'
+              target.style.height = `${target.scrollHeight}px + 10px`
+              target.style.scrollbarWidth = 'none'
+              target.style.overflow = 'hidden'
             }}
             onChange={(e) => handleChange(e)}
             className="px-2 text-4xl font-bold border-none shadow-none resize-none outline-hidden bg-background focus:ring-0 focus:outline-hidden "
           />
         </div>
 
-        <div className="w-full min-h-full">
-          <TiptapEditor initialContent={'<p></p>'} onContentChange={() => {}} />
+        <div className="w-full min-h-full bg-red-50">
+          <EditorRoot />
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default LearnEditorPage;
+export default LearnEditorPage
