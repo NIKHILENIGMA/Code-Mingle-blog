@@ -29,7 +29,7 @@ const UploadImage: FC<UploadImageProps> = ({ id, onLoading }) => {
   return (
     <div className="flex flex-col space-y-2 rounded-lg">
       <div
-        className="w-full h-[35vw] flex justify-center items-start border-[2px] bg-background text-muted-foreground border-dashed rounded-lg space-x-3 p-5"
+        className="w-full h-[35vw] flex justify-center items-start border-2 bg-background text-muted-foreground border-dashed rounded-lg space-x-3 p-5"
         onClick={() => selectFile.current?.click()}
       >
         <div className="flex flex-col items-center space-y-2 justify-center w-full h-full">

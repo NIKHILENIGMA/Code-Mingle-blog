@@ -233,7 +233,7 @@ const AdminUsers: FC = () => {
         </DialogContent>
       </Dialog>
 
-      <section className="rounded-lg shadow bg-card">
+      <section className="rounded-lg shadow-sm bg-card">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y rounded-lg ">
             <thead className="text-secondary-foreground bg-card">

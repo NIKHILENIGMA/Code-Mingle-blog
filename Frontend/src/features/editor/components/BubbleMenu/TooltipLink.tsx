@@ -34,7 +34,7 @@ const TooltipLink: FC<TooltipLinkProps> = ({ editor, onToggleModal }) => {
         </TooltipTrigger>
         <TooltipContent
           side="top"
-          className="z-[9999] space-x-3 bg-card border border-secondary/50"
+          className="z-9999 space-x-3 bg-card border border-secondary/50"
         >
           <div className="flex flex-col items-center space-y-1">
             <p className="text-sm font-medium text-foreground">Link</p>

@@ -7,7 +7,7 @@ import {
 import { EllipsisVertical, ScanEye } from "@/Utils/Icons";
 import { Button } from "@/components";
 import { Draft } from "../../types";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { useDraftMutations } from "../../hooks/useDraftMutations";
 import { toast } from "sonner";
 import DeleteDialog from "@/components/common/DeleteDialog";

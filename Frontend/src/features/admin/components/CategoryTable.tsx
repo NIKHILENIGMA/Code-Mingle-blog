@@ -20,7 +20,7 @@ const CategoryTable: FC<CategoryTableProps> = ({ categories }) => {
 
   return (
     <div className="mt-4">
-      <table className="w-full border shadow-sm rounded-md">
+      <table className="w-full border shadow-xs rounded-md">
         <thead className="text-muted-foreground uppercase text-sm">
           <tr>
             <th className="p-3 text-left w-10">

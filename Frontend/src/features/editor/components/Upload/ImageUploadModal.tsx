@@ -45,7 +45,7 @@ const ImageUploadModal: FC<ImageUploadModalProps> = ({
   }, [image, updateAttributes, onModalChange]);
 
   return (
-    <div className="absolute w-full top-[110%] rounded-md flex flex-col justify-center items-center space-y-4 p-5 bg-card border border-secondary/50 shadow-md backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
+    <div className="absolute w-full top-[110%] rounded-md flex flex-col justify-center items-center space-y-4 p-5 bg-card border border-secondary/50 shadow-md backdrop-blur-xs bg-opacity-90 dark:bg-opacity-90">
       <div className="w-full flex items-center justify-start space-x-4 relative">
         <Button
           variant={"secondary"}

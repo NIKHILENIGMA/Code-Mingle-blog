@@ -32,7 +32,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ size }) => {
                 autoComplete="off"
                 autoCorrect="on"
                 aria-label="Search"
-                className="border-none outline-none focus:ring focus:outline-blue-600 focus:outline-dotted"
+                className="border-none outline-hidden focus:ring-3 focus:outline-blue-600 focus:outline-dotted"
                 placeholder="Search post and creators by username ..."
               />
             </div>

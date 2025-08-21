@@ -66,7 +66,7 @@ const RenderYoutubeVideo: FC<NodeViewProps> = ({
         contentEditable={false}
       >
         {node?.attrs?.src !== "" ? (
-          <div className="relative w-full min-h-full rounded-lg shadow-sm youtube-video">
+          <div className="relative w-full min-h-full rounded-lg shadow-xs youtube-video">
             <iframe
               className="absolute inset-0 w-full h-full object-cover"
               src={node?.attrs?.src}
@@ -74,7 +74,7 @@ const RenderYoutubeVideo: FC<NodeViewProps> = ({
               allowFullScreen
             />
             {bubbleMenu && (
-              <div className="absolute z-[9999] flex flex-col top-[20%] left-0 bg-background/40 rounded-sm border-secondary/50 p-2">
+              <div className="absolute z-9999 flex flex-col top-[20%] left-0 bg-background/40 rounded-sm border-secondary/50 p-2">
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -88,7 +88,7 @@ const RenderYoutubeVideo: FC<NodeViewProps> = ({
                         <Pencil size={10} />
                       </Button>
                     </TooltipTrigger>
-                    <TooltipContent side="top" className="z-[9999]">
+                    <TooltipContent side="top" className="z-9999">
                       <p>Change Video</p>
                     </TooltipContent>
                   </Tooltip>
@@ -105,7 +105,7 @@ const RenderYoutubeVideo: FC<NodeViewProps> = ({
                         {/* {isCopy ?  : <Clipboard />} */}
                       </Button>
                     </TooltipTrigger>
-                    <TooltipContent side="top" className="z-[9999]">
+                    <TooltipContent side="top" className="z-9999">
                       <p>Copy Video URL</p>
                     </TooltipContent>
                   </Tooltip>
@@ -121,7 +121,7 @@ const RenderYoutubeVideo: FC<NodeViewProps> = ({
                         <Trash2 size={10} />
                       </Button>
                     </TooltipTrigger>
-                    <TooltipContent side="top" className="z-[9999]">
+                    <TooltipContent side="top" className="z-9999">
                       <p>Remove Video</p>
                     </TooltipContent>
                   </Tooltip>
@@ -130,7 +130,7 @@ const RenderYoutubeVideo: FC<NodeViewProps> = ({
             )}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center w-full h-[90%] overflow-hidden border-2 border-secondary rounded-lg shadow-sm px-6 py-4 transition-colors duration-200 youtube-video">
+          <div className="flex flex-col items-center justify-center w-full h-[90%] overflow-hidden border-2 border-secondary rounded-lg shadow-xs px-6 py-4 transition-colors duration-200 youtube-video">
             <div className="flex flex-col items-start justify-center w-full mb-4 space-y-2 leading-tight relative">
               <h4 className="text-xl md:text-2xl flex items-center font-bold text-muted-foreground tracking-tight space-x-2 w-full">
                 <FaYoutube size={27} color="red" />
@@ -158,7 +158,7 @@ const RenderYoutubeVideo: FC<NodeViewProps> = ({
                 placeholder="Enter youtube url here"
                 onChange={handleUrlChange}
                 autoComplete="off"
-                className={`w-full px-4 py-2 border border-primary/70 bg-card text-muted-foreground rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 ${
+                className={`w-full px-4 py-2 border border-primary/70 bg-card text-muted-foreground rounded-md shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 ${
                   error ? "border-red-500" : ""
                 }`}
               />

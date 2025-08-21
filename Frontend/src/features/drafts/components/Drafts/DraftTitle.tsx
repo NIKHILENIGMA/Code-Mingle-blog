@@ -33,7 +33,7 @@ const DraftTitle: FC<DraftTitleProps> = ({
       value={title}
       placeholder="Article Title..."
       onChange={(e) => onTitleChange(e.target.value)}
-      className="w-full resize-none text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold p-2 break-words outline-none bg-background   hide-scrollbar leading-snug"
+      className="w-full resize-none text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold p-2 break-words outline-hidden bg-background   hide-scrollbar leading-snug"
     />
   );
 };

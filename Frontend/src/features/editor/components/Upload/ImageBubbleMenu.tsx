@@ -23,7 +23,7 @@ const ImageBubbleMenu: FC<ImageBubbleMenuProps> = ({
 }) => {
   //handleImageChange
   return (
-    <div className="absolute z-[9999] top-0 right-0 space-x-2 rounded-sm border-secondary/50 p-2">
+    <div className="absolute z-9999 top-0 right-0 space-x-2 rounded-sm border-secondary/50 p-2">
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -31,7 +31,7 @@ const ImageBubbleMenu: FC<ImageBubbleMenuProps> = ({
               <Pencil size={10} />
             </Button>
           </TooltipTrigger>
-          <TooltipContent side="top" className="z-[9999]">
+          <TooltipContent side="top" className="z-9999">
             <p>Change Image</p>
           </TooltipContent>
         </Tooltip>
@@ -47,7 +47,7 @@ const ImageBubbleMenu: FC<ImageBubbleMenuProps> = ({
               {isCopy ? <ClipboardCheck /> : <Clipboard />}
             </Button>
           </TooltipTrigger>
-          <TooltipContent side="top" className="z-[9999]">
+          <TooltipContent side="top" className="z-9999">
             <p>Copy Image URL</p>
           </TooltipContent>
         </Tooltip>
@@ -63,7 +63,7 @@ const ImageBubbleMenu: FC<ImageBubbleMenuProps> = ({
               <Trash2 />
             </Button>
           </TooltipTrigger>
-          <TooltipContent side="top" className="z-[9999]">
+          <TooltipContent side="top" className="z-9999">
             <p>Remove Image</p>
           </TooltipContent>
         </Tooltip>

@@ -56,7 +56,7 @@ const UploadUnslashImage: React.FC = () => {
           type="search"
           placeholder="Search Image"
           onChange={(e) => handleSearchImage(e)}
-          className="w-full p-4 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full p-4 border border-gray-300 rounded focus:outline-hidden focus:ring-2 focus:ring-blue-500"
         />
       </div>
       <div className="w-full p-2 overflow-auto h-96">

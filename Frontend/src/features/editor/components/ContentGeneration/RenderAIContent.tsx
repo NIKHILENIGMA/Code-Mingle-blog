@@ -41,7 +41,7 @@ const RenderAIContent: FC<RenderAIContentProps> = ({
                 <BsBoxArrowDown size={15} />
               </Button>
             </TooltipTrigger>
-            <TooltipContent side="top" className="z-[9999]">
+            <TooltipContent side="top" className="z-9999">
               <p>Insert</p>
             </TooltipContent>
           </Tooltip>
@@ -58,7 +58,7 @@ const RenderAIContent: FC<RenderAIContentProps> = ({
                 {copy ? <ClipboardCheck size={15} /> : <Clipboard size={15} />}
               </Button>
             </TooltipTrigger>
-            <TooltipContent side="top" className="z-[9999]">
+            <TooltipContent side="top" className="z-9999">
               <p>Copy</p>
             </TooltipContent>
           </Tooltip>
@@ -75,7 +75,7 @@ const RenderAIContent: FC<RenderAIContentProps> = ({
                 <VscDiscard size={15} />
               </Button>
             </TooltipTrigger>
-            <TooltipContent side="top" className="z-[9999]">
+            <TooltipContent side="top" className="z-9999">
               <p>Discard</p>
             </TooltipContent>
           </Tooltip>

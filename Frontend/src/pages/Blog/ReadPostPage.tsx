@@ -1,6 +1,6 @@
 import React from "react";
 import { cards } from "@/constants/cardsContent";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import { Bookmark, Heart } from "@/Utils/Icons";
 // import CommentButton from "@/features/Blog/components/Comments/CommentButton";
 import SharePostLink from "@/features/Blog/components/Comments/SharePostLink";
@@ -21,7 +21,7 @@ const ReadPostPage: React.FC = () => {
   return (
     <div className="w-full min-h-screen p-5 mx-auto mt-20 scroll-bar-wdith">
       <div className="w-full h-full mx-auto space-x-4">
-        <div className="w-full h-[100%] px-12 py-5 shadow-sm space-y-3 ">
+        <div className="w-full h-full px-12 py-5 space-y-3 shadow-xs ">
           {/* Cover Image */}
           <div className="w-[60%] px-6 py-5 flex items-center justify-center mx-auto">
             <img
@@ -65,7 +65,7 @@ const ReadPostPage: React.FC = () => {
           </div>
 
           {/* Post Actions */}
-          <div className=" w-[40%] mx-auto h-[40%] px-2 py-3 rounded-2xl border-[1px] border-gray-200 flex justify-center sticky bottom-8 space-x-10 ">
+          <div className=" w-[40%] mx-auto h-[40%] px-2 py-3 rounded-2xl border border-gray-200 flex justify-center sticky bottom-8 space-x-10 ">
             <Button
               variant={"outline"}
               className="flex items-center gap-2"
@@ -117,7 +117,7 @@ const ReadPostPage: React.FC = () => {
         </div>
 
         {/* Post Card */}
-        {/* <div className="hidden lg:block w-[30%] h-[40%] sticky top-[13%] right-3 px-8 py-4 shadow-sm border-[1px] border-gray-200 rounded-3xl">
+        {/* <div className="hidden lg:block w-[30%] h-[40%] sticky top-[13%] right-3 px-8 py-4 shadow-xs border border-gray-200 rounded-3xl">
           <div className="w-full h-[60%] px-2">
             {postCard && (
               <div>

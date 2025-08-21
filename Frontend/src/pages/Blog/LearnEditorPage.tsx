@@ -2,8 +2,8 @@ import React from "react";
 import { House } from "@/Utils/Icons";
 import TiptapEditor from "@/features/editor/components/TiptapEditor/TipTapEditor";
 import { Button } from "@/components";
-import { useNavigate } from "react-router-dom";
-import { ModeToggle } from "@/components/DarkMode/mode-toggle";
+import { useNavigate } from "react-router";
+import { ModeToggle } from "@/components";
 
 interface LearnEditorPageProps {
   title: string;
@@ -50,7 +50,7 @@ const LearnEditorPage: React.FC = () => {
               target.style.overflow = "hidden";
             }}
             onChange={(e) => handleChange(e)}
-            className="text-4xl font-bold border-none shadow-none outline-none resize-none px-2 bg-background focus:ring-0 focus:outline-none  "
+            className="px-2 text-4xl font-bold border-none shadow-none resize-none outline-hidden bg-background focus:ring-0 focus:outline-hidden "
           />
         </div>
 

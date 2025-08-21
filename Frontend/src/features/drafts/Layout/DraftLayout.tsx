@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from "react";
 import SideBar from "../components/SideBar/SideBar";
-import { Outlet } from "react-router-dom";
+import { Outlet } from "react-router";
 import { Toaster } from "sonner";
 import {
   Button,
@@ -39,13 +39,13 @@ const DraftLayout: FC = () => {
 
   return (
     <div
-      className="flex w-full h-screen bg-background overflow-hidden relative"
+      className="relative flex w-full h-screen overflow-hidden bg-background"
       tabIndex={0} // Make the div focusable to capture key events
     >
       <SideBar sidebarOpen={expanded} />
 
       {/* Toggle Button */}
-      <div className="fixed top-4 left-4 z-50">
+      <div className="fixed z-50 top-4 left-4">
         {expanded ? (
           <TooltipProvider>
             <Tooltip>
@@ -53,14 +53,14 @@ const DraftLayout: FC = () => {
                 <Button
                   variant="outline"
                   onClick={toggleSidebar}
-                  className="fixed top-2 start-52 md:start-48 lg:start-80 border-none z-50 p-2 rounded"
+                  className="fixed z-50 p-2 border-none rounded top-2 start-52 md:start-48 lg:start-80"
                 >
                   <GoSidebarCollapse size={20} />
                 </Button>
               </TooltipTrigger>
               <TooltipContent
                 side="top"
-                className="z-[9999] space-x-3 bg-card border border-secondary/50"
+                className="space-x-3 border z-9999 bg-card border-secondary/50"
               >
                 <div className="flex flex-col items-center space-y-1">
                   <p className="text-sm font-medium text-foreground">
@@ -77,7 +77,7 @@ const DraftLayout: FC = () => {
           <Button
             variant="outline"
             onClick={toggleSidebar}
-            className="fixed top-2 left-0 sm:left-4 z-50 p-2 rounded border-none"
+            className="fixed left-0 z-50 p-2 border-none rounded top-2 sm:left-4"
           >
             <GoSidebarExpand size={20} />
           </Button>
@@ -91,7 +91,7 @@ const DraftLayout: FC = () => {
           ${expanded ? "ml-80" : "flex justify-center"}
         `}
       >
-        <div className="max-w-6xl w-full flex justify-center">
+        <div className="flex justify-center w-full max-w-6xl">
           <Outlet />
           <Toaster />
         </div>

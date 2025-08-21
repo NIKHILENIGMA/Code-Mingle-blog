@@ -1,14 +1,14 @@
 import { useState } from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink } from 'react-router'
 import { FiMenu } from 'react-icons/fi'
-import { ModeToggle } from '../../../components/DarkMode/mode-toggle'
+import { ModeToggle } from '@/components'
 import { ADMIN_SIDEBAR_LINKS } from '@/constants'
 
 const AdminSidebar = () => {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
-    <div className="flex flex-col h-screen border-primary/10 border-[2px] bg-card text-secondary-foreground">
+    <div className="flex flex-col h-screen border-2 border-primary/10 bg-card text-secondary-foreground">
       {/* Mobile Menu Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
@@ -22,7 +22,7 @@ const AdminSidebar = () => {
         className={`fixed inset-y-0 left-0 w-64 p-5 transform transition-transform duration-300 ease-in-out 
         ${
           isOpen ? 'translate-x-0' : '-translate-x-64'
-        } md:translate-x-0 md:static md:flex-shrink-0 h-full`}
+        } md:translate-x-0 md:static md:shrink-0 h-full`}
       >
         <h2 className="mb-6 text-xl font-bold text-black dark:text-white">Nodedrafts</h2>
         <ul>

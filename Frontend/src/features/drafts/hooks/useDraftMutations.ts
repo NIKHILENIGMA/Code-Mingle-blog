@@ -7,7 +7,7 @@ import {
 import queryClient from "@/Utils/queryClient";
 import { useMutation } from "@tanstack/react-query";
 import { useDraftQuery } from "./useDraftQuery";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { Draft } from "../types";
 import { useDispatch } from "react-redux";
 import { setSelectedDraft } from "../slices/draftSlice";

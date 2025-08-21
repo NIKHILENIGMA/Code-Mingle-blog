@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink } from "react-router";
 import { FileText } from "@/Utils/Icons";
 import { Draft } from "@/features/drafts/types";
 import { useDispatch } from "react-redux";
@@ -19,7 +19,7 @@ const SidebarCard: FC<DraftSideBarCardProps> = ({ draft }) => {
   return (
     <div
       key={draft.id}
-      className="space-y-2 flex p-1 border border-primary/70 rounded-md bg-card hover:bg-card/20"
+      className="flex p-1 space-y-2 border rounded-md border-primary/70 bg-card hover:bg-card/20"
     >
       <NavLink
         to={`/draft/${draft.id}`}
@@ -30,8 +30,8 @@ const SidebarCard: FC<DraftSideBarCardProps> = ({ draft }) => {
           } flex items-center truncate w-full px-1 text-nowrap overflow-hidden hover:text-primary/80 transition-colors duration-200 ease-in-out space-x-1`
         }
       >
-        <FileText size={24} className="flex-shrink-0 px-1" />
-        <span className="truncate text-clip whitespace-nowrap overflow-hidden">
+        <FileText size={24} className="px-1 shrink-0" />
+        <span className="overflow-hidden truncate text-clip whitespace-nowrap">
           {draft?.title ? draft?.title : "Untitled"}
         </span>
       </NavLink>

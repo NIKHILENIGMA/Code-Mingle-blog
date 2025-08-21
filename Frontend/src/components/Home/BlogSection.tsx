@@ -83,7 +83,7 @@ const BlogSection: FC = () => {
                 alt={post.title}
                 className="w-full h-48 object-cover"
               />
-              <div className="p-5 flex flex-col flex-grow">
+              <div className="p-5 flex flex-col grow">
                 <div className="flex items-center text-sm space-x-4 mb-2">
                   <span>{post.date}</span>
                   <span className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-600">
@@ -91,7 +91,7 @@ const BlogSection: FC = () => {
                   </span>
                 </div>
                 <h3 className="text-lg font-semibold mb-2">{post.title}</h3>
-                <p className="text-muted-foreground text-sm mb-4 flex-grow">
+                <p className="text-muted-foreground text-sm mb-4 grow">
                   {post.description}
                 </p>
                 <div className="flex items-center space-x-3 mt-auto">

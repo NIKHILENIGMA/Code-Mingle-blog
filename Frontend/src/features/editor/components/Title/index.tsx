@@ -16,7 +16,7 @@ const Title: FC = () => {
         value={title}
         placeholder="Title"
         onChange={() => setTitle(debouncedValue)}
-        className="w-full text-4xl font-bold focus:outline-none p-5 py-8 outline-none border-0 focus:border-0 focus:ring-0"
+        className="w-full text-4xl font-bold focus:outline-hidden p-5 py-8 outline-hidden border-0 focus:border-0 focus:ring-0"
       />
     </div>
   );

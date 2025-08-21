@@ -25,7 +25,7 @@ const TiptapEditor: FC<TiptapEditorProps> = ({
     editorProps: {
       attributes: {
         class:
-          "prose prose-sm sm:prose lg:prose-md xl:prose-xl mx-1 focus:outline-none prose-headings:my-2 prose-p:my-1 rounded-lg text-wrap text-pretty prose dark:prose-dark group",
+          "prose prose-sm sm:prose lg:prose-md xl:prose-xl mx-1 focus:outline-hidden prose-headings:my-2 prose-p:my-1 rounded-lg text-wrap text-pretty prose dark:prose-dark group",
         style: "min-width: 98%; min-height: 30vw;",
         "aria-label": "Rich Text Editor",
       },

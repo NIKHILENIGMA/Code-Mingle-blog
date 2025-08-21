@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams } from 'react-router'
 import { Separator } from '@/components/ui/separator'
 import { DUMMY_POSTS } from '@/constants'
 // import { usePreview } from "@/features/drafts/hooks/usePreview";

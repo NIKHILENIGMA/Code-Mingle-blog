@@ -1,11 +1,11 @@
 import { FC, useCallback, useEffect } from 'react'
 import { authService } from '../services/authApiServices'
 import { useAuthContext } from '../hooks/useAuthContext'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router'
 import { OAuthState } from '../types/authTypes'
 
 const OAuthRedirect: FC = () => {
-  const { userAuthenticatedState } = useAuthContext()
+  const { loggedIn } = useAuthContext()
   const location = useLocation()
   const navigate = useNavigate()
 
@@ -70,7 +70,7 @@ const OAuthRedirect: FC = () => {
           )
           return
         }
-        userAuthenticatedState(data.user, data.tokens.accessToken)
+        loggedIn(data.user, data.tokens.accessToken)
       } else {
         redirectToAuthPageWithError('Invalid OAuth state.')
         return
@@ -86,7 +86,7 @@ const OAuthRedirect: FC = () => {
         `Google login failed. Please try again later. ${(error as Error).message}`,
       )
     }
-  }, [navigateAfterLogin, userAuthenticatedState, redirectToAuthPageWithError])
+  }, [navigateAfterLogin, loggedIn, redirectToAuthPageWithError])
 
   useEffect(() => {
     handleGoogleCallback()
