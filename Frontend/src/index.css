@@ -1,4 +1,8 @@
-@import 'tailwindcss';
+@import "./features/tiptap/styles/editor.css" layer(base);
+@import "tailwindcss";
+
+
+@custom-variant dark (&:is(.dark *));
 
 @custom-variant dark (&:is(.dark *));
 
@@ -131,5 +135,37 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.ai-generated-text {
+  background: linear-gradient(120deg, #fef3c7 0%, #fde68a 100%);
+  padding: 8px 12px;
+  border-radius: 8px;
+  border-left: 4px solid #8e51ff00;
+  margin: 8px 0;
+  box-shadow: 0 2px 4px rgba(245, 158, 11, 0.1);
+  font-style: italic;
+  animation: aiHighlight 2s ease-in-out;
+}
+
+.ai-generated-text::before {
+  content: "✨ AI Generated: ";
+  font-weight: bold;
+  color: #92400e;
+}
+
+@keyframes aiHighlight {
+  0% {
+    background-color: #fbbf24;
+    transform: scale(1.02);
+  }
+  100% {
+    background-color: #fef3c7;
+    transform: scale(1);
+  }
+}
+
+.scrollbar::-webkit-scrollbar {
+  width: 2px;
 }
 
