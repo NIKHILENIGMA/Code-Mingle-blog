@@ -95,9 +95,9 @@ const router = createBrowserRouter([
   {
     path: '/draft',
     element: (
-      <ProtectedRoute>
+      // <ProtectedRoute>
         <DraftLayout />
-      </ProtectedRoute>
+      // </ProtectedRoute>
     ),
     children: [
       {
