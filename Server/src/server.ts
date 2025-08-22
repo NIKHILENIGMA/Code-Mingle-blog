@@ -1,7 +1,7 @@
 import app from './app'
 import { appConfig } from './config'
 import { logger } from './utils/logger/index'
-import { disconnectPrisma } from './config/prisma.config'
+import { disconnectPrisma } from './config/db.config'
 import 'module-alias/register'
 
 const server = app.listen(appConfig.PORT, () => {
