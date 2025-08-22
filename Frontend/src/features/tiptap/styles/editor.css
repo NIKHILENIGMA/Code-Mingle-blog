@@ -115,7 +115,7 @@
 
 /* Code links */
 .tiptap-Editor a {
-  @apply text-primary-foreground underline;
+  @apply text-primary underline font-medium italic;
 }
 
 /* Placeholder */
