@@ -1,36 +1,22 @@
-// src/tiptap/components/EditorRoot.tsx
-import { type FC } from "react";
-import { EditorContent } from "@tiptap/react";
-import { useEditorInstance } from "../hooks/useEditorInstance";
-import { BubbleTools } from "./BubbleTools";
-import { DragHandle } from "@tiptap/extension-drag-handle-react";
-// import { Node as ProseMirrorNode } from "prosemirror-model";
+import { type FC } from 'react'
+import { EditorContent } from '@tiptap/react'
+import { useEditorInstance } from '../hooks/useEditorInstance'
+import { BubbleTools } from './BubbleTools'
+import { DragHandle } from '@tiptap/extension-drag-handle-react'
 
 export const EditorRoot: FC = () => {
-
-  
   const { editor, isActive } = useEditorInstance({
-    placeholder: "Write something awesome...",
-  });
+    placeholder: 'Write something awesome...',
+  })
 
-  if (!editor) return null;
+  if (!editor) return null
 
   return (
-    <div className=" bg-background rounded-2xl">
+    <div className="bg-background rounded-2xl">
       {/* <Toolbar editor={editor} /> */}
       <div className="min-h-[70vh] p-6 border-none rounded-md shadow-none">
         {/* Drag handle */}
-
-        <DragHandle
-          editor={editor}
-          // onNodeChange={({ node }) => {
-          //   if (node?.type?.name !== "ai-chat-extension") {
-          //     setSelectedNode(null);
-          //   } else {
-          //     setSelectedNode(node);
-          //   }
-          // }}
-        >
+        <DragHandle editor={editor}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -56,5 +42,5 @@ export const EditorRoot: FC = () => {
       </div>
       <BubbleTools editor={editor} active={isActive} />
     </div>
-  );
-};
+  )
+}
