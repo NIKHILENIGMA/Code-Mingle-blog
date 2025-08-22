@@ -1,7 +1,7 @@
 import { ENUMS } from '@/types'
-import { Post } from '@prisma/client'
+import { Post } from '@/generated/prisma/client'
 import { DraftPreview } from '../drafts/draft.types'
-import prisma from '@/config/prisma.config'
+import prisma from '@/config/db.config'
 
 interface CreateDraftPayload {
     status: ENUMS.DRAFT_STATUS

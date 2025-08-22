@@ -1,5 +1,5 @@
-import prisma from '@/config/prisma.config'
-import { Comment } from '@prisma/client'
+import prisma from '@/config/db.config'
+import { Comment } from '@/generated/prisma/client'
 
 interface ICommentRepository {
     createComment(postId: string, userId: string, content: string): Promise<Comment>

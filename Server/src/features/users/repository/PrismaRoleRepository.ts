@@ -1,6 +1,6 @@
-import prisma from '@/config/prisma.config'
+import prisma from '@/config/db.config'
 import { DatabaseError } from '@/utils/Errors'
-import { Role } from '@prisma/client'
+import { Role } from '@/generated/prisma/client'
 
 export interface IRoleRepository {
     createRole(name: string, description?: string): Promise<Role>

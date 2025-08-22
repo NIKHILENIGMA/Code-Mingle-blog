@@ -1,5 +1,5 @@
-import prisma from '@/config/prisma.config'
-import { User, UserProvider } from '@prisma/client'
+import prisma from '@/config/db.config'
+import { User, UserProvider } from '@/generated/prisma/client'
 import { Permission, UserDTO } from '../authentication/auth.types'
 import { Dashboard } from '../profile/profile.types'
 import { DatabaseError, NotFoundError } from '@/utils/Errors'

@@ -1,6 +1,6 @@
-import prisma from '@/config/prisma.config'
+import prisma from '@/config/db.config'
 import { DatabaseError } from '@/utils/Errors'
-import { PasswordResetToken } from '@prisma/client'
+import { PasswordResetToken } from '@/generated/prisma/client'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 
 interface ResetTokenPayload {

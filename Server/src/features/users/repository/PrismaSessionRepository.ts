@@ -1,6 +1,6 @@
-import prisma from '@/config/prisma.config'
+import prisma from '@/config/db.config'
 import { DatabaseError } from '@/utils/Errors'
-import { Session } from '@prisma/client'
+import { Session } from '@/generated/prisma/client'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 
 export interface SessionPayload {

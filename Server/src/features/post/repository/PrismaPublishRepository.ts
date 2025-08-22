@@ -1,7 +1,7 @@
-import prisma from '@/config/prisma.config'
+import prisma from '@/config/db.config'
 import { ENUMS } from '@/types'
 import { DatabaseError } from '@/utils/Errors'
-import { Post } from '@prisma/client'
+import { Post } from '@/generated/prisma/client'
 import { CommunityPosts, OrderBy } from '../published/publish.types'
 
 export interface PublishPostPayload {

@@ -1,5 +1,5 @@
-import prisma from '@/config/prisma.config'
-import { SavedPost } from '@prisma/client'
+import prisma from '@/config/db.config'
+import { SavedPost } from '@/generated/prisma/client'
 
 interface ISavedPostRepository {
     getCollectionById(collectionId: string): Promise<SavedPost | null>
@@ -9,7 +9,7 @@ interface ISavedPostRepository {
 
 class PrismaCollectionRepository implements ISavedPostRepository {
     public async getCollectionById(collectionId: string): Promise<SavedPost | null> {
-        return prisma.savedPost.findFirst({
+        return prisma.savedPost.findUnique({
             where: { id: collectionId }
         })
     }

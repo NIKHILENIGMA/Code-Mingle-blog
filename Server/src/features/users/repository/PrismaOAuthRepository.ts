@@ -1,9 +1,9 @@
-import prisma from '@/config/prisma.config'
+import prisma from '@/config/db.config'
 import { EUserProvider, ROLE } from '@/types/common/enum.types'
 import { DatabaseError, InternalServerError, NotFoundError } from '@/utils/Errors'
 import { StandardError } from '@/utils/Errors/StandardError'
 import { CreateUserByGoogleOAuthPayload, Permission } from '../authentication/auth.types'
-import { User, UserProvider } from '@prisma/client'
+import { User, UserProvider } from '@/generated/prisma/client'
 import { generateUniqueUsername } from '@/utils/generateUsername'
 
 export interface OAuthRepository {

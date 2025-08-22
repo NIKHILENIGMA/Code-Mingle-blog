@@ -1,4 +1,4 @@
-import prisma from '@/config/prisma.config'
+import prisma from '@/config/db.config'
 
 export interface FollowRepository {
     followUser(userId: string, followId: string): Promise<void>

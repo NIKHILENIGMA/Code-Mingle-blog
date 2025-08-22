@@ -1,5 +1,5 @@
-import prisma from '@/config/prisma.config'
-import { Like, LikeTarget } from '@prisma/client'
+import prisma from '@/config/db.config'
+import { Like, LikeTarget } from '@/generated/prisma/client'
 
 interface ILikeRepository {
     likePost(postId: string, userId: string): Promise<Like | null>
