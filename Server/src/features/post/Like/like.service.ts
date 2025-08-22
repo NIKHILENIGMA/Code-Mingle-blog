@@ -1,4 +1,4 @@
-import prisma from '@/config/prisma.config'
+import prisma from '@/config/db.config'
 import { StandardError } from '@/utils/Errors/StandardError'
 
 type LikeWhere = {
