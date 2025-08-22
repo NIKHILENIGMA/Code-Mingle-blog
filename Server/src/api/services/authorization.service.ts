@@ -1,5 +1,5 @@
 import { NotFoundError } from '@/utils/Errors'
-import prisma from '@/config/prisma.config'
+import prisma from '@/config/db.config'
 import { FlattenedPermissions } from '@/utils/FlatPermission'
 import { PrismaCommentRepository } from '@/Lib/Repositories/PrismaRepos/PrismaCommentRepository'
 import { Action, Resource, ResourceDataMap } from '@/features/users/authentication/auth.types'
