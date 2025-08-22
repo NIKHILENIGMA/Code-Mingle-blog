@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '@/app/store/store'
 import { updateSelectedDraft } from '@/features/drafts/slices/draftSlice'
 import DraftTitle from './DraftTitle'
+import { EditorRoot } from '@/features/tiptap/components/EditorRoot'
 
 const DraftForm: FC = () => {
   const selectedDraft = useSelector(
@@ -20,7 +21,9 @@ const DraftForm: FC = () => {
           dispatch(updateSelectedDraft({ ...selectedDraft, title: newTitle }))
         }}
       />
-      <div className="flex flex-col w-full h-full p-1 mx-auto mb-16 space-y-3 rounded-lg"></div>
+      <div className="flex flex-col w-full h-full p-1 mx-auto mb-16 space-y-3 rounded-lg">
+        <EditorRoot />
+      </div>
       <div className="flex justify-center my-10 h-[34vh]"></div>
     </div>
   )

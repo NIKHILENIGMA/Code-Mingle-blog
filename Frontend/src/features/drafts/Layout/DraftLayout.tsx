@@ -1,41 +1,42 @@
-import { FC, useEffect, useState } from "react";
-import SideBar from "../components/SideBar/SideBar";
-import { Outlet } from "react-router";
-import { Toaster } from "sonner";
+import { FC, useEffect, useState } from 'react'
+import SideBar from '../components/SideBar/SideBar'
+import { Outlet } from 'react-router'
+import { Toaster } from 'sonner'
 import {
   Button,
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components";
-import { GoSidebarCollapse, GoSidebarExpand } from "react-icons/go";
+} from '@/components'
+import { GoSidebarCollapse, GoSidebarExpand } from 'react-icons/go'
+import { cn } from '@/lib/utils'
 
 const DraftLayout: FC = () => {
-  const [expanded, setExpanded] = useState<boolean>(false);
+  const [expanded, setExpanded] = useState<boolean>(false)
 
   const toggleSidebar = () => {
-    setExpanded((prev) => !prev);
-  };
+    setExpanded((prev) => !prev)
+  }
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.key.toLocaleLowerCase() === "e") {
-        e.preventDefault();
-        setExpanded((prev) => !prev); // Expand the sidebar
-      } else if (e.key === "Escape") {
-        setExpanded(false); // Collapse the sidebar
+      if (e.ctrlKey && e.key.toLocaleLowerCase() === 'e') {
+        e.preventDefault()
+        setExpanded((prev) => !prev) // Expand the sidebar
+      } else if (e.key === 'Escape') {
+        setExpanded(false) // Collapse the sidebar
       }
-    };
+    }
 
     // Add event listener for keydown events
-    addEventListener("keydown", handleKeyPress);
+    addEventListener('keydown', handleKeyPress)
 
     // Cleanup the event listener on component unmount
     return () => {
-      removeEventListener("keydown", handleKeyPress);
-    };
-  }, []);
+      removeEventListener('keydown', handleKeyPress)
+    }
+  }, [])
 
   return (
     <div
@@ -53,20 +54,20 @@ const DraftLayout: FC = () => {
                 <Button
                   variant="outline"
                   onClick={toggleSidebar}
-                  className="fixed z-50 p-2 border-none rounded top-2 start-52 md:start-48 lg:start-80"
+                  className="fixed z-50 p-2 rounded border-hidden top-2 start-52 md:start-48 lg:start-80"
                 >
                   <GoSidebarCollapse size={20} />
                 </Button>
               </TooltipTrigger>
               <TooltipContent
                 side="top"
-                className="space-x-3 border z-9999 bg-card border-secondary/50"
+                className="space-x-3 border z-9999 bg-hidden border-secondary/50"
               >
                 <div className="flex flex-col items-center space-y-1">
                   <p className="text-sm font-medium text-foreground">
                     Collapse Sidebar
                   </p>
-                  <span className="text-xs text-foreground/30">
+                  <span className="text-xs text-primary-foreground/80">
                     Ctrl + E / Escape
                   </span>
                 </div>
@@ -75,9 +76,9 @@ const DraftLayout: FC = () => {
           </TooltipProvider>
         ) : (
           <Button
-            variant="outline"
+            variant="ghost"
             onClick={toggleSidebar}
-            className="fixed left-0 z-50 p-2 border-none rounded top-2 sm:left-4"
+            className="fixed left-0 z-50 p-2 rounded bg-none border-hidden top-2 sm:left-4"
           >
             <GoSidebarExpand size={20} />
           </Button>
@@ -85,11 +86,10 @@ const DraftLayout: FC = () => {
       </div>
 
       <div
-        className={`
-          transform transition-transform duration-500 ease-in-out 
-          w-full h-full overflow-y-auto 
-          ${expanded ? "ml-80" : "flex justify-center"}
-        `}
+        className={cn(
+          'transform transition-transform duration-500 ease-in-out w-full h-full overflow-y-auto',
+          expanded ? 'ml-80' : 'flex justify-center',
+        )}
       >
         <div className="flex justify-center w-full max-w-6xl">
           <Outlet />
@@ -97,7 +97,7 @@ const DraftLayout: FC = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default DraftLayout;
+export default DraftLayout

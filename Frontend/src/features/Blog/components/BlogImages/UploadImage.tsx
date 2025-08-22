@@ -1,20 +1,14 @@
-import React, { useRef } from "react";
-import { Button, Input } from "@/components";
-import { useDispatch } from "react-redux";
-import { setCoverImage } from "../../slices/blogSlice";
+import React, { useRef } from 'react'
+import { Button, Input } from '@/components'
 
 const UploadImage: React.FC = () => {
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const dispatch = useDispatch();
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    const url = file ? URL.createObjectURL(file) : null;
+    const value = e.target.files?.[0]
+    Promise.resolve(value)
     // const trimUrl = url?.split("blob:")[1] ?? "";
-    if (url) {
-      dispatch(setCoverImage({ coverImageUrl: url }));
-    }
-  };
+  }
 
   return (
     <div className="flex items-center justify-center w-full py-2">
@@ -25,7 +19,7 @@ const UploadImage: React.FC = () => {
           ref={fileInputRef}
           placeholder="Upload Image"
           onChange={handleFile}
-          className="hidden"
+          className={`hidden`}
         />
         <Button
           onClick={() => fileInputRef.current?.click()}
@@ -36,7 +30,7 @@ const UploadImage: React.FC = () => {
         </Button>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default UploadImage;
+export default UploadImage

@@ -1,52 +1,48 @@
-import { Img, Input } from "@/components";
-import { useDebounce } from "@/hooks/useDebounce";
-import unsplashService from "@/services/unsplashApi/unsplashService";
-import React, { useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { setCoverImage } from "../../slices/blogSlice";
+import React, { useEffect } from 'react'
+import { Img, Input } from '@/components'
+import { useDebounce } from '@/hooks/useDebounce'
+import unsplashService from '@/services/unsplashApi/unsplashService'
 
 const UploadUnslashImage: React.FC = () => {
-  const [search, setSearch] = React.useState<string>("");
-  const [images, setImages] = React.useState<string[]>([]);
-  const [selectedImage, setSelectedImage] = React.useState<string>("");
+  const [search, setSearch] = React.useState<string>('')
+  const [images, setImages] = React.useState<string[]>([])
+  const [selectedImage, setSelectedImage] = React.useState<string>('')
 
-  const dispatch = useDispatch();
   const handleSearchImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     // console.log(e.target.value);
-    setSearch(e.target.value);
-  };
+    setSearch(e.target.value)
+  }
 
-  const debouncedSearch = useDebounce(search, 1000);
+  const debouncedSearch = useDebounce(search, 1000)
 
   const handleSelectImage = (image: string) => {
-    setSelectedImage(image);
-    dispatch(setCoverImage({ coverImageUrl: selectedImage }));
-  };
+    setSelectedImage(image)
+  }
 
   useEffect(() => {
     if (debouncedSearch) {
       const fetchImages = async () => {
         try {
-          const response = await unsplashService.searchPhotos(debouncedSearch);
-          console.log("Response: ", response);
+          const response = await unsplashService.searchPhotos(debouncedSearch)
+          console.log('Response: ', response)
           const urls = response.results.map(
-            (image: { urls: { full: string } }) => image.urls.full
-          );
-          setImages(urls);
+            (image: { urls: { full: string } }) => image.urls.full,
+          )
+          setImages(urls)
         } catch (error) {
-          console.log("Error: ", error);
+          console.log('Error: ', error)
         }
-      };
+      }
 
-      fetchImages();
+      fetchImages()
     } else {
-      setImages([]);
+      setImages([])
     }
 
     return () => {
-      setImages([]);
-    };
-  }, [debouncedSearch]);
+      setImages([])
+    }
+  }, [debouncedSearch])
 
   return (
     <div className="w-full min-h-full">
@@ -55,8 +51,9 @@ const UploadUnslashImage: React.FC = () => {
           id="search-img"
           type="search"
           placeholder="Search Image"
+          value={search}
           onChange={(e) => handleSearchImage(e)}
-          className="w-full p-4 border border-gray-300 rounded focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+          className={`w-full p-4 border border-gray-300 rounded focus:outline-hidden focus:ring-2 focus:ring-blue-500 ${selectedImage}`}
         />
       </div>
       <div className="w-full p-2 overflow-auto h-96">
@@ -86,7 +83,7 @@ const UploadUnslashImage: React.FC = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default UploadUnslashImage;
+export default UploadUnslashImage
