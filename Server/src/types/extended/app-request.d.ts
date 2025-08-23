@@ -1,6 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import express from 'express'
-import { UserDTO } from '@/features/users/authentication/auth.types'
+import { UserDTO } from '@/features/authentication/auth.types'
 import { FlattenedPermissions } from '@/utils/FlatPermission'
 import { Comment, Post } from '@prisma/client'
 
