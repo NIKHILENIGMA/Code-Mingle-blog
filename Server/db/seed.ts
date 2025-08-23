@@ -1,4 +1,4 @@
-import { PrismaClient, Resource, ActionType } from '../src/generated/prisma'
+import { PrismaClient, Resource, ActionType } from '../src/generated/prisma/client'
 import { logger } from '../src/utils/logger/index'
 import { PrismaPg } from '@prisma/adapter-pg';
 import { appConfig } from './../src/config/app.config';
