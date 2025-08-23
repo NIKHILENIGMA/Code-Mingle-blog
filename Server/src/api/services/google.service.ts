@@ -1,10 +1,10 @@
 import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI } from '@/config'
 import { Credentials, OAuth2Client, type TokenPayload } from 'google-auth-library'
-import { OAuthRepository } from '../../features/users/repository/PrismaOAuthRepository'
+import { OAuthRepository } from '../../features/authentication/PrismaOAuthRepository'
 import { CreateUserByGoogleOAuthPayload, Permission } from '@/features/users/authentication/auth.types'
 import { StandardError } from '@/utils/Errors/StandardError'
 import { InternalServerError, NotFoundError } from '@/utils/Errors'
-import { User } from '@prisma/client'
+import { User } from '@/generated/prisma/client'
 import { EUserProvider } from '@/types/common/enum.types'
 
 interface ITokenResponse {
