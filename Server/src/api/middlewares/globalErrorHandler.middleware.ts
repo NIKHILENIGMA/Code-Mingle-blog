@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express'
 import { REQUESTS } from '@/types'
 import { isProduction } from '@/config'
 
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const globalErrorHandler = (error: REQUESTS.THttpError, req: Request, res: Response, __: NextFunction) => {
     const statusCode = error.statusCode || 500 // Default to 500 if undefined
