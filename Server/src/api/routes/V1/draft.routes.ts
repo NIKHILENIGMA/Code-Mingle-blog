@@ -1,7 +1,7 @@
 import express from 'express'
 import { validateParams, isAuthenticated, validateBody, validateQuery } from '@/api/middlewares'
 import * as draftController from '@/features/post/drafts/draft.controller'
-import { DraftParamsSchema, DraftQuerySchema, UpdateDraftBodySchema } from '../../validators/draft.validator'
+import { DraftParamsSchema, DraftQuerySchema, UpdateDraftBodySchema } from '../../../features/draft/draft.validator'
 import { upload } from '@/api/middlewares/multer.middleware'
 
 const router = express.Router({ mergeParams: true })

@@ -6,7 +6,7 @@ import {
     makeTextShort,
     simplifiedTheText,
     translateText
-} from '@/features/artficialIntelligence/ai.controller'
+} from '@/features/openai/ai.controller'
 
 const router = Router()
 

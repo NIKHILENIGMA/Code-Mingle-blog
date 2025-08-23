@@ -9,10 +9,10 @@ import {
     getRepliesByCommentId,
     getCommentById,
     removeReply
-} from '@/features/post/comments/comment.controller'
+} from '@/features/comment/comment.controller'
 import { isAuthenticated } from '@/api/middlewares/authentication.middleware'
 import { validateBody } from '@/api/middlewares/validateSchema.middleware'
-import { addCommentSchema, commentId, queryCommentSchema, replyId } from '../../validators/comment.validator'
+import { addCommentSchema, commentId, queryCommentSchema, replyId } from '../../../features/comment/comment.validator'
 
 const router = Router({ mergeParams: true })
 
