@@ -2,7 +2,7 @@ import winston from 'winston'
 import { createTransports } from './transports'
 import { logFormats } from './formats'
 import { LOG_DIR, LOG_LEVELS } from '@/constant'
-import { isProduction } from '@/config'
+import { IS_PRODUCTION } from '@/config'
 
 /**
  * Logger class implementing the Singleton pattern for winston logger configuration
@@ -24,7 +24,7 @@ class Logger {
             Logger.instance = winston.createLogger({
                 level: process.env.LOG_LEVEL || 'info',
                 levels: LOG_LEVELS,
-                format: isProduction ? logFormats.productionFormat : logFormats.developmentFormat,
+                format: IS_PRODUCTION ? logFormats.productionFormat : logFormats.developmentFormat,
                 transports: [transports.console, transports.developmentFile, transports.errorFile, transports.combinedFile],
                 exceptionHandlers: [transports.exceptionFile],
                 rejectionHandlers: [transports.exceptionFile],
