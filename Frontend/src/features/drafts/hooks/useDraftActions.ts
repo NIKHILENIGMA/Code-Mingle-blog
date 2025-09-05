@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
 import { RootState } from "@/app/store/store";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { useDraftMutations } from "./useDraftMutations";
 
 export const useDraftActions = () => {

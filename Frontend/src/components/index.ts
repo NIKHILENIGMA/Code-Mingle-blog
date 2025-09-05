@@ -17,13 +17,6 @@ import {
 } from './ui/select'
 import { Checkbox } from './ui/checkbox'
 import { Switch } from './ui/switch'
-import { Skeleton } from './ui/skeleton'
-import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
-  TooltipProvider,
-} from './ui/tooltip'
 import {
   Command,
   CommandDialog,
@@ -72,8 +65,6 @@ import {
 } from './ui/popover'
 import {
   Sheet,
-  SheetPortal,
-  SheetOverlay,
   SheetTrigger,
   SheetClose,
   SheetContent,
@@ -82,7 +73,12 @@ import {
   SheetTitle,
   SheetDescription,
 } from './ui/sheet'
-
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip.tsx";
 import {
   Pagination,
   PaginationContent,
@@ -96,8 +92,8 @@ import Img from './common/Img'
 import Card from './common/Card'
 import DeleteDialog from './common/DeleteDialog'
 // import PrivateRoute from './common/PrivateRoute'
-import { ModeToggle } from './DarkMode/mode-toggle'
-import { useTheme, ThemeProvider } from './DarkMode/theme-provider'
+import { ModeToggle } from './Theme/mode-toggle'
+import { useTheme, ThemeProvider } from './Theme/theme-provider'
 import SideBarNotRender from './Error/SideBarNotRender'
 import Loader from './Loader/Loader'
 import SidebarLoader from './Loader/SidebarLoader'
@@ -132,7 +128,10 @@ export {
   PopoverAnchor,
   Card,
   DeleteDialog,
-  // PrivateRoute,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
   ModeToggle,
   ThemeProvider,
   useTheme,
@@ -151,11 +150,6 @@ export {
   Checkbox,
   Switch,
   Textarea,
-  Skeleton,
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
-  TooltipProvider,
   Command,
   CommandDialog,
   CommandInput,
@@ -181,8 +175,6 @@ export {
   DropdownMenuSubTrigger,
   DropdownMenuRadioGroup,
   Sheet,
-  SheetPortal,
-  SheetOverlay,
   SheetTrigger,
   SheetClose,
   SheetContent,

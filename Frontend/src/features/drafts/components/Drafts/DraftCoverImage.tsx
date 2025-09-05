@@ -42,18 +42,18 @@ const DraftCoverImage: FC<DraftCoverImageProps> = ({ id }) => {
   };
 
   return (
-    <div className="p-4 md:p-8 max-w-4xl mx-auto ">
+    <div className="max-w-4xl p-4 mx-auto md:p-8 ">
       {draftState && draftState.image !== "" && draftState.image !== null ? (
         <div className="relative">
           <img
             src={draftState?.image}
             alt="Cover Image"
-            className="w-full h-auto rounded-lg object-cover"
+            className="object-cover w-full h-auto rounded-lg"
           />
           <Button
             variant={"destructive"}
             onClick={handleRemoveCoverImage}
-            className="absolute top-2 right-2 rounded-full p-2 px-2 bg-transparent hover:bg-transparent"
+            className="absolute p-2 px-2 bg-transparent rounded-full top-2 right-2 hover:bg-transparent"
           >
             <Trash2 color="red" />
           </Button>
@@ -74,8 +74,8 @@ const DraftCoverImage: FC<DraftCoverImageProps> = ({ id }) => {
               </DialogDescription>
             </DialogHeader>
 
-            <div className=" w-full p-4 rounded-lg min-h-full space-y-2">
-              <div className="flex space-x-3 w-full p-1">
+            <div className="w-full min-h-full p-4 space-y-2 rounded-lg ">
+              <div className="flex w-full p-1 space-x-3">
                 <Button
                   variant={navigate === "upload" ? "default" : "outline"}
                   onClick={() => setNavigate("upload")}

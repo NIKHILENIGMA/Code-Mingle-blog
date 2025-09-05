@@ -1,4 +1,4 @@
-import { isProduction, appConfig } from './app.config'
+import { appConfig, IS_PRODUCTION } from './app.config'
 import {
     FILE_SIZE_LIMIT,
     FILE_UPLOAD_PATH,
@@ -17,7 +17,7 @@ import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI, GOOGLE_TOK
 
 export {
     appConfig,
-    isProduction,
+    IS_PRODUCTION,
     FILE_UPLOAD_PATH,
     FILE_SIZE_LIMIT,
     cloudinaryConfig,

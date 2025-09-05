@@ -4,7 +4,7 @@ import SideBarNewDraftButton from "./SideBarNewDraftButton";
 import SideBarDraftList from "./SideBarDraftList";
 import { ArrowLeftToLine } from "@/Utils/Icons";
 import { Separator } from "@/components/ui/separator";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { Button, Input } from "@/components";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Draft } from "../../types";
@@ -50,14 +50,14 @@ const Sidebar: FC<SidebarProps> = ({ sidebarOpen }) => {
       {/* Header */}
       <div className="space-y-2">
         <h1
-          className="text-xl font-bold mb-4 cursor-pointer"
+          className="mb-4 text-xl font-bold cursor-pointer"
           onClick={() => navigate("/")}
         >
           NODEDRAFTS
         </h1>
         <SideBarNewDraftButton />
         <Separator />
-        <div className="w-full flex items-center justify-between relative">
+        <div className="relative flex items-center justify-between w-full">
           <Input
             type="text"
             placeholder="Search Drafts"
@@ -68,7 +68,7 @@ const Sidebar: FC<SidebarProps> = ({ sidebarOpen }) => {
           {search && (
             <Button
               variant={"link"}
-              className="absolute inset-y-0 end-2 hover:no-underline p-2"
+              className="absolute inset-y-0 p-2 end-2 hover:no-underline"
               onClick={() => setSearch("")}
             >
               clear

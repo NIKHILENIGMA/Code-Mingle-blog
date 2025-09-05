@@ -1,6 +1,6 @@
 import { FC, ReactNode } from "react";
 import { useAuthContext } from "@/features/auth/hooks/useAuthContext";
-import { Navigate, useLocation } from "react-router-dom";
+import { Navigate, useLocation } from "react-router";
 
 const ProtectedRoute: FC<{ children: ReactNode }> = ({ children }) => {
   const { isAuthenticated, accessToken } = useAuthContext();

@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 import { InternalServerError, UnauthorizedError } from '@/utils/Errors'
 import { AsyncHandler, tokenManagement } from '@/utils'
 import { StandardError } from '@/utils/Errors/StandardError'
-import { sessionRepository } from '@/features/users/repository/PrismaSessionRepository'
+import { sessionRepository } from '@/api/repository/session.repository'
 
 
 

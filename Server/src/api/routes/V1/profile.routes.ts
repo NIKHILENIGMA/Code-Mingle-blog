@@ -10,7 +10,7 @@ import {
     uploadAvatar,
     uploadCoverPhoto,
     userDashboard
-} from '@/features/users/profile/profile.controller'
+} from '@/features/profile/profile.controller'
 import { isAuthenticated } from '@/api/middlewares'
 import { upload } from '@/api/middlewares/multer.middleware'
 

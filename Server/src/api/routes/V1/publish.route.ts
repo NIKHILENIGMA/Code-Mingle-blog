@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { isAuthenticated } from '@/api/middlewares'
-import { checkIsSlugAvailable, deletePublishedPost, getAllPublishedPosts, publishPost } from '@/features/post/published/publish.controller'
+import { checkIsSlugAvailable, deletePublishedPost, getAllPublishedPosts, publishPost } from '@/features/publish/publish.controller'
 
 const router = Router()
 

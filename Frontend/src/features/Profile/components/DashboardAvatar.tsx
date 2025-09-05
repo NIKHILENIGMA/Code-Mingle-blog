@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { User } from "@/Types/user";
+// import { User } from "@/Types/user";
 import DashboardAvatarChange from "./DashboardAvatarChange";
 import {
   FaFacebook,
@@ -9,7 +9,13 @@ import {
   FaReddit,
 } from "react-icons/fa6";
 import { TbWorld } from "react-icons/tb";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
+
+type User = {
+  firstName: string;
+  lastName: string;
+  avatarImg: string | null;
+}
 
 interface ProfileAvatarProps {
   user: User | null;

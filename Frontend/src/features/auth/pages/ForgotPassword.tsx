@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import { Button, Input, Label } from '@/components'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { FaArrowLeftLong } from 'react-icons/fa6'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -30,7 +30,7 @@ const ForgotPassword: FC = () => {
 
   return (
     <div className="flex items-center justify-center w-full h-screen">
-      <div className="absolute inset-0 z-[-1] bg-[linear-gradient(to_right,#f0f0f0_1px,transparent_1px),linear-gradient(to_bottom,#f0f0f0_1px,transparent_1px)] bg-[size:6rem_4rem] dark:bg-[linear-gradient(to_right,#2b2b2b_1px,transparent_1px),linear-gradient(to_bottom,#2b2b2b_1px,transparent_1px)]">
+      <div className="absolute inset-0 z-[-1] bg-[linear-gradient(to_right,#f0f0f0_1px,transparent_1px),linear-gradient(to_bottom,#f0f0f0_1px,transparent_1px)] bg-size-[6rem_4rem] dark:bg-[linear-gradient(to_right,#2b2b2b_1px,transparent_1px),linear-gradient(to_bottom,#2b2b2b_1px,transparent_1px)]">
         <div className="absolute inset-0 bg-[radial-gradient(circle_600px_at_55%_40%,#d5c5ff,transparent)] dark:bg-[radial-gradient(circle_600px_at_55%_40%,#4f388c,transparent)]"></div>
       </div>
       <div className="w-full max-w-md p-10 space-y-8 rounded-md shadow-md bg-background">

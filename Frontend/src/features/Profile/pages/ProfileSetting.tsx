@@ -1,6 +1,6 @@
 import { SETTINGS_SIDEBAR_OPTIONS } from '@/constants'
 import { FC } from 'react'
-import { NavLink, Outlet } from 'react-router-dom'
+import { NavLink, Outlet } from 'react-router'
 
 const ProfileSettings: FC = () => {
   return (

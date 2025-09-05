@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter, RouterProvider } from 'react-router'
 import HomePage from '../pages/Public/HomePage'
 import React from 'react'
 import AboutPage from '../pages/Public/AboutPage'
@@ -95,9 +95,9 @@ const router = createBrowserRouter([
   {
     path: '/draft',
     element: (
-      <ProtectedRoute>
+      // <ProtectedRoute>
         <DraftLayout />
-      </ProtectedRoute>
+      // </ProtectedRoute>
     ),
     children: [
       {

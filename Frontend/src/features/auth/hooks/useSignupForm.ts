@@ -3,7 +3,7 @@ import { authService } from '../services/authApiServices'
 import { ApiError } from '@/services/api/apiClient'
 import { toast } from 'sonner'
 import { SignupRequest } from '../types/authTypes'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 
 export const useSignupForm = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false)

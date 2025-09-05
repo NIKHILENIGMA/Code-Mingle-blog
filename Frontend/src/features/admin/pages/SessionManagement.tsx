@@ -87,7 +87,7 @@ const SessionManagement: FC = () => {
             type="text"
             placeholder="Search sessions..."
             onChange={handleSearchChange}
-            className="w-full py-2 pl-10 pr-4 border rounded-lg bg-card text-secondary-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full py-2 pl-10 pr-4 border rounded-lg bg-card text-secondary-foreground focus:outline-hidden focus:ring-2 focus:ring-primary"
           />
           <svg
             className="absolute left-3 top-2.5 h-5 w-5 text-gray-400"
@@ -185,7 +185,7 @@ const SessionManagement: FC = () => {
                       `${value.toString().slice(0, 19)}...`
                     ) : key === 'status' ? (
                       <span
-                        className={`inline-flex px-2 text-xs font-semibold leading-5 border-[1px] rounded-full ${
+                        className={`inline-flex px-2 text-xs font-semibold leading-5 border rounded-full ${
                           value === 'active'
                             ? 'text-green-800 bg-green-100 border-green-700'
                             : 'text-red-800 bg-red-100 border-red-700'

@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import { ForbiddenError, NotFoundError, UnauthorizedError } from '@/utils/Errors'
 import { authorizationService } from '../services/authorization.service'
-import { Action, Resource, RESOURCE_ID_PARAMS, ResourceDataMap } from '@/features/users/authentication/auth.types'
+import { Action, Resource, RESOURCE_ID_PARAMS, ResourceDataMap } from '@/features/authentication/auth.types'
 
 /**
  * Creates an authorization middleware that verifies user permissions for specific resource actions.
@@ -32,7 +32,7 @@ export const authorization = (resourceType: Resource, action: Action) => {
     return async (req: Request, _: Response, next: NextFunction) => {
         try {
             // Extract user ID from the authenticated request
-            const userId: string | undefined = req.user?.id
+            const userId = req.user?.id
             if (!userId) {
                 return next(new UnauthorizedError('User not authenticated.'))
             }

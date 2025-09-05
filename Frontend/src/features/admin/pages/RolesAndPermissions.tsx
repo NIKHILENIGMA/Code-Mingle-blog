@@ -20,7 +20,7 @@ const RolesAndPermissions: FC = () => {
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         {/* Example Role Card */}
 
-        <div className="p-4 shadow bg-card text-foreground rounded-xl">
+        <div className="p-4 shadow-sm bg-card text-foreground rounded-xl">
           <h3 className="text-lg font-semibold">Admin</h3>
           <p className="text-sm text-muted-foreground">
             Full access to all features and settings.

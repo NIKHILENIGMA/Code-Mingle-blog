@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { Button } from "@/components";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 const PreviewToggleDevice: FC<{
   onToggle: (device: "laptop" | "mobile") => void;

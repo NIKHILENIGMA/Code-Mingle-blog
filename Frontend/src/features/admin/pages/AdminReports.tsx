@@ -71,7 +71,7 @@ const AdminReports: FC = () => {
   const totalPages = Math.ceil(reports.length / reportsPerPage);
 
   return (
-    <div className="p-5  max-w-screen-lg mx-auto">
+    <div className="p-5  max-w-(--breakpoint-lg) mx-auto">
       <h1 className="text-2xl font-bold text-center">Reports</h1>
       <div className="mt-5 grid grid-cols-1 md:grid-cols-2 gap-4">
         {paginatedReports.map((report) => (
@@ -114,7 +114,7 @@ const AdminReports: FC = () => {
         <Button
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
           disabled={currentPage === 1}
-          className="px-4 py-2 bg-gray-300 text-gray-700 font-medium rounded-lg shadow hover:bg-gray-400 transition disabled:opacity-50"
+          className="px-4 py-2 bg-gray-300 text-gray-700 font-medium rounded-lg shadow-sm hover:bg-gray-400 transition disabled:opacity-50"
         >
           Previous
         </Button>
@@ -123,7 +123,7 @@ const AdminReports: FC = () => {
             setCurrentPage((prev) => Math.min(prev + 1, totalPages))
           }
           disabled={currentPage === totalPages}
-          className="px-4 py-2 bg-gray-300 text-gray-700 font-medium rounded-lg shadow hover:bg-gray-400 transition disabled:opacity-50"
+          className="px-4 py-2 bg-gray-300 text-gray-700 font-medium rounded-lg shadow-sm hover:bg-gray-400 transition disabled:opacity-50"
         >
           Next
         </Button>

@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { DUMMY_POSTS } from '@/constants'
 import Container from '@/container/Container'
 import { Button, Input } from '@/components'
@@ -41,7 +41,7 @@ const AllPostsPage: FC = () => {
   return (
     <Container>
       <div className="relative z-10 w-full p-4 my-16 bg-background md:p-8">
-        <div className="absolute bottom-0 left-0 right-0 top-0 -z-[1] bg-[radial-gradient(circle_300px_at_100%_200px,#d5c5ff,transparent)] sm:bg-[radial-gradient(circle_400px_at_50%_300px,#d5c5ff,transparent)] dark:bg-[radial-gradient(circle_400px_at_50%_300px,#4f388c,transparent)]"></div>
+        <div className="absolute bottom-0 left-0 right-0 top-0 -z-1 bg-[radial-gradient(circle_300px_at_100%_200px,#d5c5ff,transparent)] sm:bg-[radial-gradient(circle_400px_at_50%_300px,#d5c5ff,transparent)] dark:bg-[radial-gradient(circle_400px_at_50%_300px,#4f388c,transparent)]"></div>
         {/* Header */}
         <h1 className="mb-6 text-3xl font-bold text-center md:text-4xl">
           Explore Community Stories
@@ -80,7 +80,7 @@ const AllPostsPage: FC = () => {
               {DUMMY_POSTS.map((post: PostInterface) => (
                 <div
                   key={post.id}
-                  className="w-full p-4 bg-card space-y-4 transition rounded-lg cursor-pointer border-[1px] sm:flex md:flex-row text-muted-foreground md:p-6 md:space-y-0 md:space-x-6 hover:shadow-md border-secondary/85 "
+                  className="w-full p-4 space-y-4 transition border rounded-lg cursor-pointer bg-card sm:flex md:flex-row text-muted-foreground md:p-6 md:space-y-0 md:space-x-6 hover:shadow-md border-secondary/85 "
                   onClick={() => handleReadPost(post.id.toString())}
                 >
                   {/* Post Image */}
@@ -160,7 +160,7 @@ const AllPostsPage: FC = () => {
                 </button>
               </div>
             </div>
-            <div className="hidden md:w-[20%] md:block md:h-[80%] border-secondary/85 border shadow-sm pl-4 rounded-lg">
+            <div className="hidden md:w-[20%] md:block md:h-[80%] border-secondary/85 border shadow-xs pl-4 rounded-lg">
               <div className="h-full p-4 space-y-6 ">
                 <h3 className="font-medium text-wrap ">Top Writer ✨</h3>
                 <div className="flex items-center space-x-3 cursor-pointer">

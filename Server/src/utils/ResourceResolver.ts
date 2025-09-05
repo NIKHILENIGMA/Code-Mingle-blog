@@ -1,9 +1,17 @@
-import prisma from '@/config/prisma.config'
+import prisma from '@/config/db.config'
 
 /**
- * Object containing resolver functions for different resource types
- * @type {Object.<string, Function>}
+ * An object containing resolver functions for various resource types.
+ *
+ * Each resolver is responsible for fetching a resource by its unique identifier,
+ * except for abstract resources which do not require an ID.
+ *
+ * @property {function(string): Promise<Post|null>} POST - Resolves a Post resource by ID.
+ * @property {function(string): Promise<Comment|null>} COMMENT - Resolves a Comment resource by ID.
+ * @property {function(string): Promise<User|null>} USER - Resolves a User resource by ID.
+ * @property {function(): null} ADMIN_PANEL - Represents an abstract AdminPanel resource, always returns null.
  */
+
 export const resourceResolvers = {
     /**
      * Resolver for Post resources

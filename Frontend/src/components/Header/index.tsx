@@ -1,10 +1,10 @@
 import { createElement, FC } from 'react'
 import { useDispatch } from 'react-redux'
 import { DraftingCompass, Notebook, Pencil } from '@/Utils/Icons'
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink, useNavigate, Link } from 'react-router'
 import { NAV_LINKS, NOT_AUTHENTICATED_OPTIONS } from '@/constants'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { ModeToggle } from '../DarkMode/mode-toggle'
+import { ModeToggle } from '../Theme/mode-toggle'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,7 +18,6 @@ import { useDraftMutations } from '@/features/drafts/hooks/useDraftMutations'
 import { toast } from 'sonner'
 import { setSelectedDraft } from '@/features/drafts/slices/draftSlice'
 import { useAuthContext } from '@/features/auth/hooks/useAuthContext'
-import { Link } from 'react-router-dom'
 import { Button } from '../ui/button'
 import { authService } from '@/features/auth/services/authApiServices'
 
@@ -77,10 +76,10 @@ const Header: FC = () => {
 
   return (
     // Fixed Header Component
-    <header className="fixed top-0 left-0 z-50 w-full bg-transparent border-b shadow-sm backdrop-blur-md dark:bg-background/50 border-border/5">
+    <header className="fixed top-0 left-0 z-50 w-full bg-transparent border-b shadow-xs backdrop-blur-md dark:bg-background/50 border-border/5">
       <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 min-h-[4rem]">
-          <div className="flex-shrink-0 text-xl font-bold">NODEDRAFTS</div>
+        <div className="flex items-center justify-between h-16 min-h-16">
+          <div className="text-xl font-bold shrink-0">NODEDRAFTS</div>
 
           {/* Navigation with proper flex layout */}
           <nav className="items-center hidden space-x-6 md:flex">
@@ -111,7 +110,7 @@ const Header: FC = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
-                className="w-48 z-[60] bg-background/95 backdrop-blur-sm border shadow-lg"
+                className="w-48 border shadow-lg z-60 bg-background/95 backdrop-blur-xs"
                 side="bottom"
                 align="start"
                 sideOffset={8}
@@ -137,7 +136,7 @@ const Header: FC = () => {
           </nav>
 
           {/* Right side with consistent spacing */}
-          <div className="flex items-center flex-shrink-0 space-x-3">
+          <div className="flex items-center space-x-3 shrink-0">
             <div className="items-center hidden space-x-3 lg:flex">
               <ModeToggle />
             </div>
@@ -161,7 +160,7 @@ const Header: FC = () => {
                       </Avatar>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
-                      className="w-48 border shadow-lg bg-background/95 backdrop-blur-sm"
+                      className="w-48 border shadow-lg bg-background/95 backdrop-blur-xs"
                       side="bottom"
                       align="end"
                       sideOffset={8}
@@ -206,7 +205,7 @@ const Header: FC = () => {
                       <Button
                         key={index}
                         onClick={() => handleClick(option?.to)}
-                        variant={option?.variant}
+                        variant={'secondary'}
                         size="sm"
                       >
                         {option?.name}

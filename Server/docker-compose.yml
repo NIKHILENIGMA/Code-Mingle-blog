@@ -1,15 +1,16 @@
 services:
-    db:
-        container_name: nodedrafts_container # Set the container name
-        image: postgres:latest # Use the latest PostgreSQL image
+    database:
+        image: postgres:17 # Use PostgreSQL 17 image
+        container_name: nodedrafts_pg_container # Set the container name
         ports:
-            - '5432:5432' # Map port 5432 of the container to port 5433 on the host
+            - '${POSTGRES_PORT}:5432' # Map PostgreSQL port 
         environment:
-            POSTGRES_USER: nikhilenigma # Set the PostgreSQL user
-            POSTGRES_PASSWORD: root@123 # Set the PostgreSQL password
-            POSTGRES_DB: nodedrafts # Create a database
+            POSTGRES_USER: ${POSTGRES_USER} # Set the PostgreSQL user
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD} # Set the PostgreSQL password
+            POSTGRES_DB: ${POSTGRES_DB} # Create a database
         volumes:
-            - ./nodedrafts_data:/var/lib/postgresql/data # Mount the host directory to persist data
+            - postgres_data:/var/lib/postgresql/data # Mount the volume for persistent data
 
 volumes:
-    nodedrafts_volumes: # Define the volume for PostgreSQL data
+    postgres_data:
+        driver: local

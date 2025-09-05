@@ -23,7 +23,7 @@ import {
   removeDraftThumbnailService,
   uploadDraftThumbnailService,
 } from "@/services/api/draftApiServices";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/app/store/store";
 import { updateSelectedDraft } from "../../slices/draftSlice";
@@ -70,7 +70,7 @@ const PublishButton: React.FC = () => {
             Publish
           </Button>
         </DialogTrigger>
-        <DialogContent className=" p-10">
+        <DialogContent className="p-10 ">
           <DialogHeader>
             <DialogTitle>Published your Post</DialogTitle>
             <DialogDescription>
@@ -82,7 +82,7 @@ const PublishButton: React.FC = () => {
                 <Label htmlFor="thumbnail-image">
                   Thumbnail for the post:{" "}
                 </Label>
-                <p className="text-xs pb-2 text-left  leading-2 text-muted-foreground text-wrap">
+                <p className="pb-2 text-xs text-left leading-2 text-muted-foreground text-wrap">
                   Add an image to your post for better engagement! If you don't
                   have one, we'll use the blog cover image. Please make sure the
                   image is high-resolution and related to your post.
@@ -104,7 +104,7 @@ const PublishButton: React.FC = () => {
                       toast.error("Please wait for the upload to finish.");
                     }
                   }}
-                  className="flex items-center justify-center w-full h-64 p-2 rounded-lg  outline-dashed focus:outline-2 outline-offset-2  space-x-3"
+                  className="flex items-center justify-center w-full h-64 p-2 space-x-3 rounded-lg outline-dashed focus:outline-2 outline-offset-2"
                 >
                   {draftState && draftState?.thumbnailImage ? (
                     <div className="relative w-full h-64 p-2">
@@ -117,7 +117,7 @@ const PublishButton: React.FC = () => {
                           <img
                             src={draftState?.thumbnailImage}
                             alt="thumbnail"
-                            className="w-full h-full object-cover rounded-lg"
+                            className="object-cover w-full h-full rounded-lg"
                           />
                           <button
                             className="absolute top-2 right-2"
@@ -143,7 +143,7 @@ const PublishButton: React.FC = () => {
 
               {/* Custom Slug */}
               <div className="flex items-center space-x-2">
-                <div className="flex flex-col space-y-2 flex-grow">
+                <div className="flex flex-col space-y-2 grow">
                   <Label
                     htmlFor="slug"
                     className="text-sm font-medium text-muted-foreground"
@@ -154,7 +154,7 @@ const PublishButton: React.FC = () => {
                     id="slug"
                     type="text"
                     placeholder="Enter your custom slug"
-                    className={`"w-full bg-background text-muted-foreground border p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" ${
+                    className={`"w-full bg-background text-muted-foreground border p-2 rounded-md focus:outline-hidden focus:ring-2 focus:ring-blue-500" ${
                       isSlugValid === true
                         ? "border-green-500"
                         : isSlugValid === false
@@ -189,7 +189,7 @@ const PublishButton: React.FC = () => {
 
               {/* Add Category */}
               <div className="flex items-end space-x-2">
-                <div className="flex flex-col space-y-2 flex-grow">
+                <div className="flex flex-col space-y-2 grow">
                   <Label
                     htmlFor="category"
                     className="text-sm font-medium text-muted-foreground"

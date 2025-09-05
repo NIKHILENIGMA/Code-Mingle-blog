@@ -29,7 +29,7 @@ const Footer: FC = () => {
             <input
               type="email"
               placeholder="Enter your email"
-              className="w-full px-4 py-2 text-gray-200 placeholder-gray-400 bg-transparent border border-gray-500 rounded-l-md focus:outline-none focus:ring-1 focus:ring-yellow-500"
+              className="w-full px-4 py-2 text-gray-200 placeholder-gray-400 bg-transparent border border-gray-500 rounded-l-md focus:outline-hidden focus:ring-1 focus:ring-yellow-500"
             />
             <button
               type="submit"

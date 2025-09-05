@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { authService } from '../services/authApiServices'
 import { useAuthContext } from './useAuthContext'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router'
 import { ApiError } from '@/services/api/apiClient'
 import { toast } from 'sonner'
 

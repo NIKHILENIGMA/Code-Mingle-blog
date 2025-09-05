@@ -1,19 +1,15 @@
-import { Button, Img } from "@/components";
-import { Cross2Icon } from "@radix-ui/react-icons";
-import React from "react";
-import { useDispatch } from "react-redux";
-import { resetCoverImage } from "../../slices/blogSlice";
+import { FC } from 'react'
+import { Button, Img } from '@/components'
+import { RxCross2 } from 'react-icons/rx'
 
 interface ShowBlogCoverImageProps {
-  image: string;
+  image: string
 }
 
-const ShowBlogCoverImage: React.FC<ShowBlogCoverImageProps> = ({ image }) => {
-  const dispatch = useDispatch();
+const ShowBlogCoverImage: FC<ShowBlogCoverImageProps> = ({ image }) => {
   const handleRemoveBlogImage = () => {
-    console.log("Removing Blog Image  ");
-    dispatch(resetCoverImage());
-  };
+    console.log('Removing Blog Image  ')
+  }
   return (
     <div className="w-[55vw] h-[60vh] relative space-y-2 overflow-hidden">
       <Img
@@ -23,11 +19,11 @@ const ShowBlogCoverImage: React.FC<ShowBlogCoverImageProps> = ({ image }) => {
       />
       <div className="absolute top-0 right-2">
         <Button onClick={handleRemoveBlogImage}>
-          <Cross2Icon fontSize={18} />
+          <RxCross2 fontSize={18} />
         </Button>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ShowBlogCoverImage;
+export default ShowBlogCoverImage

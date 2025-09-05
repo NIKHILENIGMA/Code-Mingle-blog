@@ -3,7 +3,7 @@ import { Button } from "@/components";
 import { FilePlus2, ShieldAlert } from "@/Utils/Icons";
 import SpinLoader from "@/components/Loader/SpinLoader";
 import { useDraftMutations } from "../../hooks/useDraftMutations";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { useDispatch } from "react-redux";
 import { setSelectedDraft } from "../../slices/draftSlice";
@@ -55,7 +55,7 @@ const SideBarNewDraftButton: FC = () => {
         variant={"ghost"}
         size={"sm"}
         onClick={handleNewDraft}
-        className="w-full flex items-center justify-start space-x-2"
+        className="flex items-center justify-start w-full space-x-2"
       >
         {createDraftMutation.isPending ? (
           <>

@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import PreviewMockup from "@/features/drafts/components/Preview/PreviewMockup";
 import PreviewToggleDevice from "@/features/drafts/components/Preview/PreviewToggleDevice";
 import { usePreview } from "../hooks/usePreview";

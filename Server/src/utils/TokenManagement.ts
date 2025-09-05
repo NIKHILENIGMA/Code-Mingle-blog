@@ -1,6 +1,6 @@
+import { Request } from 'express'
 import fs from 'fs/promises'
 import jwt, { Algorithm, JsonWebTokenError, SignOptions, TokenExpiredError } from 'jsonwebtoken'
-import { InternalServerError, UnauthorizedError } from './Errors'
 import {
     ACCESS_TOKEN_VALIDITY_IN_SEC,
     JWT_ALGORITHM,
@@ -10,12 +10,10 @@ import {
     PUBLIC_KEY_PATH,
     REFRESH_TOKEN_VALIDITY_IN_SEC
 } from '@/config/app.config'
-
-import { Permission } from '@/features/users/authentication/auth.types'
-
-import { User } from '@prisma/client'
+import { Permission } from '@/features/authentication/auth.types'
+import { User } from '@/generated/prisma/client'
 import { flatPermissions, FlattenedPermissions } from './FlatPermission'
-import { Request } from 'express'
+import { InternalServerError, UnauthorizedError } from './Errors'
 
 interface AccessTokenPayload {
     sub: string // Subject of the token, typically user ID

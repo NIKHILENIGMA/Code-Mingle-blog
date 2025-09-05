@@ -25,7 +25,7 @@ const ProductSection: FC = () => {
           </div>
 
           {/* Placeholder for Image/Illustration */}
-          <div className="h-64 sm:h-80 md:h-96 lg:h-[30rem] bg-white rounded-lg shadow-lg overflow-hidden">
+          <div className="h-64 sm:h-80 md:h-96 lg:h-120 bg-white rounded-lg shadow-lg overflow-hidden">
             {/* Add an image or illustration here */}
             <video
               src="https://cdn.pixabay.com/video/2019/07/08/25059-347958040_large.mp4"

@@ -1,5 +1,5 @@
 import { format } from 'winston'
-import { isProduction } from '@/config'
+import { IS_PRODUCTION } from '@/config'
 import { FORMAT_TIMESTAMP } from '@/constant'
 
 /**
@@ -32,9 +32,9 @@ export const logFormats = {
                 timestamp,
                 level: level.toLocaleUpperCase(),
                 message,
-                stack: !isProduction ? stack : undefined,
+                stack: !IS_PRODUCTION ? stack : undefined,
                 ...meta,
-                environment: !isProduction ? 'development' : '',
+                environment: !IS_PRODUCTION ? 'development' : '',
                 service: process.env.SERVICE_NAME || 'api-service'
             },
             null,

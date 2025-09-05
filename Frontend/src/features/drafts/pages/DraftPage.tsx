@@ -1,6 +1,6 @@
 import { FC, useEffect } from "react";
 import { DraftActions, DraftForm } from "@/features/Blog/components";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import DraftCoverImage from "@/features/drafts/components/Drafts/DraftCoverImage";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedDraft } from "../slices/draftSlice";
