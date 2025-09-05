@@ -1,5 +1,5 @@
 import { StandardError } from '@/utils/Errors/StandardError'
-import { ISessionRepository, SessionPayload, sessionRepository } from '../../features/authentication/PrismaSessionRepository'
+import { ISessionRepository, SessionPayload, sessionRepository } from '@/api/repository/session.repository'
 import { BadRequestError, DatabaseError, InternalServerError, NotFoundError } from '@/utils/Errors'
 import { Session } from '@/generated/prisma/client'
 
