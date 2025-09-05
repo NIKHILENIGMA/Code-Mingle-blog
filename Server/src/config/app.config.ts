@@ -14,7 +14,8 @@ interface IAppConfig {
 type CookieSameSite = 'strict' | 'lax' | 'none'
 
 // Check if the environment is production
-export const isProduction: boolean = process.env.NODE_ENV === 'production'
+export const IS_PRODUCTION: boolean = process.env.NODE_ENV === 'production'
+export const IS_DEVELOPMENT: boolean = process.env.NODE_ENV === 'development'
 export const FRONTEND_URL: string = process.env.FRONTEND_URL || 'http://localhost:5173'
 
 // Check if the environment is development
@@ -29,7 +30,7 @@ export const appConfig: IAppConfig = {
 export const ACCESS_COOKIE_NAME: string = process.env.ACCESS_COOKIE_NAME || 'access_token'
 export const REFRESH_COOKIE_NAME: string = process.env.REFRESH_COOKIE_NAME || 'refresh_token'
 export const COOKIE_SAME_SITE: CookieSameSite = process.env.COOKIE_SAME_SITE as CookieSameSite || 'lax'
-export const COOKIE_SECURE: boolean = process.env.COOKIE_SECURE === 'true' || isProduction
+export const COOKIE_SECURE: boolean = process.env.COOKIE_SECURE === 'true' || IS_PRODUCTION
 export const COOKIE_HTTP_ONLY: boolean = process.env.COOKIE_HTTP_ONLY === 'true' || true
 
 
@@ -55,6 +56,6 @@ export const PRIVATE_KEY_PATH = path.resolve(process.cwd(), process.env.PRIVATE_
 export const PUBLIC_KEY_PATH = path.resolve(process.cwd(), process.env.PUBLIC_KEY_PATH || './keys/public.pem')
 
 
-// Google OAuth 2.0 
+
 
 
