@@ -6,6 +6,6 @@ export default defineConfig({
     schema: path.join('db', 'schema.prisma'),
     migrations: {
         path: path.join('db', 'migrations'),
-        seed: 'tsx db/seed.ts'
+        seed: 'ts-node-dev --respawn --transpile-only -r tsconfig-paths/register db/seed.ts'
     }
 })
