@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import { REQUESTS } from '@/types'
-import { isProduction } from '@/config'
+import { IS_PRODUCTION } from '@/config/app.config'
 
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -22,7 +22,7 @@ const globalErrorHandler = (error: REQUESTS.THttpError, req: Request, res: Respo
                 url: req.url
             },
             data: null,
-            trace: !isProduction ? { error: error.stack } : null
+            trace: !IS_PRODUCTION ? { error: error.stack } : null
         })
         return
     }
@@ -38,7 +38,7 @@ const globalErrorHandler = (error: REQUESTS.THttpError, req: Request, res: Respo
             },
             message: error instanceof Error ? error.message : 'Internal server error',
             data: null,
-            trace: !isProduction ? { error: error.stack } : null
+            trace: !IS_PRODUCTION ? { error: error.stack } : null
         }
 
         res.status(500).json(defaultError)
@@ -55,8 +55,8 @@ const globalErrorHandler = (error: REQUESTS.THttpError, req: Request, res: Respo
             url: req.url
         },
         data: null,
-        trace: !isProduction ? { error: error.stack } : null,
-        stack: isProduction ? undefined : stack
+        trace: !IS_PRODUCTION ? { error: error.stack } : null,
+        stack: IS_PRODUCTION ? undefined : stack
     })
 }
 
