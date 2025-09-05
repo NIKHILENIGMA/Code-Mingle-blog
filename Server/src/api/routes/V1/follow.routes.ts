@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { followUser, getFollowers, unfollowUser, getFollowing, getFollowStatus } from '@/features/users/followSystem/follow.controller'
+import { followUser, getFollowers, unfollowUser, getFollowing, getFollowStatus } from '@/features/follow/follow.controller'
 import { isAuthenticated, validateBody, validateParams, validateQuery } from '@/api/middlewares'
 import { followSchema, getFollowersSchema, getFollowingSchema, getFollowStatusSchema, unfollowSchema } from '../../../features/follow/follow.validator'
 

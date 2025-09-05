@@ -1,6 +1,6 @@
 import express from 'express'
 import { validateParams, isAuthenticated, validateBody, validateQuery } from '@/api/middlewares'
-import * as draftController from '@/features/post/drafts/draft.controller'
+import * as draftController from '@/features/draft/draft.controller'
 import { DraftParamsSchema, DraftQuerySchema, UpdateDraftBodySchema } from '../../../features/draft/draft.validator'
 import { upload } from '@/api/middlewares/multer.middleware'
 

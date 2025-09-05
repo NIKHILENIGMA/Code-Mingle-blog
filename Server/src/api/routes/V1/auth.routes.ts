@@ -1,6 +1,6 @@
 // Auth routes for handling user authentication and authorization.
 import { Router } from 'express'
-import { changeUserPassword, currentUser, forgotPassword, googleLoginCallback, googleSignUpCallback, login, logout, refreshAccessToken, resetPassword, signup } from '@/features/users/authentication/auth.controller'
+import { changeUserPassword, currentUser, forgotPassword, googleLoginCallback, googleSignUpCallback, login, logout, refreshAccessToken, resetPassword, signup } from '@/features/authentication/auth.controller'
 import { isAuthenticated } from '@/api/middlewares'
 
 // Create a new router instance
