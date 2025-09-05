@@ -2,10 +2,10 @@ import { Request, Response } from 'express'
 import { ApiResponse, AsyncHandler, entitiesValidation } from '@/utils'
 import profileServices from './profile.service'
 import { CloundinaryOption } from '@/types/common/base.types'
-import { uploadService } from '../../../api/services/upload.service'
+import { uploadService } from '@/api/services/upload.service'
 import { DatabaseError, InternalServerError, UnauthorizedError } from '@/utils/Errors'
 import { ProfileChangePasswordCredentials, UpdateProfileCredentials } from './profile.types'
-import { ProfileChangePasswordSchema, ProfileUpdateBodySchema } from '@/api'
+import { ProfileChangePasswordSchema, ProfileUpdateBodySchema } from './profile.validator'
 
 
 export const updateUserDetails = AsyncHandler(async (req: Request, res: Response) => {

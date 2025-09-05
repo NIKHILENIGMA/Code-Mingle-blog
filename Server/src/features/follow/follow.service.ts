@@ -2,7 +2,7 @@ import prisma from '@/config/db.config'
 import { StandardError } from '@/utils/Errors/StandardError'
 import { InternalServerError } from '@/utils/Errors'
 import { FollowDTO } from './follow.types'
-import { FollowRepository, PrismaFollowRepository } from './PrismaFollowRepository'
+import { FollowRepository, PrismaFollowRepository } from './follow.repository'
 
 class FollowService {
     constructor(private followRepository: FollowRepository) {

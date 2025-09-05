@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { PublishBodySchema } from '@/api'
+import { PublishBodySchema } from './publish.validator'
 import { ThumbnailFileSchema } from '@/features/publish/publish.validator'
 
 export type PublishPayload = z.infer<typeof PublishBodySchema>

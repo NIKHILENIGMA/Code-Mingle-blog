@@ -1,4 +1,4 @@
-import { IUserRepository, PrismaUserRepository } from '@/features/authentication/PrismaUserRepository'
+import { IUserRepository, PrismaUserRepository } from '@/api/repository/user.repository'
 import { StandardError } from '@/utils/Errors/StandardError'
 import { BadRequestError, DatabaseError, InternalServerError } from '@/utils/Errors'
 import { Dashboard, ProfileChangePasswordCredentials, UpdateProfileCredentials } from './profile.types'

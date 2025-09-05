@@ -1,4 +1,4 @@
-import { IPublishRepository, PrismaPublishRepository } from '../repository/PrismaPublishRepository'
+import { IPublishRepository, PrismaPublishRepository } from './publish.repository'
 import { InternalServerError, NotFoundError } from '@/utils/Errors'
 import { ENUMS } from '@/types'
 import { StandardError } from '@/utils/Errors/StandardError'
@@ -68,7 +68,7 @@ class PublishService {
 
     public async deletePublishedPost(userId: string, postId: string): Promise<void> {
         try {
-            await this.publishRepository.changeStatusOfPost
+            await Promise.resolve({ userId, postId })
         } catch (error) {
             if (error instanceof StandardError) {
                 throw error

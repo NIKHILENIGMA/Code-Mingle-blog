@@ -1,7 +1,7 @@
 import { User, UserProvider } from '@/generated/prisma/client'
-import { PrismaUserRepository } from './PrismaUserRepository'
-import { PrismaRoleRepository } from './PrismaRoleRepository'
-import { PrismaResetPasswordRepository } from './PrismaResetPasswordRepository'
+import { PrismaUserRepository } from '@/api/repository/user.repository'
+import { PrismaRoleRepository } from '@/api/repository/role.repository'
+import { PrismaResetPasswordRepository } from '@/api/repository/reset.repository'
 
 import { comparePassword, hashedPassword } from '@/utils/HashPassword'
 import { generateUniqueUsername } from '@/utils/generateUsername'
@@ -369,8 +369,6 @@ export class AuthService {
             )
         }
     }
-
-    
 }
 
 /** Singleton instance of AuthService for application-wide use */

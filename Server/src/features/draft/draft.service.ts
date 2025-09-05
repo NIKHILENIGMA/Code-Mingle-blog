@@ -1,5 +1,5 @@
-import { Post } from '@prisma/client'
-import PrismaDraftRepository, { IDraftRepository } from '@/features/publish/post/repository/PrismaDraftRepository'
+import { Post } from '@/generated/prisma/client'
+import PrismaDraftRepository, { IDraftRepository } from './draft.repository'
 import { ENUMS } from '@/types'
 import { DraftPreview, DraftUpdateFields } from './draft.types'
 import { DatabaseError, InternalServerError } from '@/utils/Errors'

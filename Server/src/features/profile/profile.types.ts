@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { ProfileChangePasswordSchema, ProfileUpdateBodySchema } from '@/api'
+import { ProfileChangePasswordSchema, ProfileUpdateBodySchema } from './profile.validator'
 
 export interface Dashboard {
     id: string

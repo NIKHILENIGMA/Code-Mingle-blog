@@ -1,6 +1,6 @@
 // This file contains the types for the authentication feature
 import { z } from 'zod'
-import { forgotPasswordSchema, loginSchema, resetPasswordSchema, signupSchema } from '@/api'
+import { forgotPasswordSchema, loginSchema, resetPasswordSchema, signupSchema } from './auth.validator'
 import { Post, User, Comment, ActionType } from '@/generated/prisma/client'
 import { changePassword } from '@/features/authentication/auth.validator'
 /**

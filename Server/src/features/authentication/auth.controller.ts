@@ -10,14 +10,14 @@ import {
     OAuthProvider,
     CreateUserByGoogleOAuthPayload
 } from './auth.types'
-import { forgotPasswordSchema, resetPasswordSchema, signupSchema } from '@/api/validators'
+import { forgotPasswordSchema, resetPasswordSchema, signupSchema } from './auth.validator'
 import { ApiResponse, AsyncHandler, entitiesValidation, tokenManagement } from '@/utils'
 import { BadRequestError, ConflictError, DatabaseError, ForbiddenError, NotFoundError, UnauthorizedError } from '@/utils/Errors'
 import { ENUMS } from '@/types'
 import {
     ACCESS_COOKIE_NAME,
     ACCESS_TOKEN_VALIDITY_IN_SEC,
-    isProduction,
+    IS_PRODUCTION,
     REFRESH_COOKIE_NAME,
     REFRESH_TOKEN_VALIDITY_IN_SEC
 } from '@/config/app.config'
@@ -61,6 +61,10 @@ import { EUserProvider } from '@/types/common/enum.types'
 export const signup = AsyncHandler(async (req: Request, res: Response): Promise<void> => {
     // Extract the user credentials from the request body
     const signupCredientials = req.body as SignupCredientials
+
+    const hostname = req.headers.host
+
+    logger.info(`Signup request received from host: ${hostname}`)
 
     // Validate the request body against the signup schema
     const credientials = entitiesValidation<SignupCredientials>(signupSchema, signupCredientials)
@@ -139,12 +143,12 @@ export const login = AsyncHandler(async (req: Request, res: Response): Promise<v
     // Set the tokens in the cookies
     res.cookie(ACCESS_COOKIE_NAME, accessToken, {
         httpOnly: true,
-        secure: !isProduction,
+        secure: !IS_PRODUCTION,
         sameSite: 'strict',
         maxAge: 1000 * ACCESS_TOKEN_VALIDITY_IN_SEC
     }).cookie(REFRESH_COOKIE_NAME, refreshToken, {
         httpOnly: true,
-        secure: !isProduction,
+        secure: !IS_PRODUCTION,
         sameSite: 'strict',
         maxAge: 1000 * REFRESH_TOKEN_VALIDITY_IN_SEC
     })
@@ -279,12 +283,12 @@ export const refreshAccessToken = AsyncHandler(async (req: Request, res: Respons
     // Set the new tokens in the cookies
     res.cookie('access_token', newAccessToken, {
         httpOnly: true,
-        secure: !isProduction,
+        secure: !IS_PRODUCTION,
         sameSite: 'strict',
         maxAge: 1000 * ACCESS_TOKEN_VALIDITY_IN_SEC
     }).cookie('refresh_token', newRefreshToken, {
         httpOnly: true,
-        secure: !isProduction,
+        secure: !IS_PRODUCTION,
         sameSite: 'strict',
         maxAge: 1000 * REFRESH_TOKEN_VALIDITY_IN_SEC
     })
@@ -492,12 +496,12 @@ export const googleSignUpCallback = AsyncHandler(async (req: Request, res: Respo
     // Set the tokens in the cookies
     res.cookie(ACCESS_COOKIE_NAME, accessToken, {
         httpOnly: true,
-        secure: !isProduction,
+        secure: !IS_PRODUCTION,
         sameSite: 'strict',
         maxAge: 1000 * ACCESS_TOKEN_VALIDITY_IN_SEC
     }).cookie(REFRESH_COOKIE_NAME, refreshToken, {
         httpOnly: true,
-        secure: !isProduction,
+        secure: !IS_PRODUCTION,
         sameSite: 'strict',
         maxAge: 1000 * REFRESH_TOKEN_VALIDITY_IN_SEC
     })
@@ -603,12 +607,12 @@ export const googleLoginCallback = AsyncHandler(async (req: Request, res: Respon
     // Set the tokens in the cookies
     res.cookie(ACCESS_COOKIE_NAME, accessToken, {
         httpOnly: true,
-        secure: !isProduction,
+        secure: !IS_PRODUCTION,
         sameSite: 'strict',
         maxAge: 1000 * ACCESS_TOKEN_VALIDITY_IN_SEC
     }).cookie(REFRESH_COOKIE_NAME, refreshToken, {
         httpOnly: true,
-        secure: !isProduction,
+        secure: !IS_PRODUCTION,
         sameSite: 'strict',
         maxAge: 1000 * REFRESH_TOKEN_VALIDITY_IN_SEC
     })

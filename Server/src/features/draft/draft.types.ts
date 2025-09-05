@@ -1,5 +1,5 @@
-import { UpdateDraftBodySchema } from '@/api'
 import { z } from 'zod'
+import { UpdateDraftBodySchema } from './draft.validator'
 
 export type DraftUpdateFields = z.infer<typeof UpdateDraftBodySchema>
 

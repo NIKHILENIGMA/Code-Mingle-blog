@@ -1,13 +1,13 @@
 import { Request, Response } from 'express'
 import { AsyncHandler, ApiResponse, entitiesValidation } from '@/utils'
-import { Post } from '@prisma/client'
+import { Post } from '@/generated/prisma/client'
 import { uploadService } from '@/api/services/upload.service'
 import { CloundinaryOption } from '@/types/common/base.types'
 import { ENUMS } from '@/types'
 import { BadRequestError, DatabaseError, InternalServerError, NotFoundError, UnauthorizedError } from '@/utils/Errors'
 import draftService from './draft.service'
 import { DraftUpdateFields } from './draft.types'
-import { UpdateDraftBodySchema } from '@/api'
+import { UpdateDraftBodySchema } from './draft.validator'
 export const createDraft = AsyncHandler(async (req: Request, res: Response): Promise<void> => {
     // Get draft
     const userId: string | undefined = req.user?.id
